@@ -7,18 +7,17 @@ import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import { useAuth } from "@/context/AuthContext";
 import {
-  HomeIcon,
+ 
   UserPlusIcon,
   UsersIcon,
   BookOpenIcon,
   UserGroupIcon,
   ChartBarSquareIcon,
-  DocumentTextIcon,
-  ClipboardDocumentListIcon,
+ 
   Bars3Icon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
-import { Home, BookOpen,CalendarDays,Cog, Users, Upload, UserRoundSearch,FileText, Shield } from "lucide-react";
+import { Home, BookOpen, BookOpenText,BookOpenCheck,CalendarDays,Cog, Users, Upload, UserRoundSearch,FileText, Shield } from "lucide-react";
 import { branding } from "@/config/branding";
 import type { SVGProps } from "react";
 
@@ -56,13 +55,13 @@ const menuItems: MenuItem[] = [
   },
     {
     name: "Units",
-    icon: BookOpenIcon,
+    icon: BookOpenText,
     href: "/coordinator/unit-templates",
     roles: ["admin", "coordinator"],
   },
   {
     name: "Curriculum",
-    icon: BookOpenIcon,
+    icon: BookOpenCheck,
     href: "/coordinator/units",
     roles: ["admin", "coordinator"],
   },
