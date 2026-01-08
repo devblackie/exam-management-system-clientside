@@ -1,15 +1,49 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
-  --background: #ffffff;
+  --hover-background: #7cf778;
   --foreground: #171717;
+
+
+    /* 🎨 New Colors */
+  --green-dark: #156504;
+  --green-darkest: #0e2509;
+  --yellow-gold: #cfba29;
+  --lime-bright: #cbd000;
+  --green-base: #008000;
+  --white-pure: #ffffff;
 }
 
+/* 🎨 Tell Tailwind about your theme */
 @theme inline {
-  --color-background: var(--background);
+  --color-hover-background: var(--hover-background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  
+
+  --color-green-dark: var(--green-dark);
+  --color-green-darkest: var(--green-darkest);
+  --color-yellow-gold: var(--yellow-gold);
+  --color-lime-bright: var(--lime-bright);
+  --color-green-base: var(--green-base);
+  --color-white-pure: var(--white-pure);
+
+  --font-sans: ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, monospace;
+}
+
+@theme {
+  @keyframes spinLateral {
+    0% {
+      transform: rotateY(0deg);
+    }
+    100% {
+      transform: rotateY(360deg);
+    }
+  }
+
+  --animate-spinLateral: spinLateral 5s linear infinite;
 }
 
 @media (prefers-color-scheme: dark) {
