@@ -107,7 +107,7 @@ export default function StudentSearchPage() {
   };
 
   return (
-    <div className=" max-w-6xl h-full ml-48  my-10">
+    <div className=" max-w-8xl ml-48  my-10">
       <div className="bg-white rounded-3xl shadow-2xl p-10 min-h-screen">
         {/* ... header and search bar ... */}
         <div className=" rounded-lg shadow-md border border-green-dark/20 p-4 mb-4">

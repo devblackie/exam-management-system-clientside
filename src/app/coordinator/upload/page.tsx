@@ -427,10 +427,10 @@ import { useState, useMemo, useEffect } from "react";
 import { uploadMarks, downloadTemplate } from "@/api/marksApi";
 import { useToast } from "@/context/ToastContext";
 import { branding } from "@/config/branding";
-import { getPrograms } from "@/api/programsApi"; // 👈 New Import
-import { getAcademicYears } from "@/api/academicYearsApi"; // 👈 New Import
-import { getProgramUnits } from "@/api/programUnitsApi"; // 👈 New Import
-import type { Program, AcademicYear, ProgramUnit } from "@/api/types"; // 👈 New Import (Assuming you define types here)
+import { getPrograms } from "@/api/programsApi";
+import { getAcademicYears } from "@/api/academicYearsApi"; 
+import { getProgramUnits } from "@/api/programUnitsApi"; 
+import type { Program, AcademicYear, ProgramUnit } from "@/api/types"; 
 
 interface UploadResult {
   message: string;
@@ -619,7 +619,7 @@ export default function UploadMarks() {
   };
 
   return (
-    <div className="max-w-6xl ml-48  my-10 ">
+    <div className="max-w-8xl ml-48  my-10 ">
       <div className="bg-white max-w-full min-h-screen rounded-3xl shadow-2xl p-10">
         <div className=" rounded-lg shadow-md border border-green-dark/20 p-4 ">
           <h1 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r  from-green-darkest to-green-dark">
@@ -719,20 +719,7 @@ export default function UploadMarks() {
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Unit
             </label>
-            {/* <select
-                            value={selectedUnitId}
-                            onChange={(e) => setSelectedUnitId(e.target.value)}
-                            disabled={!selectedProgramId || !selectedYearOfStudy || !selectedSemester}
-                            className={`w-full p-2 border rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 ${(!selectedProgramId || !selectedYearOfStudy || !selectedSemester) ? 'bg-gray-200 cursor-not-allowed' : 'border-gray-300'}`}
-                        >
-                            <option value="">Select Unit</option>
-                            {filteredProgramUnits.map(pu => (
-                                <option key={pu._id} value={pu.unitId}>
-                                   
-                                    {pu.unit.code} - {pu.unit.name} 
-                                </option>
-                            ))}
-                        </select> */}
+          
             <select
               value={selectedUnitId}
               onChange={(e) => setSelectedUnitId(e.target.value)}
