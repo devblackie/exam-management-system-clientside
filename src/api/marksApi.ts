@@ -1,4 +1,4 @@
-// src/api/marksApi.ts
+// clientside/src/api/marksApi.ts
 import axiosInstance from "@/config/axiosInstance";
 import api from "@/config/axiosInstance";
 
@@ -23,24 +23,6 @@ export async function uploadMarks(file: File): Promise<UploadResult> {
   return res.data;
 }
 
-/**
- * Download the official marks upload template
- */
-// export async function downloadTemplate() {
-//   const res = await api.get("/marks/template", {
-//     responseType: "blob", // This tells Axios to return Blob
-//   });
-
-//   // Fixed: res.data is Blob now
-//   const url = window.URL.createObjectURL(res.data as Blob);
-//   const link = document.createElement("a");
-//   link.href = url;
-//   link.setAttribute("download", "marks-upload-template.csv");
-//   document.body.appendChild(link);
-//   link.click();
-//   link.remove();
-//   window.URL.revokeObjectURL(url); // Clean up
-// }
 
 export const downloadTemplate = async (
     programId: string,
@@ -71,12 +53,30 @@ export const downloadTemplate = async (
             responseType: 'blob', // Important for downloading files
         });
 
+      // --- EXTRACT FILENAME FROM HEADER ---
+        let fileName = "scoresheet-template.xlsx";
+        const contentDisposition = response.headers['content-disposition'];
+        
+      if (contentDisposition) {
+    // This regex looks for filename= and captures everything up to .xlsx
+    // It ignores any trailing quotes or semicolon garbage
+    const fileNameMatch = contentDisposition.match(/filename="?(.+?)"?$/);
+    if (fileNameMatch?.[1]) {
+        fileName = fileNameMatch[1];
+
+        // 2. Safety Net: If it ends in .xlsx_ or just has a trailing _, clean it
+        fileName = fileName
+            .replace(/_+$/, '')      // Remove underscores at the very end
+            .replace(/\.xlsx_$/, '.xlsx') // Specifically fix .xlsx_
+            .trim();
+    }
+}
         // Create a blob URL and trigger download (Standard pattern for file download)
         // const url = window.URL.createObjectURL(new Blob([response.data]));
         const url = window.URL.createObjectURL(response.data as Blob);
         const link = document.createElement('a');
         link.href = url;
-        link.setAttribute('download', 'marks-scoresheet-template.csv'); 
+        link.setAttribute('download', fileName); // Use extracted filename here'); 
         document.body.appendChild(link);
         link.click();
         link.remove();
