@@ -527,9 +527,7 @@ export default function UploadMarks() {
 
   // -----------------------------------------------------
   // Handlers
-  // -----------------------------------------------------
-
-  // **FIX FOR TYPE ERROR & ARGUMENTS**
+ 
   const handleDownloadTemplate = async () => {
     // Use the state variables for the required parameters
     if (!isDownloadEnabled) {
@@ -636,17 +634,17 @@ export default function UploadMarks() {
         <div className="mt-8 grid grid-cols-2 md:grid-cols-5 gap-4 p-4 bg-gray-50 rounded-xl border border-gray-200">
           {/* 1. Program Select */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-green-darkest mb-1">
               Program
             </label>
             <select
               value={selectedProgramId}
               onChange={(e) => setSelectedProgramId(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500"
+              className="w-full p-2 border border-gray-300 rounded-lg text-green-darkest/40 shadow-sm focus:ring-green-500 focus:border-green-500"
             >
-              <option value="">Select Program</option>
+              <option value="" >Select Program</option>
               {programs.map((p) => (
-                <option key={p._id} value={p._id}>
+                <option key={p._id} value={p._id} className="text-green-darkest text-sm">
                   {p.code} - {p.name}
                 </option>
               ))}
@@ -661,7 +659,7 @@ export default function UploadMarks() {
             <select
               value={selectedAcademicYearId}
               onChange={(e) => setSelectedAcademicYearId(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500"
+              className="w-full p-2 border border-gray-300 text-green-darkest/40 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500"
             >
               <option value="">Select Year</option>
               {academicYears.map((y) => (
@@ -682,7 +680,7 @@ export default function UploadMarks() {
               onChange={(e) =>
                 setSelectedYearOfStudy(parseInt(e.target.value) || undefined)
               }
-              className="w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500"
+              className="w-full p-2 border border-gray-300  text-green-darkest/40 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500"
             >
               <option value="">Select Year</option>
               {YEARS_OF_STUDY.map((y) => (
@@ -703,7 +701,7 @@ export default function UploadMarks() {
               onChange={(e) =>
                 setSelectedSemester(parseInt(e.target.value) || undefined)
               }
-              className="w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500"
+              className="w-full p-2 border border-gray-300 text-green-darkest/40 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500"
             >
               <option value="">Select Sem</option>
               {SEMESTERS.map((s) => (
@@ -728,8 +726,8 @@ export default function UploadMarks() {
               }
               className={`w-full p-2 border rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 ${
                 !selectedProgramId || !selectedYearOfStudy || !selectedSemester
-                  ? "bg-gray-200 cursor-not-allowed"
-                  : "border-gray-300"
+                  ? "bg-gray-200 cursor-not-allowed text-gray-400"
+                  : "border-gray-300 text-green-darkest/40"
               }`}
             >
               <option value="">Select Unit</option>
@@ -762,13 +760,12 @@ export default function UploadMarks() {
                 d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
               />
             </svg>
-            Download Scoresheet Template (.csv)
+            Download Scoresheet Template 
           </button>
         </div>
-        {/* ... (Rest of your component: Drag & Drop Zone, Upload Button, Result) ... */}
-
+       
         {/* Drag & Drop Zone */}
-        {/* ... (content unchanged) ... */}
+       
         <div
           onDragEnter={handleDrag}
           onDragLeave={handleDrag}
@@ -780,7 +777,7 @@ export default function UploadMarks() {
               : "border-gray-400 bg-white shadow-xl"
           }`}
         >
-          {/* ... (content unchanged) ... */}
+         
           {dragActive && (
             <div className="absolute inset-0 bg-green-dark/50 bg-opacity-10 rounded-3xl animate-pul" />
           )}
