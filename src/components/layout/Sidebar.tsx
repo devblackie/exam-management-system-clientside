@@ -91,7 +91,7 @@ const menuItems: MenuItem[] = [
   //   roles: ["coordinator"],
   // },
     {
-    name: "Students",
+    name: "Register Students",
     icon: Users,
     href: "/coordinator/students",
     roles: ["coordinator"],
