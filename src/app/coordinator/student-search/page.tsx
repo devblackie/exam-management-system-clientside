@@ -14,6 +14,7 @@ import type {
   StudentFullRecord,
   GradeRecord,
   RawMark,
+  SaveMarksPayload,
 } from "@/api/types";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { useToast } from "@/context/ToastContext";
@@ -47,8 +48,7 @@ export default function StudentSearchPage() {
     finalMark: number;
     status: string;
   } | null>(null);
-    const { addToast } = useToast();
-  
+  const { addToast } = useToast();
 
   const fetchRawMarks = async () => {
     if (!selectedStudent) return;
@@ -70,7 +70,7 @@ export default function StudentSearchPage() {
     if (!query.trim()) return;
     setSearching(true);
     console.log("Searching for:", query);
-    
+
     try {
       const results = await searchStudents(query);
       console.log("Search results:", results);
@@ -79,7 +79,6 @@ export default function StudentSearchPage() {
     } catch (err) {
       console.error("Search error:", err);
       addToast("Student not found or server error", "error");
-      // alert("Student not found or server error");
     } finally {
       setSearching(false);
     }
@@ -99,8 +98,6 @@ export default function StudentSearchPage() {
     } catch (err) {
       console.error("Failed to load student record:", err);
       addToast("Failed to load student record", "error");
-
-      // alert("Failed to load student record");
     } finally {
       setLoading(false);
     }
@@ -110,15 +107,14 @@ export default function StudentSearchPage() {
     <div className=" max-w-8xl ml-48  my-10">
       <div className="bg-white rounded-3xl shadow-2xl p-10 min-h-screen">
         {/* ... header and search bar ... */}
-        <div className=" rounded-lg shadow-md border border-green-dark/20 p-4 mb-4">
+        <div className="rounded-lg shadow-md border border-green-dark/20 p-4 mb-4">
           <h1 className="text-2xl font-bold text-green-darkest">
             Student Academic Records Portal
           </h1>
-        
         </div>
 
         {/* Search Bar */}
-        <div className=" rounded-lg  mb-4">
+        <div className=" rounded-lg shadow-md  mb-4">
           <div className="flex ">
             <input
               type="text"
@@ -126,18 +122,14 @@ export default function StudentSearchPage() {
               value={query}
               onChange={(e) => setQuery(e.target.value.toUpperCase())}
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-              className="flex-1 px-4 py-2 text-green-darkest text-lg border border-green-darkest/40 rounded-br-none rounded-tr-none rounded-lg placeholder-green-dark/50 focus:outline-0 focus:border-green-darkest"
-
+              className="flex-1 px-4 py-2 text-sm text-green-darkest/50 text-lg border border-green-dark/20 rounded-br-none rounded-tr-none rounded-lg placeholder-green-dark/50 focus:outline-0 focus:border-green-darkest"
             />
             <button
               onClick={handleSearch}
               disabled={searching}
-                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-darkest to-green-dark text-white-pure rounded-lg rounded-bl-none rounded-tl-none  hover:from-green-700 hover:to-emerald-800 font-bold  disabled:opacity-50 disabled:cursor-not-allowed transition shadow-2xl"
-
-              // className="px-10 py-4 bg-blue-700 hover:bg-blue-800 disabled:bg-gray-400 text-white font-semibold rounded-lg transition"
+              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-darkest to-green-dark text-white-pure rounded-lg rounded-bl-none rounded-tl-none  hover:from-green-700 hover:to-emerald-800 font-bold  disabled:opacity-50 disabled:cursor-not-allowed transition shadow-2xl"
             >
-                          <MagnifyingGlassIcon className="h-5 w-5" />
-              
+              <MagnifyingGlassIcon className="h-5 w-5" />
               {searching ? "Searching..." : "Search Student"}
             </button>
           </div>
@@ -147,18 +139,11 @@ export default function StudentSearchPage() {
         {searchResults.length > 0 && !selectedStudent && (
           <div className=" rounded-lg  overflow-hidden border shadow-xl">
             <table className="w-full">
-                            <thead className="bg-gradient-to-r from-green-darkest to-green-dark text-lime-bright">
-                
+              <thead className="bg-gradient-to-r from-green-darkest to-green-dark text-lime-bright">
                 <tr>
-                  <th className="text-left p-4 font-semibold ">
-                    Reg No
-                  </th>
-                  <th className="text-left p-4 font-semibold ">
-                    Full Name
-                  </th>
-                  <th className="text-left p-4 font-semibold">
-                    Program
-                  </th>
+                  <th className="text-left p-4 font-semibold ">Reg No</th>
+                  <th className="text-left p-4 font-semibold ">Full Name</th>
+                  <th className="text-left p-4 font-semibold">Program</th>
                   <th className="text-right p-4"></th>
                 </tr>
               </thead>
@@ -220,9 +205,7 @@ export default function StudentSearchPage() {
                     onClick={() =>
                       downloadTranscript(selectedStudent!.student.regNo)
                     }
-                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-darkest to-green-dark text-white-pure rounded-lg rounded-br-none rounded-tr-none  hover:from-green-700 hover:to-emerald-800 font-bold  disabled:opacity-50 disabled:cursor-not-allowed transition shadow-2xl"
-
-                    // className="px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-bold rounded-lg hover:shadow-xl transition"
+                    className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-darkest to-green-dark text-white-pure rounded-lg rounded-br-none rounded-tr-none  hover:from-green-700 hover:to-emerald-800 font-bold  disabled:opacity-50 disabled:cursor-not-allowed transition shadow-2xl"
                   >
                     Download Full Transcript
                   </button>
@@ -237,9 +220,7 @@ export default function StudentSearchPage() {
                         );
                       }
                     }}
-                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-lime-bright to-green-dark text-white-pure rounded-lg rounded-bl-none rounded-tl-none  hover:from-green-700 hover:to-emerald-800 font-bold  disabled:opacity-50 disabled:cursor-not-allowed transition shadow-2xl"
-
-                    // className="px-6 py-4 border-2 border-gray-300 rounded-lg text-gray-700 font-medium"
+                    className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-lime-bright to-green-dark text-white-pure rounded-lg rounded-bl-none rounded-tl-none  hover:from-green-700 hover:to-emerald-800 font-bold  disabled:opacity-50 disabled:cursor-not-allowed transition shadow-2xl"
                     defaultValue=""
                   >
                     <option value="" disabled>
@@ -292,10 +273,8 @@ export default function StudentSearchPage() {
             {activeTab === "grades" && (
               <div className="overflow-x-auto">
                 <table className="w-full">
-                  
-                            <thead className="bg-gradient-to-r from-green-darkest to-green-dark font-semibold text-lime-bright">
-
-                    <tr >
+                  <thead className="bg-gradient-to-r from-green-darkest to-green-dark font-semibold text-lime-bright">
+                    <tr>
                       <th className="p-4 text-left">Year</th>
                       <th className="p-4 text-left">Semester</th>
                       <th className="p-4 text-left">Unit Code</th>
@@ -306,16 +285,38 @@ export default function StudentSearchPage() {
                   </thead>
                   <tbody>
                     {selectedStudent?.grades.map((grade: GradeRecord) => (
-                      <tr key={grade._id} className="border-t text-green-darkest hover:bg-green-dark/30">
-                        <td className="p-4">{grade.academicYear.year}</td>
-                        <td className="p-4">{grade.semester}</td>
-                        <td className="p-4 font-mono">
-                          {grade.unit.code}
+                      <tr
+                        key={grade._id}
+                        className="border-t border-green-darkest/30 text-green-darkest hover:bg-green-dark/30"
+                      >
+                        {/* 1. Academic Year */}
+                        <td className="p-4">
+                          {grade.academicYear?.year || "N/A"}
                         </td>
-                        <td className="p-4">{grade.unit.name}</td>
+
+                        {/* 2. Semester */}
+                        <td className="p-4">
+                          {grade.semester && grade.semester !== "N/A"
+                            ? `Semester ${grade.semester}`
+                            : "Not Set"}
+                        </td>
+
+                        {/* 3. Unit Code */}
+                        <td className="p-4 font-mono">
+                          {grade.unit?.code || "N/A"}
+                        </td>
+
+                        {/* 4. Unit Name */}
+                        <td className="p-4">
+                          {grade.unit?.name || "Unit details missing"}
+                        </td>
+
+                        {/* 5. Grade */}
                         <td className="p-4 text-center font-bold text-lg">
                           {grade.grade}
                         </td>
+
+                        {/* 6. Status */}
                         <td className="p-4 text-center">
                           <span
                             className={`py-1 px-4  rounded-full text-sm font-medium ${
@@ -341,12 +342,11 @@ export default function StudentSearchPage() {
               <div className="bg-green-dark/10  rounded-2xl p-4">
                 <div className="flex justify-between items-center mb-4">
                   <h3 className="text-lg font-bold text-green-darkest">
-                    Raw Assessment Marks 
+                    Raw Assessment Marks
                   </h3>
                   <button
                     onClick={() => setShowEditModal(true)}
-                className="text-center px-4 py-2 bg-gradient-to-r from-green-darkest to-green-dark text-white-pure rounded-lg rounded-bl-none rounded-tl-none hover:scale-105 hover:from-green-700 hover:to-emerald-800 font-bold  disabled:opacity-50 disabled:cursor-not-allowed transition shadow-2xl"
-
+                    className="text-center px-4 py-2 bg-gradient-to-r from-green-darkest to-green-dark text-white-pure rounded-lg rounded-bl-none rounded-tl-none hover:scale-105 hover:from-green-700 hover:to-emerald-800 font-bold  disabled:opacity-50 disabled:cursor-not-allowed transition shadow-2xl"
                   >
                     Add / Edit Missing Marks
                   </button>
@@ -358,21 +358,34 @@ export default function StudentSearchPage() {
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="w-full">
-                    
-                            <thead className="bg-gradient-to-r from-green-darkest to-green-dark text-lime-bright">
-
+                      <thead className="bg-gradient-to-r from-green-darkest to-green-dark text-lime-bright">
                         <tr>
                           <th className="p-4 font-semibold text-left">Year</th>
                           <th className="p-4 font-semibold text-left">Unit</th>
-                          <th className="p-4 font-semibold text-center">CAT 1</th>
-                          <th className="p-4 font-semibold text-center">CAT 2</th>
-                          <th className="p-4 font-semibold text-center">CAT 3</th>
-                          <th className="p-4 font-semibold text-center">Assign</th>
-                          <th className="p-4 font-semibold text-center">Practical</th>
-                          <th className="p-4 text-center font-bold">
-                            EXAM
+                          <th className="p-4 font-semibold text-center">
+                            CAT 1
                           </th>
-                          <th className="p-4 font-semibold text-center">Supp?</th>
+                          <th className="p-4 font-semibold text-center">
+                            CAT 2
+                          </th>
+                          <th className="p-4 font-semibold text-center">
+                            CAT 3
+                          </th>
+                          <th className="p-4 font-semibold text-center">
+                            Assign
+                          </th>
+                          <th className="p-4 font-semibold text-center">
+                            Total CAT, ASSIGNMENT
+                          </th>
+                          <th className="p-4 font-semibold text-center">
+                            Exam Total
+                          </th>
+                          <th className="p-4 text-center font-bold">
+                            Agreed Mark
+                          </th>
+                          <th className="p-4 font-semibold text-center">
+                            Supp?
+                          </th>
                         </tr>
                       </thead>
                       <tbody>
@@ -385,27 +398,31 @@ export default function StudentSearchPage() {
                             }}
                             className="border-t hover:bg-green-dark/20 cursor-pointer transition font-mono font-medium text-green-darkest/50"
                           >
-                            <td className="p-4 text-green-dark/50">{m.academicYear.year}</td>
-                            <td className="p-4 font-mono ">
-                              {m.unit.code}
-                            </td>
-                            <td className="p-4 text-center ">
-                              {m.cat1 ?? "-"}
-                            </td>
-                            <td className="p-4 text-center ">
-                              {m.cat2 ?? "-"}
+                            <td className="p-4">{m.academicYear.year}</td>
+                            <td className="p-4 font-mono">
+                              {m.programUnit?.unit?.code}
                             </td>
                             <td className="p-4 text-center">
-                              {m.cat3 ?? "-"}
+                              {m.cat1Raw ?? "-"}
                             </td>
-                            <td className="p-4 text-center ">
-                              {m.assignment ?? "-"}
+                            <td className="p-4 text-center">
+                              {m.cat2Raw ?? "-"}
                             </td>
-                            <td className="p-4 text-center ">
-                              {m.practical ?? "-"}
+                            <td className="p-4 text-center">
+                              {m.cat3Raw ?? "-"}
                             </td>
-                            <td className="p-4 text-center font-bold  ">
-                              {m.exam ?? "MISSING"}
+                            <td className="p-4 text-center">
+                              {m.assgnt1Raw ?? "-"}
+                            </td>
+                            {/* Display the calculated totals for quick reference */}
+                            <td className="p-4 text-center font-bold">
+                              {m.caTotal30 ?? 0}
+                            </td>
+                            <td className="p-4 text-center  font-bold">
+                              {m.examTotal70 ?? 0}
+                            </td>
+                            <td className="p-4 text-center font-black">
+                              {m.agreedMark ?? 0}
                             </td>
                             <td className="p-4 text-center ">
                               {m.isSupplementary ? "YES" : ""}
@@ -419,7 +436,6 @@ export default function StudentSearchPage() {
                     </table>
                   </div>
                 )}
-               
               </div>
             )}
           </div>
@@ -427,10 +443,9 @@ export default function StudentSearchPage() {
 
         {/* EDIT MODAL */}
         {showEditModal && selectedStudent && (
-          <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
+          <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-3xl shadow-3xl max-w-3xl w-full max-h-[95vh] overflow-y-auto relative">
-              {/* Header */}
-              <div className="sticky top-0 bg-white border-b-2 border-gray-200 px-10 py-6 flex justify-between items-center">
+              <div className="sticky top-0 bg-white border-b px-10 py-6 flex justify-between items-center">
                 <h2 className="text-xl font-bold text-green-dark">
                   {editingMark ? "Edit Marks" : "Add New Marks"}
                 </h2>
@@ -438,207 +453,197 @@ export default function StudentSearchPage() {
                   onClick={() => {
                     setShowEditModal(false);
                     setEditingMark(null);
-                    setLastComputed(null);
                   }}
-                  className="text-gray-500 hover:text-red-600 text-4xl hover:rotate-90 transition"
-                  disabled={savingMarks}
+                  className="text-gray-500 hover:text-red-600"
                 >
-                  <X />
+                  <X size={32} />
                 </button>
               </div>
 
               <div className="p-10">
-                {/* Student Info */}
-                <div className="bg-green-dark/10 border-2 border-b  p-4 mb-4">
-                  <p className="text-md font-bold text-green-darkest">
-                    {selectedStudent.student.name} •{" "}
-                    {selectedStudent.student.regNo}
+                <div className="bg-green-50 p-4 rounded-xl mb-6">
+                  <p className="font-bold text-green-darkest">
+                    {selectedStudent.student.name} (
+                    {selectedStudent.student.regNo})
                   </p>
                   {editingMark && (
-                    <div className="grid grid-cols-2 gap-8 text-md font-bold bg-gray-100 p-4  mt-3">
-                      <div>
-                        Unit: {editingMark.unit.code} - {editingMark.unit.name}
-                      </div>
-                      <div>Year: {editingMark.academicYear.year}</div>
-                    </div>
+                    <p className="text-sm text-green-dark">
+                      Unit: {editingMark.programUnit?.unit?.code} | Year:{" "}
+                      {editingMark.academicYear.year}
+                    </p>
                   )}
                 </div>
-                {/* Form */}
+
                 <form
                   onSubmit={async (e) => {
                     e.preventDefault();
                     setSavingMarks(true);
-
                     const formData = new FormData(e.currentTarget);
-                    const payload = {
+
+                    // Construct payload with explicit types to avoid 'any'
+                    const payload: SaveMarksPayload = {
                       regNo: selectedStudent.student.regNo,
                       unitCode:
-                        editingMark?.unit.code ||
+                        editingMark?.programUnit?.unit?.code ||
                         (formData.get("unitCode") as string),
                       academicYear:
                         editingMark?.academicYear.year ||
                         (formData.get("academicYear") as string),
-                      cat1: formData.get("cat1")
-                        ? Number(formData.get("cat1"))
-                        : undefined,
-                      cat2: formData.get("cat2")
-                        ? Number(formData.get("cat2"))
-                        : undefined,
-                      cat3: formData.get("cat3")
-                        ? Number(formData.get("cat3"))
-                        : undefined,
-                      assignment: formData.get("assignment")
-                        ? Number(formData.get("assignment"))
-                        : undefined,
-                      practical: formData.get("practical")
-                        ? Number(formData.get("practical"))
-                        : undefined,
-                      exam: formData.get("exam")
-                        ? Number(formData.get("exam"))
-                        : undefined,
+                      cat1: Number(formData.get("cat1")) || 0,
+                      cat2: Number(formData.get("cat2")) || 0,
+                      cat3: Number(formData.get("cat3")) || 0,
+                      assignment1: Number(formData.get("assignment1")) || 0,
+                      examQ1: Number(formData.get("examQ1")) || 0,
+                      examQ2: Number(formData.get("examQ2")) || 0,
+                      examQ3: Number(formData.get("examQ3")) || 0,
+                      examQ4: Number(formData.get("examQ4")) || 0,
+                      examQ5: Number(formData.get("examQ5")) || 0,
                     };
 
                     try {
-                      await saveRawMarks(payload);
-      addToast("Marks updated successfully!", "success");
-
-                      // alert("Marks updated successfully!");
+                      await saveRawMarks(payload); // No more 'as any'
+                      addToast("Marks updated successfully!", "success");
                       await fetchRawMarks();
                       setShowEditModal(false);
                       setEditingMark(null);
-                    } catch (error) {
-      setMessage(getErrorMessage(error));
-      addToast("Failed to save", "error");
-
-                      // alert(err.response?.data?.error || "Failed to save");
+                    } catch (err) {
+                      addToast(getErrorMessage(err), "error");
                     } finally {
                       setSavingMarks(false);
                     }
                   }}
                 >
-                  {/* If editing existing → hide unit/year inputs */}
-                  {editingMark ? (
-                    <div className="grid grid-cols-2 gap-8 text-md font-bold bg-gray-100 p-4  mt-3">
-
-                      <div>
-                        Unit: {editingMark.unit.code} - {editingMark.unit.name}
-                      </div>
-                      <div>Year: {editingMark.academicYear.year}</div>
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-2 gap-6 mb-4">
-
-
-                        <div>
-                      <label className="block font-bold text-gray-700 mb-2">
-                        CAT 1
-                      </label>
+                  {!editingMark && (
+                    <div className="grid grid-cols-2 gap-4 mb-6">
                       <input
                         name="unitCode"
                         required
-                        placeholder="Unit Code"
-                                              className=" w-full rounded-md border border-green-darkest border-t-transparent bg-transparent px-3  py-3  text-green-dark  outline-0 transition-all  focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-green-base/40"
-                        
-                      /></div>
-
-  <div>
-                      <label className="block font-bold text-gray-700 mb-2">
-                        CAT 1
-                      </label>
+                        placeholder="Unit Code (e.g. ICS 2101)"
+                        className="p-3 border rounded-lg"
+                      />
                       <input
                         name="academicYear"
                         required
-                        placeholder="Academic Year"
-                      className=" w-full rounded-md border border-green-darkest border-t-transparent bg-transparent px-3  py-3  text-green-dark  outline-0 transition-all  focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-green-base/40"
-
-                      /></div>
+                        placeholder="Year (e.g. 2023/2024)"
+                        className="p-3 border rounded-lg"
+                      />
                     </div>
                   )}
 
-                  <div className="grid grid-cols-3 gap-6">
-                    <div>
-                      <label className="block font-bold text-gray-700 mb-2">
-                        CAT 1
-                      </label>
-                      <input
-                        name="cat1"
-                        type="number"
-                        min="0"
-                        max="30"
-                      placeholder="Cat 1"
-
-                        defaultValue={editingMark?.cat1 ?? ""}
-                      className=" w-full rounded-md border border-green-darkest border-t-transparent bg-transparent px-3  py-3  text-green-dark  outline-0 transition-all  focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-green-base/40"
-
-                      />
-                    </div>
-                    <div>
-                      <label className="block font-bold text-gray-700 mb-2">
-                        CAT 2
-                      </label>
-                      <input
-                        name="cat2"
-                        type="number"
-                        min="0"
-                        max="30"
-                      placeholder="Cat 2"
-
-                        defaultValue={editingMark?.cat2 ?? ""}
-                      className=" w-full rounded-md border border-green-darkest border-t-transparent bg-transparent px-3  py-3  text-green-dark  outline-0 transition-all  focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-green-base/40"
-
-                      />
-                    </div>
-                    <div>
-                      <label className="block font-bold text-gray-700 mb-2">
-                        Assignment
-                      </label>
-                      <input
-                        name="assignment"
-                        type="number"
-                        min="0"
-                        max="20"
-                      placeholder="Assignment"
-
-                        defaultValue={editingMark?.assignment ?? ""}
-                      className=" w-full rounded-md border border-green-darkest border-t-transparent bg-transparent px-3  py-3  text-green-dark  outline-0 transition-all  focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-green-base/40"
-
-                      />
+                  {/* Coursework Section */}
+                  <div className="mb-8 p-4 border-l-4 border-green-600 bg-green-50/50">
+                    <h4 className="font-bold text-green-800 mb-4">
+                      Coursework (CATs /20, Assignment /10)
+                    </h4>
+                    <div className="grid grid-cols-4 gap-4">
+                      <div>
+                        <label className="text-xs font-bold text-gray-500">
+                          CAT 1
+                        </label>
+                        <input
+                          name="cat1"
+                          type="number"
+                          step="0.1"
+                          max="20"
+                          className="w-full p-2 border rounded text-gray-400"
+                          defaultValue={editingMark?.cat1Raw ?? ""}
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs font-bold text-gray-500">
+                          CAT 2
+                        </label>
+                        <input
+                          name="cat2"
+                          type="number"
+                          step="0.1"
+                          max="20"
+                          className="w-full p-2 border rounded text-gray-400"
+                          defaultValue={editingMark?.cat2Raw ?? ""}
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs font-bold text-gray-500">
+                          CAT 3
+                        </label>
+                        <input
+                          name="cat3"
+                          type="number"
+                          step="0.1"
+                          max="20"
+                          className="w-full p-2 border rounded text-gray-400"
+                          defaultValue={editingMark?.cat3Raw ?? ""}
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs font-bold text-gray-500">
+                          ASSGN 1
+                        </label>
+                        <input
+                          name="assignment1"
+                          type="number"
+                          step="0.1"
+                          max="10"
+                          className="w-full p-2 border rounded text-gray-400"
+                          defaultValue={editingMark?.assgnt1Raw ?? ""}
+                        />
+                      </div>
                     </div>
                   </div>
 
-                  <div className="mt-8">
-                    <label className="block font-bold text-green-darkest text-xl mb-3">
-                      EXAM MARK (0-70)
-                    </label>
-                    <input
-                      name="exam"
-                      type="number"
-                      min="0"
-                      max="70"
-                      required={!editingMark || editingMark.exam === undefined}
-                      defaultValue={editingMark?.exam ?? ""}
-                      placeholder="Exam mark"
-                      className=" w-full rounded-md border border-green-darkest border-t-transparent bg-transparent px-3  py-3  text-green-dark  outline-0 transition-all  focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-green-base/40"
+                  {/* Exam Section */}
+                  <div className="mb-8 p-4 border-l-4 border-blue-600 bg-blue-50/50">
+                    <h4 className="font-bold text-blue-800 mb-4">
+                      Final Exam (Q1 /10, Q2-5 /20)
+                    </h4>
+                    <div className="grid grid-cols-5 gap-4">
+                      <div>
+                        <label className="text-xs font-bold text-gray-500">
+                          Q1 (/10)
+                        </label>
+                        <input
+                          name="examQ1"
+                          required
+                          type="number"
+                          step="0.1"
+                          max="10"
+                          className="w-full p-2 border border-blue-300 rounded text-gray-400"
+                          defaultValue={editingMark?.examQ1Raw ?? ""}
+                        />
+                      </div>
+                      {[2, 3, 4, 5].map((q) => {
+                        // Explicitly map the number to the correct RawMark key
+                        const key = `examQ${q}Raw` as keyof RawMark;
+                        const defaultValue = editingMark
+                          ? (editingMark[key] as number)
+                          : "";
 
-                    />
+                        return (
+                          <div key={q}>
+                            <label className="text-xs font-bold text-gray-500">
+                              Q{q} (/20)
+                            </label>
+                            <input
+                              name={`examQ${q}`}
+                              type="number"
+                              step="0.1"
+                              max="20"
+                              className="w-full p-2 border border-blue-300 rounded text-gray-400"
+                              defaultValue={defaultValue}
+                            />
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
 
-                  <div className="flex gap-6 mt-4">
+                  <div className="flex gap-4">
                     <button
                       type="submit"
                       disabled={savingMarks}
-                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-darkest to-green-dark text-white-pure rounded-lg  hover:from-green-700 hover:to-emerald-800 font-bold  disabled:opacity-50 disabled:cursor-not-allowed transition shadow-2xl"
-
-                      // className="flex-1 py-6 bg-gradient-to-r from-green-600 to-emerald-700 text-white font-bold text-2xl rounded-xl hover:shadow-2xl transition disabled:opacity-70 flex items-center justify-center gap-4"
+                      className="flex-1 py-4 bg-green-800 text-white font-bold rounded-xl hover:bg-green-900 transition disabled:opacity-50"
                     >
-                      {savingMarks ? (
-                        <>
-                          <span className="inline-block w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin"></span>
-                          Saving...
-                        </>
-                      ) : (
-                        "Save & Update Grade"
-                      )}
+                      {savingMarks ? "Saving Marks..." : "Confirm & Save Marks"}
                     </button>
                     <button
                       type="button"
@@ -646,8 +651,7 @@ export default function StudentSearchPage() {
                         setShowEditModal(false);
                         setEditingMark(null);
                       }}
-                      disabled={savingMarks}
-                      className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white font-bold text-xl rounded-xl transition"
+                      className="px-8 py-4 bg-gray-600 rounded-xl font-bold text-gray-200"
                     >
                       Cancel
                     </button>

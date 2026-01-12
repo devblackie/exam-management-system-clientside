@@ -183,6 +183,7 @@ export interface StudentSearchResult {
 
 export interface GradeRecord {
   _id: string;
+  semester: string | number;
   unit: {
     code: string;
     name: string;
@@ -190,10 +191,9 @@ export interface GradeRecord {
   academicYear: {
     year: string;
   };
+  totalMark: number;
   grade: string;
-  semester: "SEMESTER 1" | "SEMESTER 2" | "SEMESTER 3";
-  status: "PASS" | "SUPPLEMENTARY" | "RETAKE" | "INCOMPLETE";
-  points?: number;
+  status: string;
 }
 
 export interface StudentFullRecord {
@@ -208,27 +208,66 @@ export interface StudentFullRecord {
   passedUnits: number;
 }
 
+
+
 export interface RawMark {
   _id: string;
-  academicYear: AcademicYear;
-  programUnit: ProgramUnit;
-  cat1?: number;
-  cat2?: number;
-  cat3?: number;
-  assignment?: number;
-  practical?: number;
-  exam?: number;
+  academicYear: {
+    _id: string;
+    year: string;
+  };
+  // Matches the backend population logic: mark.programUnit.unit
+  programUnit: {
+    _id: string;
+    unit: {
+      _id: string;
+      code: string;
+      name: string;
+    };
+  };
+  // Coursework Raw Scores
+  cat1Raw: number;
+  cat2Raw: number;
+  cat3Raw?: number;
+  assgnt1Raw: number;
+  assgnt2Raw?: number;
+  assgnt3Raw?: number;
+  practicalRaw?: number;
+
+  // Exam Question Raw Scores
+  examQ1Raw: number; // Max 10
+  examQ2Raw: number; // Max 20
+  examQ3Raw: number; // Max 20
+  examQ4Raw: number; // Max 20
+  examQ5Raw?: number; // Max 20
+
+  // Computed Totals (Audit)
+  caTotal30: number;
+  examTotal70: number;
+  agreedMark: number;
+  
+  // Metadata
+  attempt: "1st" | "re-take" | "supplementary";
   isSupplementary: boolean;
+  isRetake: boolean;
 }
+
+
 
 export interface SaveMarksPayload {
   regNo: string;
   unitCode: string;
   academicYear: string;
+  // Coursework
   cat1?: number;
   cat2?: number;
   cat3?: number;
-  assignment?: number;
-  practical?: number;
-  exam?: number;
+  assignment1?: number;
+  assignment2?: number;
+  // Exam Questions
+  examQ1?: number;
+  examQ2?: number;
+  examQ3?: number;
+  examQ4?: number;
+  examQ5?: number;
 }

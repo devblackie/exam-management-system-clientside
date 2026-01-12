@@ -1,3 +1,4 @@
+// clientside/src/components/layout/Sidebar.tsx
 "use client";
 
 import { useState } from "react";
@@ -6,18 +7,16 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import { useAuth } from "@/context/AuthContext";
-import {
- 
+import { 
   UserPlusIcon,
   UsersIcon,
   BookOpenIcon,
   UserGroupIcon,
-  ChartBarSquareIcon,
- 
+  ChartBarSquareIcon, 
   Bars3Icon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
-import { Home, BookOpen, BookOpenText,BookOpenCheck,CalendarDays,Cog, Users, Upload, UserRoundSearch,FileText, Shield } from "lucide-react";
+import { Home, BookOpenText,BookOpenCheck,CalendarDays,Cog, Users, Upload, UserRoundSearch,FileText } from "lucide-react";
 import { branding } from "@/config/branding";
 import type { SVGProps } from "react";
 

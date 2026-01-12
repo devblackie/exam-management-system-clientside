@@ -23,69 +23,71 @@ export async function uploadMarks(file: File): Promise<UploadResult> {
   return res.data;
 }
 
-
 export const downloadTemplate = async (
-    programId: string,
-    unitId: string,
-    academicYearId: string,
-    yearOfStudy: number,
-    semester: number
+  programId: string,
+  unitId: string,
+  academicYearId: string,
+  yearOfStudy: number,
+  semester: number
 ) => {
   // --- Defensive Check ADDED HERE ---
-    if (!programId || !unitId || !academicYearId || !yearOfStudy || !semester) {
-        console.error("Download Failed: Missing required program or year/semester parameters.");
-        // Throw a specific error to be caught by the calling component
-        throw new Error("Please select the Program, Unit, Academic Year, Year of Study, and Semester before downloading the template.");
-    }
-    // ----------------------------------
-    try {
-        // Construct the query string with the required parameters
-        const params = new URLSearchParams({
-            programId,
-            unitId,
-            academicYearId,
-            yearOfStudy: yearOfStudy.toString(),
-            semester: semester.toString(),
-        }).toString();
-        
-        // Make the GET request with the parameters
-        const response = await axiosInstance.get(`/marks/template?${params}`, {
-            responseType: 'blob', // Important for downloading files
-        });
+  if (!programId || !unitId || !academicYearId || !yearOfStudy || !semester) {
+    console.error(
+      "Download Failed: Missing required program or year/semester parameters."
+    );
+    // Throw a specific error to be caught by the calling component
+    throw new Error(
+      "Please select the Program, Unit, Academic Year, Year of Study, and Semester before downloading the template."
+    );
+  }
+  // ----------------------------------
+  try {
+    // Construct the query string with the required parameters
+    const params = new URLSearchParams({
+      programId,
+      unitId,
+      academicYearId,
+      yearOfStudy: yearOfStudy.toString(),
+      semester: semester.toString(),
+    }).toString();
 
-      // --- EXTRACT FILENAME FROM HEADER ---
-        let fileName = "scoresheet-template.xlsx";
-        const contentDisposition = response.headers['content-disposition'];
-        
-      if (contentDisposition) {
-    // This regex looks for filename= and captures everything up to .xlsx
-    // It ignores any trailing quotes or semicolon garbage
-    const fileNameMatch = contentDisposition.match(/filename="?(.+?)"?$/);
-    if (fileNameMatch?.[1]) {
+    // Make the GET request with the parameters
+    const response = await axiosInstance.get(`/marks/template?${params}`, {
+      responseType: "blob", // Important for downloading files
+    });
+
+    // --- EXTRACT FILENAME FROM HEADER ---
+    let fileName = "scoresheet-template.xlsx";
+    const contentDisposition = response.headers["content-disposition"];
+
+    if (contentDisposition) {
+      // This regex looks for filename= and captures everything up to .xlsx
+      // It ignores any trailing quotes or semicolon garbage
+      const fileNameMatch = contentDisposition.match(/filename="?(.+?)"?$/);
+      if (fileNameMatch?.[1]) {
         fileName = fileNameMatch[1];
 
         // 2. Safety Net: If it ends in .xlsx_ or just has a trailing _, clean it
         fileName = fileName
-            .replace(/_+$/, '')      // Remove underscores at the very end
-            .replace(/\.xlsx_$/, '.xlsx') // Specifically fix .xlsx_
-            .trim();
+          .replace(/_+$/, "") // Remove underscores at the very end
+          .replace(/\.xlsx_$/, ".xlsx") // Specifically fix .xlsx_
+          .trim();
+      }
     }
-}
-        // Create a blob URL and trigger download (Standard pattern for file download)
-        // const url = window.URL.createObjectURL(new Blob([response.data]));
-        const url = window.URL.createObjectURL(response.data as Blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', fileName); // Use extracted filename here'); 
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-        window.URL.revokeObjectURL(url);
-        
-    } catch (error) {
-        console.error("Failed to download template:", error);
-        throw error;
-    }
+    // Create a blob URL and trigger download (Standard pattern for file download)
+    // const url = window.URL.createObjectURL(new Blob([response.data]));
+    const url = window.URL.createObjectURL(response.data as Blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", fileName); // Use extracted filename here');
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
+  } catch (error) {
+    console.error("Failed to download template:", error);
+    throw error;
+  }
 };
 
 /**
@@ -119,21 +121,27 @@ export async function getStudentTranscript(regNo: string) {
  */
 export const generatePassList = (academicYearId: string) => {
   window.open(
-    `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/reports/pass-list/${academicYearId}`,
+    `${
+      process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+    }/reports/pass-list/${academicYearId}`,
     "_blank"
   );
 };
 
 export const generateConsolidatedMarksheet = (academicYearId: string) => {
   window.open(
-    `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/reports/consolidated/${academicYearId}`,
+    `${
+      process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+    }/reports/consolidated/${academicYearId}`,
     "_blank"
   );
 };
 
 export const generateStudentTranscript = (regNo: string) => {
   window.open(
-    `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/reports/transcript/${regNo.toUpperCase()}`,
+    `${
+      process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+    }/reports/transcript/${regNo.toUpperCase()}`,
     "_blank"
   );
 };
@@ -142,12 +150,16 @@ export const generateStudentTranscript = (regNo: string) => {
  * Get academic years, programs, units, etc.
  */
 export const getAcademicYears = async () => {
-  const res = await api.get<Array<{ _id: string; year: string }>>("/academic-years");
+  const res = await api.get<Array<{ _id: string; year: string }>>(
+    "/academic-years"
+  );
   return res.data;
 };
 
 export const getPrograms = async () => {
-  const res = await api.get<Array<{ _id: string; name: string; code: string }>>("/programs");
+  const res = await api.get<Array<{ _id: string; name: string; code: string }>>(
+    "/programs"
+  );
   return res.data;
 };
 

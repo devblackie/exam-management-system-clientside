@@ -54,30 +54,6 @@ export const saveRawMarks = async (data: SaveMarksPayload): Promise<RawMark> => 
 };
 
 
-// export const downloadTranscript = (regNo: string, year?: string): void => {
-//   const params = new URLSearchParams({ regNo });
-//   if (year) params.append("year", year);
-
-//   const endpoint = year ? "/transcript/year" : "/transcript";
-//  const url = `${API_BASE_URL}/student${endpoint}?${params.toString()}`;
-
-//   // Most reliable method — works everywhere
-//    const link = document.createElement("a");
-//   link.href = url;
-//   link.target = "_blank";
-//   link.rel = "noopener noreferrer";
-  
-//   // THIS LINE FORCES DOWNLOAD + CORRECT FILENAME
-//   link.download = year 
-//     ? `Transcript_${regNo.replace(/\//g, "_")}_${year.replace("/", "-")}.pdf`
-//     : `Transcript_${regNo.replace(/\//g, "_")}_Full.pdf`;
-
-//   document.body.appendChild(link);
-//   link.click();
-//   document.body.removeChild(link);
-// };
-
-
 export const downloadTranscript = async (regNo: string, year?: string) => {
   const params = new URLSearchParams({ regNo });
   if (year) params.append("year", year);
