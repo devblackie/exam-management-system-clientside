@@ -19,7 +19,10 @@ import type {
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { useToast } from "@/context/ToastContext";
 import { AlertTriangle, CheckCircle, X } from "lucide-react";
+import { getAcademicYears } from "@/api/academicYearsApi";
+import type { AcademicYear } from "@/api/types";
 
+// Helper to extract error message from unknown error objects
 const getErrorMessage = (error: unknown): string => {
   if (error && typeof error === "object" && "response" in error) {
     const axiosError = error as { response?: { data?: { message?: string } } };
@@ -42,14 +45,17 @@ export default function StudentSearchPage() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingMark, setEditingMark] = useState<RawMark | null>(null);
   const [savingMarks, setSavingMarks] = useState(false);
-  const [message, setMessage] = useState("");
-  const [lastComputed, setLastComputed] = useState<{
-    grade: string;
-    finalMark: number;
-    status: string;
-  } | null>(null);
+  const [academicYears, setAcademicYears] = useState<AcademicYear[]>([]);
+  const [selectedYear, setSelectedYear] = useState<string>("");
+
+  // const [lastComputed, setLastComputed] = useState<{
+  //   grade: string;
+  //   finalMark: number;
+  //   status: string;
+  // } | null>(null);
   const { addToast } = useToast();
 
+  // 
   const fetchRawMarks = async () => {
     if (!selectedStudent) return;
     try {
@@ -62,9 +68,27 @@ export default function StudentSearchPage() {
     }
   };
 
+  // 1. Fetch years from DB on mount
+  useEffect(() => {
+    const fetchYears = async () => {
+      try {
+        const years = await getAcademicYears();
+        setAcademicYears(years);
+        // Automatically select the most recent year
+        if (years.length > 0) {
+          setSelectedYear(years[years.length - 1].year);
+        }
+      } catch {
+        addToast("Failed to load academic years from database", "error");
+      }
+    };
+    fetchYears();
+  }, []);
+
   useEffect(() => {
     if (selectedStudent && activeTab === "raw") fetchRawMarks();
   }, [selectedStudent, activeTab]);
+
 
   const handleSearch = async () => {
     if (!query.trim()) return;
@@ -85,12 +109,17 @@ export default function StudentSearchPage() {
   };
 
   const viewStudent = async (regNo: string) => {
+    if (!selectedYear) {
+      addToast("Please select an academic year first", "warning");
+      return;
+    }
+
     const encoded = encodeURIComponent(regNo);
     setLoading(true);
     console.log("Fetching record for:", regNo);
 
     try {
-      const record = await getStudentRecord(encoded);
+      const record = await getStudentRecord(encoded, selectedYear);
       console.log("Full record loaded:", record);
       setSelectedStudent(record);
       setRawMarks([]);
@@ -118,12 +147,27 @@ export default function StudentSearchPage() {
           <div className="flex ">
             <input
               type="text"
-              placeholder="e.g. ICS/001/2020"
+              placeholder="e.g. SC/ICT/001/2023"
               value={query}
               onChange={(e) => setQuery(e.target.value.toUpperCase())}
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-              className="flex-1 px-4 py-2 text-sm text-green-darkest/50 text-lg border border-green-dark/20 rounded-br-none rounded-tr-none rounded-lg placeholder-green-dark/50 focus:outline-0 focus:border-green-darkest"
+              className="flex-1 px-4 py-2 text-sm text-green-darkest/50  border border-r-transparent border-green-dark/20 rounded-br-none rounded-tr-none rounded-lg placeholder-green-dark/50 focus:outline-0 focus:border-green-darkest"
             />
+
+            {/* NEW YEAR SELECTOR */}
+            <select
+              value={selectedYear}
+              onChange={(e) => setSelectedYear(e.target.value)}
+              className="px-4 py-2 bg-white border border-l-transparent border-green-dark/20  text-green-darkest font-bold outline-none cursor-pointer"
+            >
+              <option value="" disabled>Select Year</option>
+              {academicYears.map((y) => (
+                <option key={y._id} value={y.year}>
+                  {y.year}
+                </option>
+              ))}
+            </select>
+
             <button
               onClick={handleSearch}
               disabled={searching}
@@ -191,12 +235,12 @@ export default function StudentSearchPage() {
               </div>
               <div className="text-right">
                 <div
-                  
+
                 >
-                  
+
                   {/* ACADEMIC STATUS ALERT BOX */}
                   {selectedStudent?.academicStatus && (
-                    <div className={`mb-6 p-4 rounded-xl border-l-4 flex items-start gap-4 ${selectedStudent.academicStatus.variant === 'success' ? 'bg-green-50 border-green-500 text-green-800' :
+                    <div className={`mb-6 p-2 rounded-xl border-l-4 flex items-start ${selectedStudent.academicStatus.variant === 'success' ? 'bg-green-50 border-green-500 text-green-800' :
                       selectedStudent.academicStatus.variant === 'warning' ? 'bg-yellow-50 border-yellow-500 text-yellow-800' :
                         'bg-red-50 border-red-500 text-red-800'
                       }`}>
@@ -207,9 +251,35 @@ export default function StudentSearchPage() {
                         <h3 className="font-bold text-md leading-none mb-1">
                           {selectedStudent.academicStatus.status}
                         </h3>
-                        <p className="text-sm opacity-90">
+                        <p className="text-xs font-mono opacity-90">
                           {selectedStudent.academicStatus.details}
                         </p>
+
+                        {/* NEW: Explicit list of missing units if status is INCOMPLETE */}
+                        {selectedStudent.academicStatus.missingList && selectedStudent.academicStatus.missingList.length > 0 && (
+                          <div className="mt-4">
+                            <ul className="grid grid-cols-2 gap-2">
+                              {selectedStudent.academicStatus.missingList?.map((unitStr, idx) => (
+                                <li key={idx} className="text-xs font-mono bg-blue-100 p-1 rounded">
+                                  ⚠️ {unitStr}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+
+                        {/* SUPPLEMENTARY EXAMS SECTION */}
+                        {/* {selectedStudent.academicStatus.supplementaryList && selectedStudent.academicStatus.supplementaryList.length > 0 && (
+                          <div className="mt-4">
+                            <ul className="grid grid-cols-2 gap-2">
+                              {selectedStudent.academicStatus.supplementaryList.map((unitStr, idx) => (
+                                <li key={idx} className="text-xs font-mono bg-amber-100 border border-amber-200 text-amber-800 p-1.5 rounded flex items-center gap-1">
+                                  📝 {unitStr}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )} */}
 
                         {/* Mini Progress Tracker */}
                         <div className="mt-3 flex gap-4 text-xs font-semibold uppercase tracking-wider">
@@ -526,7 +596,11 @@ export default function StudentSearchPage() {
                       await saveRawMarks(payload); // No more 'as any'
                       addToast("Marks updated successfully!", "success");
                       await fetchRawMarks();
+                      if (selectedStudent) {
+                        await viewStudent(selectedStudent.student.regNo);
+                      }
                       setShowEditModal(false);
+
                       setEditingMark(null);
                     } catch (err) {
                       addToast(getErrorMessage(err), "error");

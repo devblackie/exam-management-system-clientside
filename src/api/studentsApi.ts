@@ -36,8 +36,8 @@ export const searchStudents = async (query: string): Promise<StudentSearchResult
 };
 
 // Get full academic record + status
-export const getStudentRecord = async (regNo: string): Promise<StudentFullRecord> => {
-  const res = await api.get<StudentFullRecord>("/student/record", { params: { regNo } });
+export const getStudentRecord = async (regNo: string, academicYear: string): Promise<StudentFullRecord> => {
+  const res = await api.get<StudentFullRecord>("/student/record", { params: { regNo, academicYear } });
   return res.data;
 };
 

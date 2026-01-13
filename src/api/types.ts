@@ -188,6 +188,8 @@ export interface AcademicStatus {
   variant: "success" | "warning" | "error" | "info";
   details: string;
   summary: AcademicSummary;
+  missingList: string[];
+  supplementaryList: string[];
 }
 
 export interface GradeRecord {
