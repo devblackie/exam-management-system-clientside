@@ -63,7 +63,6 @@ export interface ProgramUnit {
   requiredSemester: 1 | 2;
   isElective: boolean;
   
-  // These are the populated details (from the backend ProgramUnit GET endpoint)
   unit: {
     _id: string;
     code: string;
@@ -77,13 +76,10 @@ export interface ProgramUnit {
   updatedAt?: string;
 }
 
-// --- 2. UPDATED INTERFACE: Unit (Now just the Template) ---
-// This represents the base unit template, managed via /units route.
 export interface Unit {
   _id: string;
   code: string;
   name: string;
-  // REMOVED: program, programId, year, semester
   createdAt?: string;
   updatedAt?: string;
 }
@@ -92,10 +88,12 @@ export interface StudentFromAPI {
   _id?: string;
   regNo: string;
   name: string;
-  program: string;           // populated name
+  program: string;           // Populated name
   programId: string;
-  yearOfStudy: number;
+  currentYearOfStudy: number; // Corrected field name
+  currentSemester: number;    // Added field
   admissionAcademicYear: string;
+  status: "active" | "inactive" | "graduated" | "suspended" | "deferred";
 }
 
 export interface AcademicYear {
@@ -156,14 +154,11 @@ export interface InstitutionSettingsInput {
   gradingScale?: GradingScale[];
 }
 
-// This is what we use in the form (minimal + safe)
 export interface StudentFormRow {
   regNo: string;
   name: string;
-  program: string;           // human name
-  yearOfStudy: number;
-  // These will be added before submit
-  // programId and admissionAcademicYear are NOT needed here
+  program: string;
+  currentYearOfStudy: number; // Corrected field name
 }
 
 export interface StudentStats {
@@ -181,19 +176,28 @@ export interface StudentSearchResult {
   };
 }
 
+export interface AcademicSummary {
+  totalExpected: number;
+  passed: number;
+  failed: number;
+  missing: number;
+}
+
+export interface AcademicStatus {
+  status: string;
+  variant: "success" | "warning" | "error" | "info";
+  details: string;
+  summary: AcademicSummary;
+}
+
 export interface GradeRecord {
   _id: string;
+  unit: { code: string; name: string };
   semester: string | number;
-  unit: {
-    code: string;
-    name: string;
-  };
-  academicYear: {
-    year: string;
-  };
+  status: string;
   totalMark: number;
   grade: string;
-  status: string;
+  academicYear: { year: string };
 }
 
 export interface StudentFullRecord {
@@ -204,11 +208,14 @@ export interface StudentFullRecord {
   };
   grades: GradeRecord[];
   currentStatus: string;
-  totalUnits: number;
-  passedUnits: number;
+  academicStatus: AcademicStatus; // Add this line
+  summary: {                       // Update summary to match the backend
+    totalUnits: number;
+    passed: number;
+    supplementary: number;
+    retake: number;
+  };
 }
-
-
 
 export interface RawMark {
   _id: string;
@@ -251,8 +258,6 @@ export interface RawMark {
   isSupplementary: boolean;
   isRetake: boolean;
 }
-
-
 
 export interface SaveMarksPayload {
   regNo: string;

@@ -18,7 +18,7 @@ import type {
 } from "@/api/types";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { useToast } from "@/context/ToastContext";
-import { X } from "lucide-react";
+import { AlertTriangle, CheckCircle, X } from "lucide-react";
 
 const getErrorMessage = (error: unknown): string => {
   if (error && typeof error === "object" && "response" in error) {
@@ -191,13 +191,37 @@ export default function StudentSearchPage() {
               </div>
               <div className="text-right">
                 <div
-                  className={`inline-block px-4 py-2 rounded-full text-md font-bold ${
-                    selectedStudent.currentStatus === "IN GOOD STANDING"
-                      ? "bg-green-100 text-green-800"
-                      : "bg-red-100 text-red-800"
-                  }`}
+                  
                 >
-                  {selectedStudent.currentStatus}
+                  
+                  {/* ACADEMIC STATUS ALERT BOX */}
+                  {selectedStudent?.academicStatus && (
+                    <div className={`mb-6 p-4 rounded-xl border-l-4 flex items-start gap-4 ${selectedStudent.academicStatus.variant === 'success' ? 'bg-green-50 border-green-500 text-green-800' :
+                      selectedStudent.academicStatus.variant === 'warning' ? 'bg-yellow-50 border-yellow-500 text-yellow-800' :
+                        'bg-red-50 border-red-500 text-red-800'
+                      }`}>
+                      <div className="mt-1">
+                        {selectedStudent.academicStatus.variant === 'success' ? <CheckCircle size={24} /> : <AlertTriangle size={24} />}
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-md leading-none mb-1">
+                          {selectedStudent.academicStatus.status}
+                        </h3>
+                        <p className="text-sm opacity-90">
+                          {selectedStudent.academicStatus.details}
+                        </p>
+
+                        {/* Mini Progress Tracker */}
+                        <div className="mt-3 flex gap-4 text-xs font-semibold uppercase tracking-wider">
+                          <span>Passed: {selectedStudent.academicStatus.summary.passed}</span>
+                          <span>Failed: {selectedStudent.academicStatus.summary.failed}</span>
+                          {selectedStudent.academicStatus.summary.missing > 0 && (
+                            <span className="text-blue-600">Missing: {selectedStudent.academicStatus.summary.missing}</span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
                 <div className="flex gap- mt-4">
                   {/* Full Transcript */}
@@ -243,27 +267,26 @@ export default function StudentSearchPage() {
                   </select>
                 </div>
               </div>
+
             </div>
 
             {/* Tabs */}
             <div className="flex gap-10 border-b-2 border-green-darkest/30 mb-4">
               <button
                 onClick={() => setActiveTab("grades")}
-                className={`pb-4 px-2 text-xl font-bold border-b-4 transition ${
-                  activeTab === "grades"
-                    ? "border-green-darkest text-green-dark"
-                    : "border-transparent text-green-darkest"
-                }`}
+                className={`pb-4 px-2 text-xl font-bold border-b-4 transition ${activeTab === "grades"
+                  ? "border-green-darkest text-green-dark"
+                  : "border-transparent text-green-darkest"
+                  }`}
               >
                 Grades
               </button>
               <button
                 onClick={() => setActiveTab("raw")}
-                className={`pb-4 px-2 text-xl font-bold border-b-4 transition ${
-                  activeTab === "raw"
-                    ? "border-green-darkest text-green-dark"
-                    : "border-transparent text-green-darkest"
-                }`}
+                className={`pb-4 px-2 text-xl font-bold border-b-4 transition ${activeTab === "raw"
+                  ? "border-green-darkest text-green-dark"
+                  : "border-transparent text-green-darkest"
+                  }`}
               >
                 Marks
               </button>
@@ -319,13 +342,12 @@ export default function StudentSearchPage() {
                         {/* 6. Status */}
                         <td className="p-4 text-center">
                           <span
-                            className={`py-1 px-4  rounded-full text-sm font-medium ${
-                              grade.status === "PASS"
-                                ? "bg-green-100 text-green-800"
-                                : grade.status === "INCOMPLETE"
+                            className={`py-1 px-4  rounded-full text-sm font-medium ${grade.status === "PASS"
+                              ? "bg-green-100 text-green-800"
+                              : grade.status === "INCOMPLETE"
                                 ? "bg-yellow-100 text-yellow-800"
                                 : "bg-red-100 text-red-800"
-                            }`}
+                              }`}
                           >
                             {grade.status}
                           </span>
@@ -661,6 +683,8 @@ export default function StudentSearchPage() {
             </div>
           </div>
         )}
+
+
 
         {/* Loading */}
         {loading && (
