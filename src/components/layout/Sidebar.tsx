@@ -61,7 +61,7 @@ const menuItems: MenuItem[] = [
   {
     name: "Curriculum",
     icon: BookOpenCheck,
-    href: "/coordinator/units",
+    href: "/coordinator/curriculum",
     roles: ["admin", "coordinator"],
   },
   {

@@ -47,12 +47,6 @@ export default function StudentSearchPage() {
   const [savingMarks, setSavingMarks] = useState(false);
   const [academicYears, setAcademicYears] = useState<AcademicYear[]>([]);
   const [selectedYear, setSelectedYear] = useState<string>("");
-
-  // const [lastComputed, setLastComputed] = useState<{
-  //   grade: string;
-  //   finalMark: number;
-  //   status: string;
-  // } | null>(null);
   const { addToast } = useToast();
 
   // 
@@ -240,58 +234,107 @@ export default function StudentSearchPage() {
 
                   {/* ACADEMIC STATUS ALERT BOX */}
                   {selectedStudent?.academicStatus && (
-                    <div className={`mb-6 p-2 rounded-xl border-l-4 flex items-start ${selectedStudent.academicStatus.variant === 'success' ? 'bg-green-50 border-green-500 text-green-800' :
-                      selectedStudent.academicStatus.variant === 'warning' ? 'bg-yellow-50 border-yellow-500 text-yellow-800' :
-                        'bg-red-50 border-red-500 text-red-800'
+                    <div className={`mb-6 p-4 rounded-xl border-l-4 flex items-start gap-3 shadow-sm ${selectedStudent.academicStatus.variant === 'success' ? 'bg-green-50 border-green-500 text-green-800' :
+                        selectedStudent.academicStatus.variant === 'warning' ? 'bg-yellow-50 border-yellow-500 text-yellow-800' :
+                          'bg-red-50 border-red-500 text-red-800'
                       }`}>
-                      <div className="mt-1">
-                        {selectedStudent.academicStatus.variant === 'success' ? <CheckCircle size={24} /> : <AlertTriangle size={24} />}
+                      <div className="mt-1 flex-shrink-0">
+                        {selectedStudent.academicStatus.variant === 'success' ? (
+                          <CheckCircle size={20} className="text-green-600" />
+                        ) : (
+                          <AlertTriangle size={20} className={selectedStudent.academicStatus.variant === 'error' ? 'text-red-600' : 'text-yellow-600'} />
+                        )}
                       </div>
-                      <div>
-                        <h3 className="font-bold text-md leading-none mb-1">
+
+                      <div className="flex-1">
+                        <h3 className="font-bold text-md leading-tight mb-1">
                           {selectedStudent.academicStatus.status}
                         </h3>
-                        <p className="text-xs font-mono opacity-90">
+                        <p className="text-xs font-mono opacity-90 mb-4">
                           {selectedStudent.academicStatus.details}
                         </p>
 
-                        {/* NEW: Explicit list of missing units if status is INCOMPLETE */}
-                        {selectedStudent.academicStatus.missingList && selectedStudent.academicStatus.missingList.length > 0 && (
-                          <div className="mt-4">
-                            <ul className="grid grid-cols-2 gap-2">
-                              {selectedStudent.academicStatus.missingList?.map((unitStr, idx) => (
-                                <li key={idx} className="text-xs font-mono bg-blue-100 p-1 rounded">
-                                  ⚠️ {unitStr}
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        )}
+                        {/* UNIT BREAKDOWN GRID */}
+                        <div className="space-y-4">
 
-                        {/* SUPPLEMENTARY EXAMS SECTION */}
-                        {/* {selectedStudent.academicStatus.supplementaryList && selectedStudent.academicStatus.supplementaryList.length > 0 && (
-                          <div className="mt-4">
-                            <ul className="grid grid-cols-2 gap-2">
-                              {selectedStudent.academicStatus.supplementaryList.map((unitStr, idx) => (
-                                <li key={idx} className="text-xs font-mono bg-amber-100 border border-amber-200 text-amber-800 p-1.5 rounded flex items-center gap-1">
-                                  📝 {unitStr}
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        )} */}
+                          {/* 1. MISSING UNITS (Info/Blue) */}
+                          {selectedStudent.academicStatus.missingList?.length > 0 && (
+                            <div>
+                              <span className="text-[10px] font-bold uppercase tracking-widest text-blue-600 block mb-1">Missing Records</span>
+                              <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                {selectedStudent.academicStatus.missingList.map((unitStr, idx) => (
+                                  <li key={idx} className="text-xs font-mono bg-blue-100/50 border border-blue-200 p-2 rounded flex items-center gap-2">
+                                    <span className="text-blue-500">❓</span> {unitStr}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
 
-                        {/* Mini Progress Tracker */}
-                        <div className="mt-3 flex gap-4 text-xs font-semibold uppercase tracking-wider">
-                          <span>Passed: {selectedStudent.academicStatus.summary.passed}</span>
-                          <span>Failed: {selectedStudent.academicStatus.summary.failed}</span>
+                          {/* 2. SUPPLEMENTARIES / FAILED (Warning/Amber) */}
+                          {selectedStudent.academicStatus.failedList?.length > 0 && (
+                            <div>
+                              <span className="text-[10px] font-bold uppercase tracking-widest text-amber-600 block mb-1">Pending Supplementaries (1st Attempt)</span>
+                              <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                {selectedStudent.academicStatus.failedList.map((unitStr, idx) => (
+                                  <li key={idx} className="text-xs font-mono bg-amber-100/50 border border-amber-200 p-2 rounded flex items-center gap-2">
+                                    <span className="text-amber-500">📝</span> {unitStr}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+
+                          {/* 3. RETAKES (Danger/Orange) */}
+                          {selectedStudent.academicStatus.retakeList?.length > 0 && (
+                            <div>
+                              <span className="text-[10px] font-bold uppercase tracking-widest text-orange-600 block mb-1">Carry Over / Retakes (2nd Attempt)</span>
+                              <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                {selectedStudent.academicStatus.retakeList.map((unitStr, idx) => (
+                                  <li key={idx} className="text-xs font-mono bg-orange-100/50 border border-orange-200 p-2 rounded flex items-center gap-2 font-semibold">
+                                    <span className="text-orange-600">🔄</span> {unitStr}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+
+                          {/* 4. RE-RETAKES (Critical/Red) */}
+                          {selectedStudent.academicStatus.reRetakeList?.length > 0 && (
+                            <div>
+                              <span className="text-[10px] font-bold uppercase tracking-widest text-red-600 block mb-1">Critical Failures (3rd Attempt+)</span>
+                              <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                {selectedStudent.academicStatus.reRetakeList.map((unitStr, idx) => (
+                                  <li key={idx} className="text-xs font-mono bg-red-100 border border-red-200 p-2 rounded flex items-center gap-2 font-bold animate-pulse">
+                                    <span className="text-red-600">🚫</span> {unitStr}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Summary Footer */}
+                        <div className="mt-5 pt-3 border-t border-black/5 flex gap-6 text-[11px] font-bold uppercase tracking-tighter">
+                          <div className="flex items-center gap-1 text-green-600">
+                            <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                            Passed: {selectedStudent.academicStatus.summary.passed}
+                          </div>
+                          <div className="flex items-center gap-1 text-red-600">
+                            <span className="w-2 h-2 rounded-full bg-red-500"></span>
+                            Failed: {selectedStudent.academicStatus.summary.failed}
+                          </div>
                           {selectedStudent.academicStatus.summary.missing > 0 && (
-                            <span className="text-blue-600">Missing: {selectedStudent.academicStatus.summary.missing}</span>
+                            <div className="flex items-center gap-1 text-blue-600">
+                              <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                              Missing: {selectedStudent.academicStatus.summary.missing}
+                            </div>
                           )}
                         </div>
                       </div>
                     </div>
                   )}
+
                 </div>
                 <div className="flex gap- mt-4">
                   {/* Full Transcript */}
@@ -380,39 +423,39 @@ export default function StudentSearchPage() {
                     {selectedStudent?.grades.map((grade: GradeRecord) => (
                       <tr
                         key={grade._id}
-                        className="border-t border-green-darkest/30 text-green-darkest hover:bg-green-dark/30"
+                        className="border-t border-green-darkest/20 text-sm text-green-darkest hover:bg-green-dark/30"
                       >
                         {/* 1. Academic Year */}
-                        <td className="p-4">
+                        <td className="p-2">
                           {grade.academicYear?.year || "N/A"}
                         </td>
 
                         {/* 2. Semester */}
-                        <td className="p-4">
+                        <td className="p-2">
                           {grade.semester && grade.semester !== "N/A"
                             ? `Semester ${grade.semester}`
                             : "Not Set"}
                         </td>
 
                         {/* 3. Unit Code */}
-                        <td className="p-4 font-mono">
+                        <td className="p-2 font-mono">
                           {grade.unit?.code || "N/A"}
                         </td>
 
                         {/* 4. Unit Name */}
-                        <td className="p-4">
+                        <td className="p-2">
                           {grade.unit?.name || "Unit details missing"}
                         </td>
 
                         {/* 5. Grade */}
-                        <td className="p-4 text-center font-bold text-lg">
+                        <td className="p-4 text-center font-semibold">
                           {grade.grade}
                         </td>
 
                         {/* 6. Status */}
-                        <td className="p-4 text-center">
+                        <td className="p-2 text-center">
                           <span
-                            className={`py-1 px-4  rounded-full text-sm font-medium ${grade.status === "PASS"
+                            className={`py-1 px-4  rounded-full text-xs font-medium ${grade.status === "PASS"
                               ? "bg-green-100 text-green-800"
                               : grade.status === "INCOMPLETE"
                                 ? "bg-yellow-100 text-yellow-800"
@@ -450,7 +493,7 @@ export default function StudentSearchPage() {
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="w-full">
-                      <thead className="bg-gradient-to-r from-green-darkest to-green-dark text-lime-bright">
+                      <thead className="bg-gradient-to-r from-green-darkest to-green-dark text-sm text-lime-bright">
                         <tr>
                           <th className="p-4 font-semibold text-left">Year</th>
                           <th className="p-4 font-semibold text-left">Unit</th>
@@ -488,39 +531,39 @@ export default function StudentSearchPage() {
                               setEditingMark(m);
                               setShowEditModal(true);
                             }}
-                            className="border-t hover:bg-green-dark/20 cursor-pointer transition font-mono font-medium text-green-darkest/50"
+                            className="border-t border-green-dark/20 hover:bg-green-dark/20 cursor-pointer transition font-mono font-medium text-sm text-green-darkest/50"
                           >
-                            <td className="p-4">{m.academicYear.year}</td>
-                            <td className="p-4 font-mono">
+                            <td className="p-3">{m.academicYear.year}</td>
+                            <td className="p-3 font-mono">
                               {m.programUnit?.unit?.code}
                             </td>
-                            <td className="p-4 text-center">
+                            <td className="p-3 text-center">
                               {m.cat1Raw ?? "-"}
                             </td>
-                            <td className="p-4 text-center">
+                            <td className="p-3 text-center">
                               {m.cat2Raw ?? "-"}
                             </td>
-                            <td className="p-4 text-center">
+                            <td className="p-3 text-center">
                               {m.cat3Raw ?? "-"}
                             </td>
-                            <td className="p-4 text-center">
+                            <td className="p-3 text-center">
                               {m.assgnt1Raw ?? "-"}
                             </td>
                             {/* Display the calculated totals for quick reference */}
-                            <td className="p-4 text-center font-bold">
+                            <td className="p-3 text-center font-bold">
                               {m.caTotal30 ?? 0}
                             </td>
-                            <td className="p-4 text-center  font-bold">
+                            <td className="p-3 text-center  font-bold">
                               {m.examTotal70 ?? 0}
                             </td>
-                            <td className="p-4 text-center font-black">
+                            <td className="p-3 text-center font-black">
                               {m.agreedMark ?? 0}
                             </td>
-                            <td className="p-4 text-center ">
+                            <td className="p-3 text-center ">
                               {m.isSupplementary ? "YES" : ""}
                             </td>
-                            <td className="p-4 text-center font-bold  text-green-darkest">
-                              Click to Edit
+                            <td className="p-3 text-center font-bold  text-green-darkest">
+                              Edit
                             </td>
                           </tr>
                         ))}

@@ -184,12 +184,15 @@ export interface AcademicSummary {
 }
 
 export interface AcademicStatus {
+  // failedList: any;
   status: string;
   variant: "success" | "warning" | "error" | "info";
   details: string;
   summary: AcademicSummary;
   missingList: string[];
-  supplementaryList: string[];
+  failedList: string[];
+  retakeList: string[];
+  reRetakeList: string[];
 }
 
 export interface GradeRecord {

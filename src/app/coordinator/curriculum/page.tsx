@@ -1,3 +1,4 @@
+// clientside/src/app/coordinator/curriculum/page.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -310,7 +311,7 @@ const [templateForm, setTemplateForm] = useState({
               disabled={submitting || showForm} // Disable if another form is active
               className="px-4 py-2 bg-gradient-to-r from-green-dark to-lime-bright text-white-pure rounded-2xl hover:shadow-4xl hover:scale-105 font-bold disabled:opacity-50 disabled:cursor-not-allowed transition shadow-2xl"
             >
-              + New Unit Template
+              + New Unit 
             </button>
             
             {!showForm && (

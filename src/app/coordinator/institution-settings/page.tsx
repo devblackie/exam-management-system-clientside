@@ -20,14 +20,14 @@ export default function InstitutionSettingsPage() {
     supplementaryThreshold: 40,
     retakeThreshold: 5,
     gradingScale: [
-      { min: 70, grade: "A", points: 4.0 }, //69.5
-      { min: 65, grade: "B+", points: 3.5 },
-      { min: 60, grade: "B", points: 3.0 }, // 59.5
-      { min: 55, grade: "C+", points: 2.5 },
-      { min: 50, grade: "C", points: 2.0 },  //49.5
-      { min: 45, grade: "D+", points: 1.5 },
-      { min: 40, grade: "D", points: 1.0 }, //39.5
-      { min: 0, grade: "F", points: 0.0 }, //E
+      { min: 69.5, grade: "A" }, //69.5
+
+      { min: 59.5, grade: "B" }, // 59.5
+
+      { min: 49.5, grade: "C" },  //49.5
+
+      { min: 39.5, grade: "D" }, //39.5
+      { min: 0, grade: "E" }, //E
     ],
   });
 
@@ -90,8 +90,8 @@ export default function InstitutionSettingsPage() {
   }
 
   return (
-    <div className="max-w-6xl h-full ml-48 my-10">
-      <div className="max-w-7xl mx-auto">
+    <div className=" max-w-8xl ml-48  my-10">
+      <div className="bg-white rounded-3xl shadow-2xl p-10 min-h-screen">
         {/* Header */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 mb-8">
           <h1 className="text-3xl font-bold text-green-darkest">
@@ -297,9 +297,9 @@ export default function InstitutionSettingsPage() {
                   <th className="border border-gray-300 px-6 py-4 text-left text-sm font-semibold text-gray-800">
                     Grade
                   </th>
-                  <th className="border border-gray-300 px-6 py-4 text-left text-sm font-semibold text-gray-800">
+                  {/* <th className="border border-gray-300 px-6 py-4 text-left text-sm font-semibold text-gray-800">
                     Grade Points
-                  </th>
+                  </th> */}
                 </tr>
               </thead>
               <tbody>
@@ -334,9 +334,9 @@ export default function InstitutionSettingsPage() {
                         className="w-24 px-3 py-2 border border-gray-400 rounded focus:outline-none focus:border-blue-500 font-medium"
                       />
                     </td>
-                    <td className="border border-gray-300 px-6 py-4 text-green-darkest font-medium">
+                    {/* <td className="border border-gray-300 px-6 py-4 text-green-darkest font-medium">
                       {row.points?.toFixed(1)}
-                    </td>
+                    </td> */}
                   </tr>
                 ))}
               </tbody>
@@ -358,9 +358,8 @@ export default function InstitutionSettingsPage() {
         {/* Message */}
         {message && (
           <div
-            className={`mt-8 p-6 text-center rounded-lg text-white font-medium text-lg ${
-              message.type === "success" ? "bg-green-600" : "bg-red-600"
-            }`}
+            className={`mt-8 p-6 text-center rounded-lg text-white font-medium text-lg ${message.type === "success" ? "bg-green-600" : "bg-red-600"
+              }`}
           >
             {message.text}
           </div>
