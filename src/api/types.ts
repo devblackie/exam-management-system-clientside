@@ -99,8 +99,9 @@ export interface StudentFromAPI {
 export interface AcademicYear {
   _id: string;
   year: string;           // e.g. "2024/2025"
-  startDate: string;      // ISO string "2024-08-01"
-  endDate: string;        // ISO string "2025-07-31"
+  startDate?: string;      // ISO string "2024-08-01"
+  endDate?: string;        // ISO string "2025-07-31"
+ isActive: boolean;
   isCurrent?: boolean;
   createdAt?: string;
   updatedAt?: string;
@@ -158,7 +159,9 @@ export interface StudentFormRow {
   regNo: string;
   name: string;
   program: string;
-  currentYearOfStudy: number; // Corrected field name
+  currentYearOfStudy: number; 
+  academicYearId?: string; // Add this
+  admissionAcademicYear?: string; // The "2024/2025" string
 }
 
 export interface StudentStats {

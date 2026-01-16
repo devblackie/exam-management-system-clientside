@@ -53,6 +53,62 @@ export const saveRawMarks = async (data: SaveMarksPayload): Promise<RawMark> => 
   return res.data;
 };
 
+export const downloadStudentRegistrationTemplate = async (
+  programId?: string,     // optional — can pre-filter
+  academicYearId?: string // optional
+) => {
+  try {
+    const params = new URLSearchParams();
+    if (programId)     params.set("programId", programId);
+    if (academicYearId) params.set("academicYearId", academicYearId);
+
+    const query = params.toString() ? `?${params.toString()}` : "";
+
+    const response = await api.get<Blob>(`/students/template${query}`, {
+      responseType: "blob",
+    });
+
+    // ── Better filename extraction ──────────────────────────────────────
+    let filename = "student-registration-template.xlsx";
+
+    const disposition = response.headers["content-disposition"];
+    if (disposition && disposition.includes("filename")) {
+      // Handle both simple and RFC 5987 styles
+      const filenameRegex = /filename\*?=(?:UTF-8'')?([^;]+)/i;
+      const matches = disposition.match(filenameRegex);
+      if (matches?.[1]) {
+        filename = decodeURIComponent(matches[1].replace(/['"]/g, "").trim());
+      }
+    }
+
+    // Fallback / safety cleanup
+    filename = filename
+      .replace(/\.xlsx[x_]*$/i, ".xlsx")   // fix corrupted extensions
+      .replace(/[^a-z0-9._-]/gi, "_")      // very safe characters
+      .replace(/_+/g, "_")
+      .trim();
+
+    const url = window.URL.createObjectURL(response.data);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", filename);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
+
+    return true; // success indicator
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (err: any) {
+    console.error("Template download failed:", err);
+    throw new Error(
+      err.response?.data?.message ||
+      err.message ||
+      "Failed to download registration template"
+    );
+  }
+};
+
 
 export const downloadTranscript = async (regNo: string, year?: string) => {
   const params = new URLSearchParams({ regNo });

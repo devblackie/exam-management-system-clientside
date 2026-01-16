@@ -1,24 +1,63 @@
 // clientside/src/app/coordinator/students/page.tsx
 "use client";
 
-import { useState, useRef } from "react";
-import { getStudents, bulkRegisterStudents } from "@/api/studentsApi";
-import type { StudentFromAPI, StudentFormRow } from "@/api/types";
+import { useState, useEffect, useRef } from "react";
+import { getStudents, bulkRegisterStudents, downloadStudentRegistrationTemplate } from "@/api/studentsApi";
+import type { StudentFromAPI, StudentFormRow, Program, AcademicYear } from "@/api/types";
 import { useToast } from "@/context/ToastContext";
+import { getAcademicYears, getPrograms } from "@/api/marksApi";
 
 export default function RegisterStudents() {
   const [students, setStudents] = useState<StudentFormRow[]>([
-    { regNo: "", name: "", program: "", yearOfStudy: 1 },
+    { regNo: "", name: "", program: "", currentYearOfStudy: 1 },
   ]);
   const [loading, setLoading] = useState(false);
   const tableRef = useRef<HTMLDivElement>(null);
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [programs, setPrograms] = useState<Program[]>([]);
+  const [academicYears, setAcademicYears] = useState<AcademicYear[]>([]);
+  const [selectedProgramId, setSelectedProgramId] = useState<string>("");
+  const [loadingPrograms, setLoadingPrograms] = useState(false);
+  const [selectedAcademicYearId, setSelectedAcademicYearId] = useState<string>(""); // Add this
+  const [loadingData, setLoadingData] = useState(false);
   const { addToast } = useToast();
+
+  // Fetch programs on mount
+// Inside RegisterStudents component
+useEffect(() => {
+  const fetchData = async () => {
+    // 1. Use the correct loading state
+    setLoadingData(true); 
+    try {
+      const [progData, yearData] = await Promise.all([
+        getPrograms(),
+        getAcademicYears()
+      ]);
+      
+      setPrograms(progData);
+      setAcademicYears(yearData);
+
+      // 2. Safely auto-select the current year
+      const current = yearData.find((y: AcademicYear) => y.isCurrent);
+      if (current) {
+        setSelectedAcademicYearId(current._id);
+      }
+    } catch (error) {
+      console.error("Fetch error:", error);
+      addToast("Failed to load programs and years", "error");
+    } finally {
+      // 3. Reset the correct loading state
+      setLoadingData(false); 
+    }
+  };
+  fetchData();
+}, [addToast]);
 
   // Add a new empty row
   const addRow = () => {
     setStudents([
       ...students,
-      { regNo: "", name: "", program: "", yearOfStudy: 1 },
+      { regNo: "", name: "", program: "", currentYearOfStudy: 1 },
     ]);
   };
 
@@ -132,18 +171,57 @@ export default function RegisterStudents() {
     addToast(`Successfully pasted ${result.length} students`, "success");
   };
 
-  const extractAcademicYear = (regNo: string): string => {
-    const match = regNo.match(/\/(\d{4})$/);
-    return match ? `${match[1]}/${Number(match[1]) + 1}` : "2024/2025";
+ const handleDownloadTemplate = async () => {
+    if (!selectedProgramId || !selectedAcademicYearId) {
+      addToast("Please select both a programme and an academic year.", "warning");
+      return;
+    }
+
+    setIsDownloading(true);
+    try {
+      // Pass both IDs to your API utility
+      await downloadStudentRegistrationTemplate(selectedProgramId, selectedAcademicYearId);
+      addToast("Template downloaded successfully!", "success");
+    } catch {
+      addToast("Could not download template", "error");
+    } finally {
+      setIsDownloading(false);
+    }
   };
 
+  const extractAcademicYear = (regNo: string): string => {
+  const match = regNo.match(/\/(\d{2,4})$/);
+  if (!match) return "2024/2025"; // Global fallback
+
+  let yearPart = match[1];
+  // If user typed 24, convert to 2024
+  if (yearPart.length === 2) {
+    yearPart = `20${yearPart}`;
+  }
+  
+  const startYear = Number(yearPart);
+  return `${startYear}/${startYear + 1}`;
+};
+
   const handleSubmit = async () => {
-    const filled = students
-      .filter((s) => s.regNo.trim() && s.name.trim() && s.program.trim())
-      .map((s) => ({
-        ...s,
-        admissionAcademicYear: extractAcademicYear(s.regNo),
-      }));
+    // Find the label of the selected year for the payload
+  const selectedYearDoc = academicYears.find(y => y._id === selectedAcademicYearId);
+  // Fallback if no year is selected but the user tries to submit
+    if (!selectedYearDoc && !selectedAcademicYearId) {
+       addToast("Please select an academic year", "error");
+       return;
+    } 
+  const yearLabel = selectedYearDoc?.year;
+
+  const filled = students
+    .filter((s) => s.regNo.trim() && s.name.trim() && s.program.trim())
+    .map((s) => ({
+      ...s,
+      // Priority: 1. Dropdown Selection, 2. Regex Extraction, 3. Hardcoded Fallback
+      admissionAcademicYear: yearLabel || extractAcademicYear(s.regNo),
+      // We also send the ID to the backend for direct DB linking
+      academicYearId: selectedAcademicYearId 
+    }));
 
     if (filled.length === 0) {
       addToast("Please fill at least one student", "error");
@@ -180,11 +258,8 @@ export default function RegisterStudents() {
       } else if (alreadyCount > 0) {
         toastMessage = "All students in the list are already registered.";
       }
-
-      addToast(toastMessage, "success"); // ✅ Always show success/skip toast
-
-      // RESET THE FORM INSTEAD OF RELOADING ALL STUDENTS
-      setStudents([{ regNo: "", name: "", program: "", yearOfStudy: 1 }]);
+      addToast(toastMessage, "success");
+      setStudents([{ regNo: "", name: "", program: "", currentYearOfStudy: 1 }]);
     } catch (err: unknown) {
       const error = err as {
         response?: {
@@ -220,18 +295,14 @@ export default function RegisterStudents() {
   return (
     <div className="max-w-8xl ml-48 my-10 ">
       <div className="bg-white min-h-screen rounded-3xl shadow-2xl p-10">
-       
-       
-
-         <div className="rounded-lg shadow-md border border-green-dark/20 p-4 ">
+        <div className="rounded-lg shadow-md border border-green-dark/20 p-4 ">
           <h1 className="text-2xl font-bold text-green-darkest">
             Register Students
           </h1>
- <p className=" text-green-dark">
-          Add students to your institution. Required:{" "}
-          <strong>Reg No, Name, Program</strong>
-        </p>
-         
+          <p className=" text-green-dark">
+            Add students to your institution. Required:{" "}
+            <strong>Reg No, Name, Program</strong>
+          </p>
         </div>
 
         {duplicates.size > 0 && (
@@ -241,6 +312,85 @@ export default function RegisterStudents() {
             </div>
           </div>
         )}
+
+
+
+        {/* Selectors Grid */}
+<div className="my-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+  {/* Program Selector */}
+  <div>
+    <label className="block text-sm font-medium text-gray-700 mb-1">
+      Select Program
+    </label>
+    <select
+      value={selectedProgramId}
+      onChange={(e) => setSelectedProgramId(e.target.value)}
+      disabled={loadingData}
+      className={`w-full p-2 border rounded-lg text-green-darkest/50 transition-colors ${
+        !selectedProgramId ? "border-orange-300 bg-orange-50" : "border-gray-300"
+      }`}
+    >
+      <option value="" className="text-gray-400">Select Programme</option>
+      {programs.map((prog) => (
+        <option key={prog._id} value={prog._id}>
+          {prog.name}
+        </option>
+      ))}
+    </select>
+  </div>
+
+  {/* Academic Year Selector */}
+  <div>
+    <label className="block text-sm font-medium text-gray-700 mb-1">
+      Academic Year
+    </label>
+    <select
+      value={selectedAcademicYearId}
+      onChange={(e) => setSelectedAcademicYearId(e.target.value)}
+      disabled={loadingData}
+      className={`w-full p-2 border rounded-lg text-green-darkest/50  transition-colors ${
+        !selectedAcademicYearId ? "border-orange-300 bg-orange-50" : "border-gray-300"
+      }`}
+    >
+    <option value="" className="text-gray-400">Select Academic Year</option>
+  {academicYears && academicYears.length > 0 ? (
+    academicYears.map((year) => (
+      <option key={year._id} value={year._id} className="text-green-darkest/50">
+        {year.year} {year.isCurrent ? "(Current)" : ""}
+      </option>
+    ))
+  ) : (
+    <option disabled>No years found</option>
+  )}
+    </select>
+  </div>
+</div>
+
+{/* Download Button Section */}
+<div className="my-6 text-center">
+  <button
+    onClick={handleDownloadTemplate}
+    disabled={isDownloading}
+    className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-green-darkest to-green-dark text-white-pure rounded-2xl font-bold shadow-xl hover:from-green-700 hover:to-emerald-800 disabled:opacity-60 disabled:cursor-not-allowed transition transform hover:scale-105"
+  >
+    {isDownloading ? (
+      <><span className="animate-spin h-5 w-5 border-4 border-white border-t-transparent rounded-full" /> Downloading...</>
+    ) : (
+      <>
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+        </svg>
+        Download Student Registration Template
+      </>
+    )}
+  </button>
+  {(!selectedProgramId || !selectedAcademicYearId) && (
+    <p className="mt-2 text-sm text-orange-600 font-medium">
+      ⚠ Select both programme and year above to enable download
+    </p>
+  )}
+</div>
+
 
         {/* PASTE AREA */}
         <div
@@ -271,16 +421,13 @@ export default function RegisterStudents() {
             </thead>
             <tbody className="divide-y divide-gray-200 border">
               {students.map((student, i) => {
-           
-
                 const safeReg = String(student.regNo || "");
                 const safeName = String(student.name || "");
                 const safeProgram = String(student.program || "");
-
                 const currentReg = safeReg.trim().toUpperCase();
                 const isDuplicate = currentReg && duplicates.has(currentReg);
                 const isIncomplete =
-                  !safeReg.trim() || !safeName.trim() || !safeProgram.trim(); // FIXED: Using safeProgram string here
+                  !safeReg.trim() || !safeName.trim() || !safeProgram.trim();
 
                 return (
                   <tr
@@ -288,11 +435,10 @@ export default function RegisterStudents() {
                     className={`
         hover:bg-green-base/20 transition-all duration-200
         ${isDuplicate ? "bg-red-100 border-l-4 border-red-600 shadow-lg" : ""}
-        ${
-          !isDuplicate && isIncomplete
-            ? "bg-orange-50 border-l-4 border-orange-500"
-            : ""
-        }
+        ${!isDuplicate && isIncomplete
+                        ? "bg-orange-50 border-l-4 border-orange-500"
+                        : ""
+                      }
         ${!isDuplicate && !isIncomplete ? "bg-white" : ""}
       `}
                   >
@@ -312,13 +458,12 @@ export default function RegisterStudents() {
                           placeholder="SC/ICT/001/2023"
                           className={`
               w-full px-3 py-2 text-green-darkest rounded-lg font-bold transition-all outline-none
-              ${
-                isDuplicate
-                  ? "bg-red-200 border-2 border-red-700 text-red-900 placeholder-red-400 shadow-md"
-                  : !student.regNo.trim()
-                  ? "bg-orange-100  "
-                  : "bg-gray-50 hover:bg-yellow-gold/70 focus:ring-0"
-              }
+              ${isDuplicate
+                              ? "bg-red-200 border-2 border-red-700 text-red-900 placeholder-red-400 shadow-md"
+                              : !student.regNo.trim()
+                                ? "bg-orange-100  "
+                                : "bg-gray-50 hover:bg-yellow-gold/70 focus:ring-0"
+                            }
             `}
                         />
                       </div>
@@ -350,11 +495,11 @@ export default function RegisterStudents() {
                     <td className="px- py-2  text-center ">
                       <input
                         type="number"
-                        value={student.yearOfStudy}
+                        value={student.currentYearOfStudy}
                         onChange={(e) =>
                           updateStudent(
                             i,
-                            "yearOfStudy",
+                            "currentYearOfStudy",
                             Number(e.target.value)
                           )
                         }
@@ -393,9 +538,8 @@ export default function RegisterStudents() {
           >
             {loading
               ? "Saving..."
-              : `Register ${
-                  students.filter((s) => s.regNo && s.name && s.program).length
-                } Students`}
+              : `Register ${students.filter((s) => s.regNo && s.name && s.program).length
+              } Students`}
           </button>
         </div>
 
@@ -406,3 +550,5 @@ export default function RegisterStudents() {
     </div>
   );
 }
+
+

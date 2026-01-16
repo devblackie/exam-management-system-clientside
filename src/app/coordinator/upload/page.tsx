@@ -8,9 +8,9 @@ import { uploadMarks, downloadTemplate } from "@/api/marksApi";
 import { useToast } from "@/context/ToastContext";
 import { branding } from "@/config/branding";
 import { getPrograms } from "@/api/programsApi";
-import { getAcademicYears } from "@/api/academicYearsApi"; 
-import { getProgramUnits } from "@/api/programUnitsApi"; 
-import type { Program, AcademicYear, ProgramUnit } from "@/api/types"; 
+import { getAcademicYears } from "@/api/academicYearsApi";
+import { getProgramUnits } from "@/api/programUnitsApi";
+import type { Program, AcademicYear, ProgramUnit } from "@/api/types";
 import { CloudCheck } from 'lucide-react';
 
 interface UploadResult {
@@ -49,10 +49,6 @@ export default function UploadMarks() {
   const [uploading, setUploading] = useState(false);
   const [result, setResult] = useState<UploadResult | null>(null);
   const [dragActive, setDragActive] = useState(false);
-
-  // -----------------------------------------------------
-  // useEffects for Populating Dropdowns
-  // -----------------------------------------------------
 
   // Fetch initial data: Programs and Academic Years
   useEffect(() => {
@@ -106,9 +102,6 @@ export default function UploadMarks() {
     selectedSemester,
   ]);
 
-  // -----------------------------------------------------
-  // Handlers
- 
   const handleDownloadTemplate = async () => {
     // Use the state variables for the required parameters
     if (!isDownloadEnabled) {
@@ -207,7 +200,6 @@ export default function UploadMarks() {
           <p className=" text-green-darkest">
             Select the Academic Context and download the official{" "}
             {branding.school} scoresheet template.
-          
           </p>
         </div>
 
@@ -298,18 +290,17 @@ export default function UploadMarks() {
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Unit
             </label>
-          
+
             <select
               value={selectedUnitId}
               onChange={(e) => setSelectedUnitId(e.target.value)}
               disabled={
                 !selectedProgramId || !selectedYearOfStudy || !selectedSemester
               }
-              className={`w-full p-2 border rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 ${
-                !selectedProgramId || !selectedYearOfStudy || !selectedSemester
+              className={`w-full p-2 border rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 ${!selectedProgramId || !selectedYearOfStudy || !selectedSemester
                   ? "bg-gray-200 cursor-not-allowed text-gray-400"
                   : "border-gray-300 text-green-darkest/40"
-              }`}
+                }`}
             >
               <option value="">Select Unit</option>
               {filteredProgramUnits.map((pu) => (
@@ -341,24 +332,22 @@ export default function UploadMarks() {
                 d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
               />
             </svg>
-            Download Scoresheet Template 
+            Download Scoresheet Template
           </button>
         </div>
-       
+
         {/* Drag & Drop Zone */}
-       
         <div
           onDragEnter={handleDrag}
           onDragLeave={handleDrag}
           onDragOver={handleDrag}
           onDrop={handleDrop}
-          className={`relative border-2 border-dashed rounded-3xl p-16 mx-32  text-center transition-all duration-300 ${
-            dragActive
+          className={`relative border-2 border-dashed rounded-3xl p-16 mx-32  text-center transition-all duration-300 ${dragActive
               ? "border-green-darkest bg-green-dark/20 shadow-2xl scale-105"
               : "border-gray-400 bg-white shadow-xl"
-          }`}
+            }`}
         >
-         
+
           {dragActive && (
             <div className="absolute inset-0 bg-green-dark/50 bg-opacity-10 rounded-3xl animate-pul" />
           )}
@@ -442,7 +431,7 @@ export default function UploadMarks() {
                 </>
               ) : (
                 <>
-                <CloudCheck />
+                  <CloudCheck />
                   Upload & Process Marks
                 </>
               )}
@@ -453,11 +442,10 @@ export default function UploadMarks() {
         {/* Result */}
         {result && (
           <div
-            className={`mt-16 p-12 rounded-3xl shadow-2xl text-center ${
-              result.success === result.total
+            className={`mt-16 p-12 rounded-3xl shadow-2xl text-center ${result.success === result.total
                 ? "bg-gradient-to-br from-green-dark to-green-dark border-8 border-green-dark"
                 : "bg-gradient-to-br from-yellow-gold to-yellow-gold border-8 border-yellow-gold"
-            }`}
+              }`}
           >
             <h3 className="text-xl text-white-pure font-black mb-6">
               {result.success === result.total ? "SUCCESS!" : "PARTIAL SUCCESS"}
