@@ -2,8 +2,8 @@
 "use client";
 
 import { useState } from "react";
-import { X, CheckCircle, AlertCircle, ArrowRight, FileText, Loader2 } from "lucide-react";
-import { PromotionPreviewResponse, downloadPromotionReport, PromotionPreviewRecord } from "@/api/promoteApi";
+import { X, CheckCircle, AlertCircle, ArrowRight, FileText, Loader2, FileWarning } from "lucide-react";
+import { PromotionPreviewResponse, downloadPromotionReport, PromotionPreviewRecord, downloadIneligibilityNotices } from "@/api/promoteApi";
 
 interface PromotionParams {
   programId: string;
@@ -33,13 +33,13 @@ export default function PromotionPreviewModal({ data, params, onClose, onConfirm
     return `${parts.join(" ")} ${lastName}`;
   };
 
-  const handleDownload = async () => {
+ const handleDownloadSummaries = async () => {
     setIsDownloading(true);
     try {
       await downloadPromotionReport(params);
     } catch (error) {
-      console.error("Download error:", error);
-      alert("Failed to generate report.");
+      console.error("Summaries download error:", error);
+      alert("Failed to generate summary reports.");
     } finally {
       setIsDownloading(false);
     }
@@ -124,29 +124,59 @@ export default function PromotionPreviewModal({ data, params, onClose, onConfirm
           </table>
         </div>
 
-        {/* Footer */}
-        <div className="px-6 py-4 border-t bg-gray-50 flex justify-between">
-          <button onClick={onClose} className="px-6 py-2 font-semibold text-gray-500 hover:text-gray-800 transition">
-            Cancel
-          </button>
-          <div className="flex gap-4">
-             <button
-              disabled={isDownloading}
-              onClick={handleDownload}
-              className="flex items-center gap-2 px-6 py-2 rounded-xl font-bold border-2 border-blue-600 text-blue-600 hover:bg-blue-50 transition disabled:opacity-50"
-            >
-              {isDownloading ? <Loader2 className="w-5 h-5 animate-spin" /> : <FileText size={18} />}
-              Download Report
-            </button>
-            <button 
-              disabled={data.eligibleCount === 0}
-              onClick={onConfirm}
-              className="bg-green-600 text-white px-8 py-2 rounded-xl font-bold flex items-center gap-2 hover:bg-green-700 disabled:opacity-50 transition shadow-lg shadow-green-200"
-            >
-              Process {data.eligibleCount} Promotions <ArrowRight size={18} />
-            </button>
-          </div>
-        </div>
+       
+       {/* Footer */}
+<div className="px-6 py-4 border-t bg-gray-50 flex justify-between items-center">
+  <button 
+    onClick={onClose} 
+    className="px-6 py-2 font-semibold text-gray-500 hover:text-gray-800 transition"
+  >
+    Cancel
+  </button>
+
+  <div className="flex flex-wrap gap-4 justify-end">
+    {/* Summary download (always available) */}
+    <button
+      disabled={isDownloading}
+      onClick={handleDownloadSummaries}
+      className="flex items-center gap-2 px-6 py-2 rounded-xl font-bold border-2 border-blue-600 text-blue-600 hover:bg-blue-50 transition disabled:opacity-50"
+    >
+      {isDownloading ? <Loader2 className="w-5 h-5 animate-spin" /> : <FileText size={18} />}
+      Download Summaries
+    </button>
+
+    {/* Notices download — only if there are blocked students */}
+    {data.blockedCount > 0 && (
+      <button
+        disabled={isDownloading}
+        onClick={async () => {
+          setIsDownloading(true);
+          try {
+            await downloadIneligibilityNotices(params);
+          } catch (error) {
+            console.error("Notices download error:", error);
+            alert("Failed to generate ineligibility notices. Try again or contact support.");
+          } finally {
+            setIsDownloading(false);
+          }
+        }}
+        className="flex items-center gap-2 px-6 py-2 rounded-xl font-bold border-2 border-orange-600 text-orange-600 hover:bg-orange-50 transition disabled:opacity-50"
+      >
+        {isDownloading ? <Loader2 className="w-5 h-5 animate-spin" /> : <FileWarning size={18} />}
+        Download Notices (ZIP)
+      </button>
+    )}
+
+    {/* Process promotions — only if eligible students exist */}
+    <button 
+      disabled={data.eligibleCount === 0 || isDownloading}
+      onClick={onConfirm}
+      className="bg-green-600 text-white px-8 py-2 rounded-xl font-bold flex items-center gap-2 hover:bg-green-700 disabled:opacity-50 transition shadow-lg shadow-green-200"
+    >
+      Process {data.eligibleCount} Promotions <ArrowRight size={18} />
+    </button>
+  </div>
+</div>
       </div>
     </div>
   );

@@ -33,10 +33,6 @@ export interface BulkPromoteResponse {
   };
 }
 
-/**
- * 🔍 Preview Promotion
- * Runs a dry-run of the promotion logic without modifying the database.
- */
 export async function previewPromotion(data: {
   programId: string;
   yearToPromote: number;
@@ -49,10 +45,6 @@ export async function previewPromotion(data: {
   return res.data.data;
 }
 
-/**
- * 🚀 Bulk Promote Class
- * Commits the promotion for all eligible students in a specific program and year.
- */
 export async function bulkPromoteClass(data: {
   programId: string;
   yearToPromote: number;
@@ -68,14 +60,35 @@ export async function downloadPromotionReport(data: {
   academicYearName: string;
 }) {
   const res = await api.post("/promote/download-report", data, {
-    responseType: "blob", // Critical for binary files
+    responseType: "blob", 
+  timeout: 600000, 
   });
   
   // Create a download link in the browser
   const url = window.URL.createObjectURL(new Blob([res.data]));
   const link = document.createElement("a");
   link.href = url;
-  link.setAttribute("download", `Promotion_Report_Year_${data.yearToPromote}.docx`);
+  // link.setAttribute("download", `Promotion_Report_Year_${data.yearToPromote}.docx`);
+  link.setAttribute("download", `Promotion_Package_Year_${data.yearToPromote}.zip`);
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+}
+
+export async function downloadIneligibilityNotices(data: {
+  programId: string;
+  yearToPromote: number;
+  academicYearName: string;
+}) {
+  const res = await api.post("/promote/download-notices", data, {
+    responseType: "blob",
+    timeout: 600000,  // 10 minutes
+  });
+
+  const url = window.URL.createObjectURL(new Blob([res.data]));
+  const link = document.createElement("a");
+  link.href = url;
+  link.setAttribute("download", `Ineligibility_Notices_Year_${data.yearToPromote}.zip`);
   document.body.appendChild(link);
   link.click();
   link.remove();
