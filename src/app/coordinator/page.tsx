@@ -128,14 +128,14 @@ export default function CoordinatorPage() {
         </div>
       </div>
 
-      {showPreview && previewData && (
-        <PromotionPreviewModal 
-          data={previewData} 
-          params={currentParams}
-          onClose={() => setShowPreview(false)} 
-          onConfirm={handleFinalPromote}
-        />
-      )}
+      {showPreview && previewData && currentParams && (
+  <PromotionPreviewModal 
+    data={previewData} 
+    params={currentParams} // TypeScript is now happy because currentParams cannot be null here
+    onClose={() => setShowPreview(false)} 
+    onConfirm={handleFinalPromote}
+  />
+)}
     </ProtectedRoute>
   );
 }

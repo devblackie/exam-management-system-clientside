@@ -3,7 +3,7 @@
 
 import { useState } from "react";
 import { X, CheckCircle, AlertCircle, ArrowRight, FileText, Loader2, FileWarning } from "lucide-react";
-import { PromotionPreviewResponse, downloadPromotionReport, PromotionPreviewRecord, downloadIneligibilityNotices } from "@/api/promoteApi";
+import { PromotionPreviewResponse, downloadPromotionReport, PromotionPreviewRecord,  downloadPromotionReportWithProgress, downloadIneligibilityNoticesWithProgress } from "@/api/promoteApi";
 
 interface PromotionParams {
   programId: string;
@@ -21,6 +21,8 @@ interface PreviewModalProps {
 export default function PromotionPreviewModal({ data, params, onClose, onConfirm }: PreviewModalProps) {
   const [activeTab, setActiveTab] = useState<"eligible" | "blocked">("eligible");
   const [isDownloading, setIsDownloading] = useState(false);
+const [downloadProgress, setDownloadProgress] = useState<number | null>(null);
+  const [statusMsg, setStatusMsg] = useState("");
 
   const currentList: PromotionPreviewRecord[] = activeTab === "eligible" ? data.eligible : data.blocked;
 
@@ -33,20 +35,88 @@ export default function PromotionPreviewModal({ data, params, onClose, onConfirm
     return `${parts.join(" ")} ${lastName}`;
   };
 
- const handleDownloadSummaries = async () => {
-    setIsDownloading(true);
-    try {
-      await downloadPromotionReport(params);
-    } catch (error) {
+  const getDisplayName = (): string => {
+    return params.academicYearName || "Program";
+  };
+
+//  const handleDownloadSummaries = async () => {
+//     setIsDownloading(true);
+//     try {
+//       await downloadPromotionReport(params);
+//     } catch (error) {
+//       console.error("Summaries download error:", error);
+//       alert("Failed to generate summary reports.");
+//     } finally {
+//       setIsDownloading(false);
+//     }
+//   };
+
+  const handleDownloadSummaries = async () => {
+  setDownloadProgress(0);
+  setStatusMsg("Initializing...");
+  setIsDownloading(true);
+
+  try {
+   await downloadPromotionReportWithProgress(params, getDisplayName(), (percent, message) => {
+        setDownloadProgress(percent);
+        setStatusMsg(message);
+      });
+  } catch (error) {
+    console.error("Summaries download error:", error);
+    alert("Failed to generate summary reports.");
+    setDownloadProgress(null);
+  } finally {
+    setIsDownloading(false);
+    setTimeout(() => setDownloadProgress(null), 1000);
+    // setDownloadProgress(null); // This hides the progress bar when done
+  }
+};
+
+const handleDownloadNotices = async () => {
+  setDownloadProgress(0);
+  setStatusMsg("Analyzing blocked students...");
+  setIsDownloading(true);
+
+  try {
+   await downloadIneligibilityNoticesWithProgress(params, getDisplayName(), (percent, message) => {
+        setDownloadProgress(percent);
+        setStatusMsg(message);
+      });
+} catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to generate summary reports.";
       console.error("Summaries download error:", error);
-      alert("Failed to generate summary reports.");
+      alert(errorMessage);
+      setDownloadProgress(null);
     } finally {
       setIsDownloading(false);
+      setTimeout(() => setDownloadProgress(null), 1000);
     }
-  };
+};
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          {downloadProgress !== null && (
+      <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-[60] backdrop-blur-sm">
+        <div className="bg-white p-8 rounded-2xl shadow-2xl w-80 text-center">
+          <div className="relative pt-1">
+            <div className="flex mb-2 items-center justify-between">
+              <span className="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-green-600 bg-green-200">
+                {statusMsg}
+              </span>
+              <span className="text-xs font-semibold inline-block text-green-600">
+                {downloadProgress}%
+              </span>
+            </div>
+            <div className="overflow-hidden h-2 mb-4 text-xs flex rounded bg-green-100">
+              <div
+                style={{ width: `${downloadProgress}%` }}
+                className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-green-500 transition-all duration-500"
+              ></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )}
       <div className="bg-white rounded-lg w-full max-w-5xl max-h-[90vh] overflow-hidden shadow-2xl flex flex-col">
         {/* Header */}
         <div className="px-6 py-4 border-b flex justify-between items-center bg-gray-50">
@@ -145,26 +215,18 @@ export default function PromotionPreviewModal({ data, params, onClose, onConfirm
       Download Summaries
     </button>
 
+
+
     {/* Notices download — only if there are blocked students */}
     {data.blockedCount > 0 && (
-      <button
-        disabled={isDownloading}
-        onClick={async () => {
-          setIsDownloading(true);
-          try {
-            await downloadIneligibilityNotices(params);
-          } catch (error) {
-            console.error("Notices download error:", error);
-            alert("Failed to generate ineligibility notices. Try again or contact support.");
-          } finally {
-            setIsDownloading(false);
-          }
-        }}
-        className="flex items-center gap-2 px-6 py-2 rounded-xl font-bold border-2 border-orange-600 text-orange-600 hover:bg-orange-50 transition disabled:opacity-50"
-      >
-        {isDownloading ? <Loader2 className="w-5 h-5 animate-spin" /> : <FileWarning size={18} />}
-        Download Notices (ZIP)
-      </button>
+     <button
+  disabled={isDownloading}
+  onClick={handleDownloadNotices} // Connect the new handler
+  className="flex items-center gap-2 px-6 py-2 rounded-xl font-bold border-2 border-orange-600 text-orange-600 hover:bg-orange-50 transition disabled:opacity-50"
+>
+  {isDownloading && downloadProgress === null ? <Loader2 className="w-5 h-5 animate-spin" /> : <FileWarning size={18} />}
+  Download Notices (ZIP)
+</button>
     )}
 
     {/* Process promotions — only if eligible students exist */}
@@ -178,6 +240,8 @@ export default function PromotionPreviewModal({ data, params, onClose, onConfirm
   </div>
 </div>
       </div>
+
+ 
     </div>
   );
 }

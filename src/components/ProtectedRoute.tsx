@@ -67,7 +67,7 @@ export default function ProtectedRoute({ children, allowed }: Props) {
   // useEffect(() => {
   //   if (loading) return;
 
-  
+
 
   //   if (!user || !allowed.includes(user.role as Role)) {
   //     router.replace("/login");
@@ -79,7 +79,7 @@ export default function ProtectedRoute({ children, allowed }: Props) {
   //   return () => clearTimeout(timer);
   // }, [user, loading, allowed, router]);
 
-useEffect(() => {
+  useEffect(() => {
     if (loading) return;
 
     if (!user || !allowed.includes(user.role as Role)) {
@@ -108,6 +108,8 @@ useEffect(() => {
             alt={branding.logoAltText}
             width={140}
             height={140}
+            priority
+            style={{ height: 'auto', width: 'auto' }}
             className="object-contain"
           />
         </motion.div>

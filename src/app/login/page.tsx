@@ -49,6 +49,8 @@ export default function LoginPage() {
             alt={branding.logoAltText}
             width={200}
             height={200}
+              priority            
+              style={{ height: 'auto', width: 'auto' }}
             className="absolute inset-0 [backface-visibility:hidden]"
           />
           {/* Back side (mirrored) */}
@@ -57,6 +59,8 @@ export default function LoginPage() {
             alt={`${branding.logoAltText} back`}
             width={200}
             height={200}
+              priority            
+              style={{ height: 'auto', width: 'auto' }}
             className="absolute inset-0 rotate-y-180 [backface-visibility:hidden]"
           />
         </div>

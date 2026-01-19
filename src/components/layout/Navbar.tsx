@@ -23,6 +23,8 @@ export default function Navbar() {
             alt={branding.logoAltText}
             width={40}
             height={40}
+              priority            
+              style={{ height: 'auto', width: 'auto' }}
             className="flex items-center ml-9 md:hidden"
           />
       </div>

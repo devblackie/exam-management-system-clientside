@@ -42,6 +42,8 @@ export default function Home() {
           alt={branding.logoAltText}
           width={180}
           height={180}
+          priority            
+  style={{ height: 'auto', width: 'auto' }}
           className="object-contain"
         />
       </motion.div>
