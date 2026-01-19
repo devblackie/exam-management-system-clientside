@@ -109,7 +109,7 @@ export default function ProtectedRoute({ children, allowed }: Props) {
             width={140}
             height={140}
             priority
-            style={{ height: 'auto', width: 'auto' }}
+            style={{ height: 'auto'}}
             className="object-contain"
           />
         </motion.div>
