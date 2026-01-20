@@ -17,3 +17,8 @@ export async function createLecturer(data: {
   const res = await api.post("/coordinator/lecturers", data);
   return res.data;
 }
+
+export const promoteStudentApi = async (studentId: string) => {
+  const response = await api.post(`/coordinator/promote/${studentId}`);
+  return response.data;
+};

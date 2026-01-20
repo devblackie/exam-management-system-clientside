@@ -210,9 +210,12 @@ export interface GradeRecord {
 
 export interface StudentFullRecord {
   student: {
+    _id: string;
     name: string;
     regNo: string;
     program: string;
+    currentYear: number; 
+    currentSemester: number;
   };
   grades: GradeRecord[];
   currentStatus: string;
