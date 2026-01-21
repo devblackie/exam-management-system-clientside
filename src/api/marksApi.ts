@@ -29,7 +29,8 @@ export const downloadTemplate = async (
   unitId: string,
   academicYearId: string,
   yearOfStudy: number,
-  semester: number
+  semester: number,
+  examMode: string
 ) => {
   // --- Defensive Check ADDED HERE ---
   if (!programId || !unitId || !academicYearId || !yearOfStudy || !semester) {
@@ -50,6 +51,7 @@ export const downloadTemplate = async (
       academicYearId,
       yearOfStudy: yearOfStudy.toString(),
       semester: semester.toString(),
+      examMode
     }).toString();
 
     // Make the GET request with the parameters

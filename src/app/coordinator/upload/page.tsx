@@ -43,6 +43,7 @@ export default function UploadMarks() {
     undefined
   );
   const [selectedUnitId, setSelectedUnitId] = useState<string>("");
+  const [examMode, setExamMode] = useState<"standard" | "mandatory_q1">("standard");
 
   // --- State for Upload ---
   const [file, setFile] = useState<File | null>(null);
@@ -115,7 +116,8 @@ export default function UploadMarks() {
         selectedUnitId,
         selectedAcademicYearId,
         selectedYearOfStudy!,
-        selectedSemester!
+        selectedSemester!,
+        examMode
       );
       addToast("Template download started!", "success");
     } catch (error) {
@@ -204,7 +206,7 @@ export default function UploadMarks() {
         </div>
 
         {/* --- SELECTION CONTROLS (New Section) --- */}
-        <div className="mt-8 grid grid-cols-2 md:grid-cols-5 gap-4 p-4 bg-gray-50 rounded-xl border border-gray-200">
+        <div className="mt-8 grid grid-cols-2 md:grid-cols-6 gap-4 p-4 bg-gray-50 rounded-xl border border-gray-200">
           {/* 1. Program Select */}
           <div>
             <label className="block text-sm font-medium text-green-darkest mb-1">
@@ -298,8 +300,8 @@ export default function UploadMarks() {
                 !selectedProgramId || !selectedYearOfStudy || !selectedSemester
               }
               className={`w-full p-2 border rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 ${!selectedProgramId || !selectedYearOfStudy || !selectedSemester
-                  ? "bg-gray-200 cursor-not-allowed text-gray-400"
-                  : "border-gray-300 text-green-darkest/40"
+                ? "bg-gray-200 cursor-not-allowed text-gray-400"
+                : "border-gray-300 text-green-darkest/40"
                 }`}
             >
               <option value="">Select Unit</option>
@@ -308,6 +310,21 @@ export default function UploadMarks() {
                   {pu.unit.code} - {pu.unit.name}
                 </option>
               ))}
+            </select>
+          </div>
+
+{/* 6. Exam mode */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Exam Format
+            </label>
+            <select
+              value={examMode}
+              onChange={(e) => setExamMode(e.target.value as "standard" | "mandatory_q1")}
+              className="w-full p-2 border border-gray-300 text-green-darkest/70 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500"
+            >
+              <option value="standard">Standard (5 Questions)</option>
+              <option value="mandatory_q1">Mandatory Q1 (30m + Best 2)</option>
             </select>
           </div>
         </div>
@@ -343,8 +360,8 @@ export default function UploadMarks() {
           onDragOver={handleDrag}
           onDrop={handleDrop}
           className={`relative border-2 border-dashed rounded-3xl p-16 mx-32  text-center transition-all duration-300 ${dragActive
-              ? "border-green-darkest bg-green-dark/20 shadow-2xl scale-105"
-              : "border-gray-400 bg-white shadow-xl"
+            ? "border-green-darkest bg-green-dark/20 shadow-2xl scale-105"
+            : "border-gray-400 bg-white shadow-xl"
             }`}
         >
 
@@ -443,8 +460,8 @@ export default function UploadMarks() {
         {result && (
           <div
             className={`mt-16 p-12 rounded-3xl shadow-2xl text-center ${result.success === result.total
-                ? "bg-gradient-to-br from-green-dark to-green-dark border-8 border-green-dark"
-                : "bg-gradient-to-br from-yellow-gold to-yellow-gold border-8 border-yellow-gold"
+              ? "bg-gradient-to-br from-green-dark to-green-dark border-8 border-green-dark"
+              : "bg-gradient-to-br from-yellow-gold to-yellow-gold border-8 border-yellow-gold"
               }`}
           >
             <h3 className="text-xl text-white-pure font-black mb-6">
