@@ -1,5 +1,3 @@
-
-
 // clientside/src/app/coordinator/upload/page.tsx
 "use client";
 
@@ -53,6 +51,7 @@ export default function UploadMarks() {
 
   // Fetch initial data: Programs and Academic Years
   useEffect(() => {
+    
     getPrograms()
       .then(setPrograms)
       .catch((e) => addToast("Failed to load programs.", "error"));
@@ -313,7 +312,7 @@ export default function UploadMarks() {
             </select>
           </div>
 
-{/* 6. Exam mode */}
+         {/* 6. Exam mode */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Exam Format
@@ -497,3 +496,6 @@ export default function UploadMarks() {
     </div>
   );
 }
+
+
+
