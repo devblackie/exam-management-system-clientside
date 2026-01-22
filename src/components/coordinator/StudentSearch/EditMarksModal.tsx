@@ -1,3 +1,4 @@
+// clienside/src/components/coordinator/StudentSearch/EditMarksModal.tsx
 "use client";
 
 import { X } from "lucide-react";
@@ -32,6 +33,7 @@ export default function EditMarksModal({
   onSave,
 }: EditMarksModalProps) {
   const [isSaving, setIsSaving] = useState(false);
+  const [isSpecial, setIsSpecial] = useState(editingMark?.isSpecial || false);
 
   if (!isOpen) return null;
 
@@ -53,6 +55,8 @@ export default function EditMarksModal({
       examQ3: Number(formData.get("examQ3")) || 0,
       examQ4: Number(formData.get("examQ4")) || 0,
       examQ5: Number(formData.get("examQ5")) || 0,
+      isSpecial: isSpecial, // Pass this to the backend
+      attempt: isSpecial ? "special" : (editingMark?.attempt || "1st")
     };
 
     try {
@@ -112,23 +116,25 @@ export default function EditMarksModal({
                   const fieldName = `examQ${num}` as keyof SaveMarksPayload;
                   const rawFieldName = `examQ${num}Raw` as keyof RawMark;
                   return (
-                    <MarkInput 
-                      key={num} 
-                      name={fieldName} 
-                      label={`Q${num}`} 
-                      defaultValue={editingMark ? (editingMark[rawFieldName] as number) : null} 
+                    <MarkInput
+                      key={num}
+                      name={fieldName}
+                      label={`Q${num}`}
+                      defaultValue={editingMark ? (editingMark[rawFieldName] as number) : null}
                     />
                   );
                 })}
               </div>
             </fieldset>
 
+   
+
             <button
               type="submit"
               disabled={isSaving}
-              className="w-full py-4 bg-gradient-to-r from-green-darkest to-green-dark text-white font-bold rounded-xl shadow-lg transition-all disabled:opacity-50"
+              className="w-full py-4 bg-gradient-to-r from-green-darkest to-green-dark text-white font-bold rounded-xl shadow-lg transition-all hover:brightness-110 disabled:opacity-50"
             >
-              {isSaving ? "Synchronizing Records..." : "Save Marks & Re-calculate Grade"}
+              {isSaving ? "Updating Records..." : "Save Marks & Re-calculate Grade"}
             </button>
           </form>
         </div>
@@ -142,10 +148,10 @@ function InputField({ name, label, ...props }: InputFieldProps) {
   return (
     <div>
       <label className="text-xs font-bold text-gray-500 block mb-1 uppercase">{label}</label>
-      <input 
-        name={name} 
-        className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-green-500 outline-none" 
-        {...props} 
+      <input
+        name={name}
+        className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-green-500 outline-none"
+        {...props}
       />
     </div>
   );

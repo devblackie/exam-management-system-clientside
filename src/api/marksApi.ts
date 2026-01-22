@@ -93,6 +93,22 @@ export const downloadTemplate = async (
   }
 };
 
+
+export async function approveSpecialExam(markId: string, reason: string = "Administrative Approval") {
+  
+try {
+  const res = await api.post("/student/approve-special", {
+    markId,
+    reason
+  });
+  return res.data;}
+  catch (error) {
+    // This allows you to see the ACTUAL error in console
+    console.error("API Error Details:", error);
+    throw error; // Rethrow so the component's catch block can catch it
+  }
+}
+
 /**
  * Get student transcript (JSON data)
  */

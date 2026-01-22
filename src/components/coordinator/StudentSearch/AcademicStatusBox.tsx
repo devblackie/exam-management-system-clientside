@@ -1,4 +1,4 @@
-// 
+// clientside/src/components/coordinator/StudentSearch/AcademicStatusBox.tsx
 "use client";
 
 import { CheckCircle, AlertTriangle, ArrowUpCircle } from "lucide-react";
@@ -49,14 +49,14 @@ const handlePromote = async () => {
       // Call your promotion API
       await promoteStudentApi(studentId);
       onPromoteSuccess(); // Refresh the student data
-    } catch (err) {
+    } catch  {
       alert("Promotion failed. Ensure all criteria are met.");
     } finally {
       setIsPromoting(false);
     }
   };
   return (
-    <div className={`mb-6 p-4 rounded-xl border-l-4 flex items-start gap-3 shadow-sm ${variantClasses[status.variant]}`}>
+    <div className={`mb-6 p-2 rounded-lg border-l-4 flex items-start gap-4 shadow-sm ${variantClasses[status.variant]}`}>
       <div className="mt-1 flex-shrink-0">
         {status.variant === 'success' ? (
           <CheckCircle size={20} className="text-green-600" />
@@ -83,8 +83,10 @@ const handlePromote = async () => {
         <p className="text-xs font-mono opacity-90 mb-4">{status.details}</p>
 
         <div className="space-y-4">
-          <UnitSection label="Missing Records" list={status.missingList} color="blue" icon="❓" />
-          <UnitSection label="Pending Supplementaries" list={status.failedList} color="amber" icon="📝" />
+         <UnitSection label="Special Exams Approved" list={status.specialList} color="blue" icon="⭐" />
+    <UnitSection label="Incomplete Marks" list={status.incompleteList} color="blue" icon="🔍" />
+    <UnitSection label="Missing Records" list={status.missingList} color="blue" icon="❓" />
+    <UnitSection label="Pending Supplementaries" list={status.failedList} color="amber" icon="📝" />
           <UnitSection label="Retakes" list={status.retakeList} color="orange" icon="🔄" />
           <UnitSection label="Critical Failures" list={status.reRetakeList} color="red" icon="🚫" pulse />
         </div>
@@ -93,6 +95,7 @@ const handlePromote = async () => {
           <SummaryItem color="green" label="Passed" value={status.summary.passed} />
           <SummaryItem color="red" label="Failed" value={status.summary.failed} />
           {status.summary.missing > 0 && <SummaryItem color="blue" label="Missing" value={status.summary.missing} />}
+          {status.specialList?.length > 0 && <SummaryItem color="blue" label="Specials" value={status.specialList.length} />}
         </div>
       </div>
     </div>

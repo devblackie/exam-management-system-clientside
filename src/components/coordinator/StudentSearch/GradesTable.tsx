@@ -1,3 +1,4 @@
+// clientside/src/components/coordinator/StudentSearch/GradesTable.tsx
 "use client";
 
 import { GradeRecord } from "@/api/types";

@@ -129,7 +129,7 @@ export default function StudentSearchPage() {
           <h1 className="text-2xl font-bold text-green-darkest">Student Academic Records Portal</h1>
         </div>
 
-        <SearchBar 
+        <SearchBar
           query={query} setQuery={setQuery} onSearch={handleSearch} searching={searching}
           academicYears={academicYears} selectedYear={selectedYear} setSelectedYear={setSelectedYear}
         />
@@ -148,10 +148,10 @@ export default function StudentSearchPage() {
             <div className="flex flex-col lg:flex-row gap-6 mb-8">
               <div className="flex-1">
                 <StudentProfileHeader student={selectedStudent.student} />
-                
+
                 {/* Download Actions */}
                 <div className="flex gap-2 mt-4">
-                  <button 
+                  <button
                     onClick={() => downloadTranscript(selectedStudent.student.regNo)}
                     className="px-4 py-2 bg-green-darkest text-white rounded-lg font-bold text-sm shadow-md"
                   >
@@ -159,16 +159,16 @@ export default function StudentSearchPage() {
                   </button>
                 </div>
               </div>
-              
+
               <div className="lg:w-1/2">
                 {selectedStudent.academicStatus && (
-  <AcademicStatusBox 
-    status={selectedStudent.academicStatus} 
-    currentYear={selectedStudent.student.currentYear}
-    studentId={selectedStudent.student._id} 
-    onPromoteSuccess={() => viewStudent(selectedStudent.student.regNo)}
-  />
-)}
+                  <AcademicStatusBox
+                    status={selectedStudent.academicStatus}
+                    currentYear={selectedStudent.student.currentYear}
+                    studentId={selectedStudent.student._id}
+                    onPromoteSuccess={() => viewStudent(selectedStudent.student.regNo)}
+                  />
+                )}
               </div>
             </div>
 
@@ -178,9 +178,8 @@ export default function StudentSearchPage() {
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
-                  className={`pb-4 px-2 text-sm font-black uppercase tracking-widest transition-all border-b-4 ${
-                    activeTab === tab ? "border-green-darkest text-green-darkest" : "border-transparent text-gray-400"
-                  }`}
+                  className={`pb-4 px-2 text-sm font-black uppercase tracking-widest transition-all border-b-4 ${activeTab === tab ? "border-green-darkest text-green-darkest" : "border-transparent text-gray-400"
+                    }`}
                 >
                   {tab === "grades" ? "Official Grades" : "Raw Assessment Marks"}
                 </button>
@@ -190,8 +189,10 @@ export default function StudentSearchPage() {
             {activeTab === "grades" ? (
               <GradesTable grades={selectedStudent.grades} />
             ) : (
-              <RawMarksTable 
-                marks={rawMarks} 
+              <RawMarksTable
+                marks={rawMarks}
+                studentName={selectedStudent.student.name}
+    onRefresh={() => viewStudent(selectedStudent.student.regNo)}
                 onEdit={(m) => { setEditingMark(m); setShowEditModal(true); }}
                 onAddNew={() => { setEditingMark(null); setShowEditModal(true); }}
               />
@@ -200,7 +201,7 @@ export default function StudentSearchPage() {
         )}
 
         {selectedStudent && (
-          <EditMarksModal 
+          <EditMarksModal
             isOpen={showEditModal}
             onClose={() => setShowEditModal(false)}
             student={selectedStudent}

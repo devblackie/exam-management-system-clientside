@@ -196,6 +196,8 @@ export interface AcademicStatus {
   failedList: string[];
   retakeList: string[];
   reRetakeList: string[];
+  specialList: string[];
+  incompleteList: string[];
 }
 
 export interface GradeRecord {
@@ -265,9 +267,12 @@ export interface RawMark {
   agreedMark: number;
   
   // Metadata
-  attempt: "1st" | "re-take" | "supplementary";
+  attempt: "1st" | "re-take" | "supplementary" | "special";
   isSupplementary: boolean;
   isRetake: boolean;
+  isSpecial: boolean;
+  isMissingCA: boolean;
+  remarks?: string;
 }
 
 export interface SaveMarksPayload {
@@ -286,4 +291,6 @@ export interface SaveMarksPayload {
   examQ3?: number;
   examQ4?: number;
   examQ5?: number;
+  isSpecial: boolean;
+  attempt: "1st" | "re-take" | "supplementary" | "special";
 }
