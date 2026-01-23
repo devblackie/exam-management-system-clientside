@@ -179,15 +179,27 @@ export default function PromotionPreviewModal({ data, params, onClose, onConfirm
                     </span>
                   </td>
                   {activeTab === 'blocked' && (
-                    <td className="py-4 px-4">
-                      <div className="flex flex-wrap gap-1">
-                        {student.reasons.map((r, i) => (
-                          <span key={i} className="bg-red-50 text-red-600 text-[10px] px-2 py-0.5 rounded border border-red-100">
-                            {r}
-                          </span>
-                        ))}
-                      </div>
-                    </td>
+                   
+<td className="py-4 px-4">
+  <div className="flex flex-wrap gap-1">
+    {student.reasons.map((r, i) => {
+      const isSpecial = r.toUpperCase().includes("SPECIAL");
+      return (
+        <span 
+          key={i} 
+          className={`text-[10px] px-2 py-0.5 rounded border flex items-center gap-1 ${
+            isSpecial 
+              ? "bg-blue-50 text-blue-600 border-blue-100 font-bold" 
+              : "bg-red-50 text-red-600 border-red-100"
+          }`}
+        >
+          {isSpecial && <span className="w-1 h-1 bg-blue-600 rounded-full animate-pulse" />}
+          {r}
+        </span>
+      );
+    })}
+  </div>
+</td>
                   )}
                 </tr>
               ))}
