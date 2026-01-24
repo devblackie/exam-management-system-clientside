@@ -4,10 +4,11 @@ import api from "@/config/axiosInstance";
 import { startStreamingDownload } from "@/config/streamingUtils";
 
 export interface PromotionParams {
-  programId: string;
+  programId?: string;
   yearToPromote: number;
   academicYearName: string;
   programCode?: string;
+  studentId: string;
 }
 
 export interface PromotionPreviewRecord {
@@ -42,9 +43,7 @@ export interface BulkPromoteResponse {
   };
 }
 
-/**
- * UTILITY: Formats names for file systems
- */
+
 const getSafeFileName = (name: string | undefined): string => {
   const base =
     typeof name === "string" && name.trim().length > 0 ? name : "Program";
@@ -97,9 +96,7 @@ export async function downloadIneligibilityNoticesWithProgress(
   );
 }
 
-/**
- * LEGACY / DIRECT DOWNLOADS (Fallback)
- */
+
 export async function downloadPromotionReport(
   data: PromotionParams,
   programName: string,
@@ -157,3 +154,20 @@ export async function downloadIneligibilityNotices(data: {
 
   link.remove();
 }
+
+export async function downloadTranscriptsWithProgress(
+  data: PromotionParams,
+  programName: string | undefined,
+  onProgress: (percent: number, message: string) => void,
+) {
+  const safeName = getSafeFileName(programName);
+
+  return startStreamingDownload(
+    "/promote/download-transcripts-progress", // Matches the backend route we created
+    data,
+    onProgress,
+    `Transcripts_${safeName}_Y${data.yearToPromote}.zip`,
+  );
+}
+
+

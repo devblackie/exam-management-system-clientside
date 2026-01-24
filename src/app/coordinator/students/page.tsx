@@ -155,11 +155,11 @@ useEffect(() => {
 
       if (!regNo || !name || !program) continue;
 
-      let yearOfStudy = 1;
+      let currentYearOfStudy = 1;
       const y = parseInt(yearText);
-      if (!isNaN(y) && y >= 1 && y <= 5) yearOfStudy = y;
+      if (!isNaN(y) && y >= 1 && y <= 5) currentYearOfStudy = y;
 
-      result.push({ regNo, name, program, yearOfStudy });
+      result.push({ regNo, name, program, currentYearOfStudy });
     }
 
     if (result.length === 0) {
@@ -316,7 +316,7 @@ useEffect(() => {
 
 
         {/* Selectors Grid */}
-<div className="my-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+<div className="my-6 grid grid-cols-1 md:grid-cols-3 gap-6">
   {/* Program Selector */}
   <div>
     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -364,10 +364,9 @@ useEffect(() => {
   )}
     </select>
   </div>
-</div>
 
-{/* Download Button Section */}
-<div className="my-6 text-center">
+  {/* Download Button Section */}
+<div className="mt-3 text-center">
   <button
     onClick={handleDownloadTemplate}
     disabled={isDownloading}
@@ -380,7 +379,7 @@ useEffect(() => {
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
         </svg>
-        Download Student Registration Template
+        Download Student Reg. Template
       </>
     )}
   </button>
@@ -390,6 +389,9 @@ useEffect(() => {
     </p>
   )}
 </div>
+</div>
+
+
 
 
         {/* PASTE AREA */}

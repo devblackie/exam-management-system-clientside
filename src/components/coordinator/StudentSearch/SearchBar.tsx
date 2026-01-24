@@ -1,16 +1,15 @@
+// src/components/coordinator/StudentSearch/SearchBar.tsx
 "use client";
 
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
-import { AcademicYear } from "@/api/types";
 
 interface SearchBarProps {
   query: string;
   setQuery: (value: string) => void;
   onSearch: () => void;
   searching: boolean;
-  academicYears: AcademicYear[];
-  selectedYear: string;
-  setSelectedYear: (value: string) => void;
+  selectedYearOfStudy: number; // Changed from string to number
+  setSelectedYearOfStudy: (value: number) => void; // Changed from string to number
 }
 
 export default function SearchBar({
@@ -18,9 +17,8 @@ export default function SearchBar({
   setQuery,
   onSearch,
   searching,
-  academicYears,
-  selectedYear,
-  setSelectedYear,
+  selectedYearOfStudy,
+  setSelectedYearOfStudy,
 }: SearchBarProps) {
   return (
     <div className="rounded-lg shadow-md mb-4">
@@ -35,22 +33,20 @@ export default function SearchBar({
         />
 
         <select
-          value={selectedYear}
-          onChange={(e) => setSelectedYear(e.target.value)}
+          value={selectedYearOfStudy}
+          onChange={(e) => setSelectedYearOfStudy(Number(e.target.value))}
           className="px-4 py-2 bg-white border border-l-transparent border-green-dark/20 text-green-darkest font-bold outline-none cursor-pointer"
         >
-          <option value="" disabled>Select Year</option>
-          {academicYears.map((y) => (
-            <option key={y._id} value={y.year}>
-              {y.year}
-            </option>
-          ))}
+          <option value={1}>Year 1</option>
+          <option value={2}>Year 2</option>
+          <option value={3}>Year 3</option>
+          <option value={4}>Year 4</option>
         </select>
 
         <button
           onClick={onSearch}
           disabled={searching}
-          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-darkest to-green-dark text-white-pure rounded-lg rounded-bl-none rounded-tl-none hover:from-green-700 hover:to-emerald-800 font-bold disabled:opacity-50 disabled:cursor-not-allowed transition shadow-2xl"
+          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-darkest to-green-dark text-white-pure rounded-lg rounded-bl-none rounded-tl-none hover:from-green-700 hover:to-emerald-800 font-bold disabled:opacity-50 transition shadow-2xl"
         >
           <MagnifyingGlassIcon className="h-5 w-5" />
           {searching ? "Searching..." : "Search Student"}

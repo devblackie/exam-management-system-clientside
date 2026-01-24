@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import {
   searchStudents,
   getStudentRecord,
-  downloadTranscript,
   getRawMarks,
   saveRawMarks,
 } from "@/api/studentsApi";
@@ -13,10 +12,8 @@ import type {
   StudentFullRecord,
   RawMark,
   SaveMarksPayload,
-  AcademicYear,
 } from "@/api/types";
 import { useToast } from "@/context/ToastContext";
-import { getAcademicYears } from "@/api/academicYearsApi";
 
 // New Components
 import SearchBar from "@/components/coordinator/StudentSearch/SearchBar";
@@ -48,23 +45,15 @@ export default function StudentSearchPage() {
   const [activeTab, setActiveTab] = useState<"grades" | "raw">("grades");
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingMark, setEditingMark] = useState<RawMark | null>(null);
-  const [academicYears, setAcademicYears] = useState<AcademicYear[]>([]);
-  const [selectedYear, setSelectedYear] = useState<string>("");
+ const [selectedYearOfStudy, setSelectedYearOfStudy] = useState<number>(1);
   const { addToast } = useToast();
 
-  // 1. Fetch academic years on mount
-  useEffect(() => {
-    const fetchYears = async () => {
-      try {
-        const years = await getAcademicYears();
-        setAcademicYears(years);
-        if (years.length > 0) setSelectedYear(years[years.length - 1].year);
-      } catch {
-        addToast("Failed to load academic years", "error");
-      }
-    };
-    fetchYears();
-  }, [addToast]);
+useEffect(() => {
+  if (selectedStudent?.student.regNo) {
+    // This calls the updated API service with the new yearOfStudy
+    viewStudent(selectedStudent.student.regNo);
+  }
+}, [selectedYearOfStudy]);
 
   // 2. Fetch raw marks when student or tab changes
   useEffect(() => {
@@ -94,22 +83,20 @@ export default function StudentSearchPage() {
     }
   };
 
-  const viewStudent = async (regNo: string) => {
-    if (!selectedYear) {
-      addToast("Please select an academic year", "warning");
-      return;
-    }
-    setLoading(true);
-    try {
-      const record = await getStudentRecord(encodeURIComponent(regNo), selectedYear);
-      setSelectedStudent(record);
-      setActiveTab("grades");
-    } catch {
-      addToast("Failed to load student record", "error");
-    } finally {
-      setLoading(false);
-    }
-  };
+ const viewStudent = async (regNo: string) => {
+  setLoading(true);
+  try {
+    // API should now accept 'yearOfStudy' as a parameter instead of calendar year
+    // const record = await getStudentRecord(encodeURIComponent(regNo), selectedYearOfStudy.toString());
+    const record = await getStudentRecord(encodeURIComponent(regNo), selectedYearOfStudy);
+    setSelectedStudent(record);
+    setActiveTab("grades");
+  } catch {
+    addToast("Failed to load records for Year " + selectedYearOfStudy, "error");
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleSaveMarks = async (payload: SaveMarksPayload) => {
     try {
@@ -129,10 +116,14 @@ export default function StudentSearchPage() {
           <h1 className="text-2xl font-bold text-green-darkest">Student Academic Records Portal</h1>
         </div>
 
-        <SearchBar
-          query={query} setQuery={setQuery} onSearch={handleSearch} searching={searching}
-          academicYears={academicYears} selectedYear={selectedYear} setSelectedYear={setSelectedYear}
-        />
+       <SearchBar
+  query={query}
+  setQuery={setQuery}
+  onSearch={handleSearch}
+  searching={searching}
+  selectedYearOfStudy={selectedYearOfStudy}
+  setSelectedYearOfStudy={setSelectedYearOfStudy}
+/>
 
         <ResultsTable results={searchResults} onSelect={viewStudent} visible={!selectedStudent && !loading} />
 
@@ -149,25 +140,17 @@ export default function StudentSearchPage() {
               <div className="flex-1">
                 <StudentProfileHeader student={selectedStudent.student} />
 
-                {/* Download Actions */}
-                <div className="flex gap-2 mt-4">
-                  <button
-                    onClick={() => downloadTranscript(selectedStudent.student.regNo)}
-                    className="px-4 py-2 bg-green-darkest text-white rounded-lg font-bold text-sm shadow-md"
-                  >
-                    Download Full Transcript
-                  </button>
-                </div>
               </div>
 
               <div className="lg:w-1/2">
                 {selectedStudent.academicStatus && (
-                  <AcademicStatusBox
-                    status={selectedStudent.academicStatus}
-                    currentYear={selectedStudent.student.currentYear}
-                    studentId={selectedStudent.student._id}
-                    onPromoteSuccess={() => viewStudent(selectedStudent.student.regNo)}
-                  />
+                <AcademicStatusBox
+  status={selectedStudent.academicStatus}
+  currentYearOfStudy={selectedStudent.student.currentYear} // From Student DB Record
+  viewingYear={selectedYearOfStudy}                       // From UI state
+  studentId={selectedStudent.student._id}
+  onPromoteSuccess={() => viewStudent(selectedStudent.student.regNo)}
+/>
                 )}
               </div>
             </div>

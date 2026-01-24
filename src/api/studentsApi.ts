@@ -35,11 +35,19 @@ export const searchStudents = async (query: string): Promise<StudentSearchResult
   return res.data;
 };
 
-// Get full academic record + status
-export const getStudentRecord = async (regNo: string, academicYear: string): Promise<StudentFullRecord> => {
-  const res = await api.get<StudentFullRecord>("/student/record", { params: { regNo, academicYear } });
+export const getStudentRecord = async (regNo: string, yearOfStudy: string | number): Promise<StudentFullRecord> => {
+  // Update the param key from 'academicYear' to 'yearOfStudy'
+  const res = await api.get<StudentFullRecord>("/student/record", { 
+    params: { regNo, yearOfStudy } 
+  });
   return res.data;
 };
+
+// // Get full academic record + status
+// export const getStudentRecord = async (regNo: string, academicYear: string): Promise<StudentFullRecord> => {
+//   const res = await api.get<StudentFullRecord>("/student/record", { params: { regNo, academicYear } });
+//   return res.data;
+// };
 
 export const getRawMarks = async (regNo: string): Promise<RawMark[]> => {
   const res = await api.get<RawMark[]>("/student/raw-marks", {
@@ -110,34 +118,4 @@ export const downloadStudentRegistrationTemplate = async (
 };
 
 
-export const downloadTranscript = async (regNo: string, year?: string) => {
-  const params = new URLSearchParams({ regNo });
-  if (year) params.append("year", year);
 
-  const endpoint = year ? "/transcript/year" : "/transcript";
-  const url = `${API_BASE_URL}/student${endpoint}?${params.toString()}`;
-
-  const res = await fetch(url, {
-    method: "GET",
-    credentials: "include", // ⬅ IMPORTANT (sends session cookie)
-  });
-
-  if (!res.ok) {
-    alert("Transcript not found on the server");
-    throw new Error("Transcript generation failed");
-  }
-
-  const blob = await res.blob();
-  const downloadUrl = URL.createObjectURL(blob);
-
-  const a = document.createElement("a");
-  a.href = downloadUrl;
-  a.download = year
-    ? `Transcript_${regNo.replace(/\//g, "_")}_${year.replace("/", "-")}.pdf`
-    : `Transcript_${regNo.replace(/\//g, "_")}_Full.pdf`;
-
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  URL.revokeObjectURL(downloadUrl);
-};
