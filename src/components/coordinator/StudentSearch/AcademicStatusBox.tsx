@@ -63,16 +63,10 @@ export default function AcademicStatusBox({ status, currentYearOfStudy, viewingY
   };
 
   const handleDownloadSingleTranscript = async () => {
-    // --- FRONTEND DEBUG LOG ---
-  console.log("--- DOWNLOAD CLICKED ---");
-  console.log("Prop academicYearName:", academicYearName);
-  console.log("Status Object Year:", status.academicYearName);
-  console.log("Viewing Year (Level):", viewingYear);
-  // --------------------------
+ 
     setIsDownloading(true);
     try {
     const academicYearLabel = academicYearName || status.academicYearName || "N/A";
-    console.log("Final Label being sent to API:", academicYearLabel);
     await downloadTranscriptsWithProgress(
         { studentId, yearToPromote: viewingYear, academicYearName: academicYearLabel },
         `Year_${viewingYear}`,
