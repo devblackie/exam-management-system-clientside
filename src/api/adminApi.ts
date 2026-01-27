@@ -1,5 +1,10 @@
+// clientside/src/api/adminApi.ts
 import api from "@/config/axiosInstance";
 import type { User, Invite, Role, Status } from "./types";
+
+
+
+
 
 // --- User management ---
 export async function getUsers() {

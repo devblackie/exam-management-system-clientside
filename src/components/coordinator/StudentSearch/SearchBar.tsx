@@ -29,7 +29,7 @@ export default function SearchBar({
           value={query}
           onChange={(e) => setQuery(e.target.value.toUpperCase())}
           onKeyDown={(e) => e.key === "Enter" && onSearch()}
-          className="flex-1 px-4 py-2 text-sm text-green-darkest/50 border border-r-transparent border-green-dark/20 rounded-br-none rounded-tr-none rounded-lg placeholder-green-dark/50 focus:outline-0 focus:border-green-darkest"
+          className="flex-1 px-4 py-2 text-sm text-green-darkest/50 border border-r-transparent border-green-dark/20 rounded-br-none rounded-tr-none rounded-lg placeholder-green-dark/50 focus:outline-0 "
         />
 
         <select
@@ -41,6 +41,8 @@ export default function SearchBar({
           <option value={2}>Year 2</option>
           <option value={3}>Year 3</option>
           <option value={4}>Year 4</option>
+          <option value={5}>Year 5</option>
+          <option value={6}>Year 6</option>
         </select>
 
         <button

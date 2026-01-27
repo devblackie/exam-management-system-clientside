@@ -26,19 +26,20 @@ interface SummaryItemProps {
 }
 
 interface AcademicStatusBoxProps {
- status: AcademicStatus;
+  status: AcademicStatus;
   currentYearOfStudy: number; // The year the student is currently in (from DB)
   viewingYear: number;       // The year currently being viewed/filtered in the UI
   studentId: string;
+  academicYearName: string;
   onPromoteSuccess: () => void;
 }
 
-export default function AcademicStatusBox({ status, currentYearOfStudy, viewingYear, studentId, onPromoteSuccess }: AcademicStatusBoxProps) {
+export default function AcademicStatusBox({ status, currentYearOfStudy, viewingYear, studentId, academicYearName, onPromoteSuccess }: AcademicStatusBoxProps) {
   const [isPromoting, setIsPromoting] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [progress, setProgress] = useState<number | null>(null);
 
- // Logic: Only show promote button if viewing the current level of the student
+  // Logic: Only show promote button if viewing the current level of the student
   const canPromote = viewingYear === currentYearOfStudy && status.variant === 'success';
 
   const variantClasses: Record<AcademicStatus['variant'], string> = {
@@ -61,14 +62,20 @@ export default function AcademicStatusBox({ status, currentYearOfStudy, viewingY
     }
   };
 
-
-
-const handleDownloadSingleTranscript = async () => {
-setIsDownloading(true);
+  const handleDownloadSingleTranscript = async () => {
+    // --- FRONTEND DEBUG LOG ---
+  console.log("--- DOWNLOAD CLICKED ---");
+  console.log("Prop academicYearName:", academicYearName);
+  console.log("Status Object Year:", status.academicYearName);
+  console.log("Viewing Year (Level):", viewingYear);
+  // --------------------------
+    setIsDownloading(true);
     try {
-      await downloadTranscriptsWithProgress(
-        { studentId, yearToPromote: viewingYear, academicYearName: "" }, 
-        `Transcript_Year_${viewingYear}`, 
+    const academicYearLabel = academicYearName || status.academicYearName || "N/A";
+    console.log("Final Label being sent to API:", academicYearLabel);
+    await downloadTranscriptsWithProgress(
+        { studentId, yearToPromote: viewingYear, academicYearName: academicYearLabel },
+        `Year_${viewingYear}`,
         (p) => setProgress(p)
       );
     } catch {
@@ -78,7 +85,7 @@ setIsDownloading(true);
       setProgress(null);
     }
   };
-  
+
   return (
     <div className={`mb-6 p-2 rounded-lg border-l-4 flex items-start gap-4 shadow-sm ${variantClasses[status.variant]}`}>
       <div className="mt-1 flex-shrink-0">
@@ -91,11 +98,9 @@ setIsDownloading(true);
 
       <div className="flex-1">
         <div className="flex justify-between items-center mb-1">
+          <div className="flex flex-col gap-2">
           <h3 className="font-bold text-md leading-tight mb-1">{status.status}</h3>
-          <span className="bg-black/10 px-2 py-0.5 rounded text-[10px] font-bold">YEAR {viewingYear} ANALYSIS</span>
-        </div>
-        <div className="flex gap-2 mb-3">
-          {/* PROMOTE BUTTON */}
+               {/* PROMOTE BUTTON */}
           {canPromote && (
             <button
               onClick={handlePromote}
@@ -106,23 +111,27 @@ setIsDownloading(true);
               {isPromoting ? "Promoting..." : `Promote to Year ${viewingYear + 1}`}
             </button>
           )}
-{/* TRANSCRIPT BUTTON - Only allow if status is success or info (pending data/specials) */}
+          </div>
+          <div className="flex flex-col gap-2">
+          <span className="bg-black/10 px-2 py-0.5 rounded text-[10px] font-bold">YEAR {viewingYear} ANALYSIS</span>
+       {/* TRANSCRIPT BUTTON - Only allow if status is success or info (pending data/specials) */}
           {status.variant === 'success' && (
-             <button
-                onClick={handleDownloadSingleTranscript}
-                disabled={isDownloading}
-                className="flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-300 text-gray-700 rounded-lg text-xs font-black uppercase hover:bg-gray-50 transition-all shadow-sm disabled:opacity-50"
-             >
-                {isDownloading ? (
-                  <Loader2 size={14} className="animate-spin" />
-                ) : (
-                  <GraduationCap size={14} />
-                )}
-                {isDownloading ? `Preparing ${progress}%` : `Download Year ${viewingYear} Transcript`}
-             </button>
+            <button
+              onClick={handleDownloadSingleTranscript}
+              disabled={isDownloading}
+              className="flex items-center justify-center gap-1 px-3 py-1.5  text-gray-700 rounded-lg text-[10px] font-bold uppercase hover:text-blue-500 hover:underline transition-all  disabled:opacity-50"
+            >
+              {isDownloading ? (
+                <Loader2 size={14} className="animate-spin" />
+              ) : (
+                <GraduationCap size={12} />
+              )}
+              {isDownloading ? `Preparing ${progress}%` : `Year ${viewingYear} Transcript`}
+            </button>
           )}
-
-        </div>
+      </div>
+      </div>
+       
         <p className="text-xs font-mono opacity-90 mb-4">{status.details}</p>
 
         <div className="space-y-4">

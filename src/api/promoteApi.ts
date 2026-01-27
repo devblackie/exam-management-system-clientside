@@ -8,7 +8,7 @@ export interface PromotionParams {
   yearToPromote: number;
   academicYearName: string;
   programCode?: string;
-  studentId: string;
+  studentId?: string;
 }
 
 export interface PromotionPreviewRecord {

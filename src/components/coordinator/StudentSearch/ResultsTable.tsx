@@ -47,9 +47,9 @@ export default function ResultsTable({ results, onSelect, visible, searching }: 
               <td className="p-4 text-right">
                 <button
                   onClick={() => onSelect(student.regNo)}
-                  className="px-4 py-1.5 bg-green-50 text-green-700 rounded-lg hover:bg-green-700 hover:text-white transition-all text-sm font-bold border border-green-200"
+                  className="text-green-dark hover:text-green-darkest hover:scale-105 font-medium"
                 >
-                  View Records
+                  View Record →
                 </button>
               </td>
             </tr>

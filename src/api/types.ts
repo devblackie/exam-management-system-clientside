@@ -198,6 +198,7 @@ export interface AcademicStatus {
   reRetakeList: string[];
   specialList: string[];
   incompleteList: string[];
+  academicYearName: string;
 }
 
 export interface GradeRecord {

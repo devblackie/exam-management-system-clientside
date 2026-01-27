@@ -6,15 +6,10 @@ import { useState, useEffect } from "react";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { getStudentStats } from "@/api/studentsApi";
 import { StudentStats } from "@/api/types";
-import { bulkPromoteClass, previewPromotion, PromotionPreviewResponse } from "@/api/promoteApi";
+import { bulkPromoteClass, previewPromotion, PromotionParams, PromotionPreviewResponse } from "@/api/promoteApi";
 import PromotionControlCard from "@/components/coordinator/PromotionControlCard";
 import PromotionPreviewModal from "@/components/coordinator/PromotionPreviewModal";
 
-interface PromotionParams {
-  programId: string;
-  yearToPromote: number;
-  academicYearName: string;
-}
 
 export default function CoordinatorPage() {
   const [stats, setStats] = useState<StudentStats>({

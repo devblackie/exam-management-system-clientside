@@ -43,15 +43,9 @@ export const getStudentRecord = async (regNo: string, yearOfStudy: string | numb
   return res.data;
 };
 
-// // Get full academic record + status
-// export const getStudentRecord = async (regNo: string, academicYear: string): Promise<StudentFullRecord> => {
-//   const res = await api.get<StudentFullRecord>("/student/record", { params: { regNo, academicYear } });
-//   return res.data;
-// };
-
-export const getRawMarks = async (regNo: string): Promise<RawMark[]> => {
+export const getRawMarks = async (regNo: string, yearOfStudy: number): Promise<RawMark[]> => {
   const res = await api.get<RawMark[]>("/student/raw-marks", {
-    params: { regNo },
+    params: { regNo, yearOfStudy }, // Pass the level here
   });
   return res.data;
 };

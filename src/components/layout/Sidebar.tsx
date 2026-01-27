@@ -16,7 +16,7 @@ import {
   Bars3Icon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
-import { Home, BookOpenText,BookOpenCheck,CalendarDays,Cog, Users, Upload, UserRoundSearch,FileText } from "lucide-react";
+import { Home, BookOpenText,BookOpenCheck,CalendarDays,Cog, FileCog,Users, Upload, UserRoundSearch,FileText } from "lucide-react";
 import { branding } from "@/config/branding";
 import type { SVGProps } from "react";
 
@@ -107,18 +107,24 @@ const menuItems: MenuItem[] = [
     href: "/coordinator/student-search",
     roles: ["coordinator"],
   },
-  {
-    name: "Reports",
-    icon: FileText,
-    href: "/coordinator/reports",
-    roles: ["coordinator"],
-  },
-   {
-    name: "Settings",
-    icon: Cog,
-    href: "/coordinator/institution-settings",
-    roles: ["coordinator"],
-  },
+  // {
+  //   name: "Reports",
+  //   icon: FileText,
+  //   href: "/coordinator/reports",
+  //   roles: ["coordinator"],
+  // },
+  //  {
+  //   name: "Settings",
+  //   icon: FileCog,
+  //   href: "/coordinator/institution-settings",
+  //   roles: ["coordinator"],
+  // },
+  //    {
+  //   name: "System Health",
+  //   icon: Cog,
+  //   href: "/admin/health",
+  //   roles: ["coordinator"],
+  // },
 ];
 
 export default function Sidebar() {

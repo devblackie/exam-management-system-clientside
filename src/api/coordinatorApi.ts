@@ -22,3 +22,9 @@ export const promoteStudentApi = async (studentId: string) => {
   const response = await api.post(`/coordinator/promote/${studentId}`);
   return response.data;
 };
+
+// --- Data Cleanup ---
+export async function runDatabaseCleanup() {
+  const res = await api.post<{ success: boolean; message: string }>("/coordinator/maintain/cleanup-grades");
+  return res.data;
+}

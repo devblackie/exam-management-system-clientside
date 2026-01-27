@@ -97,16 +97,6 @@ useEffect(() => {
 
   const duplicates = getDuplicates();
 
-  // const handlePaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
-  //   e.preventDefault();
-
-  //   const raw = e.clipboardData.getData("text/plain");
-
-  //   console.log("==== RAW PASTED START ====");
-  //   console.log(JSON.stringify(raw, null, 2));
-  //   console.log("==== RAW PASTED END ====");
-  // };
-
   const handlePaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
     e.preventDefault();
 

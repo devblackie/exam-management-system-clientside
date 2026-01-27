@@ -12,8 +12,6 @@ import {
   PromotionParams
 } from "@/api/promoteApi";
 
-
-
 interface PreviewModalProps {
   data: PromotionPreviewResponse;
   params: PromotionParams;
@@ -173,14 +171,22 @@ export default function PromotionPreviewModal({ data, params, onClose, onConfirm
                 <tr key={student.id} className="border-b hover:bg-gray-50 transition">
                   <td className="py-4 px-4 font-mono text-gray-600 text-sm">{student.regNo}</td>
                   <td className="py-4 px-4 font-semibold text-sm text-gray-700">{formatStudentName(student.name)}</td>
-                  <td className="py-4 px-4">
-                    <span className={`px-3 py-1 rounded-full text-[10px] font-bold ${
-                        student.status === 'IN GOOD STANDING' ? 'bg-green-100 text-green-700' :
-                        student.status === 'SPECIAL EXAM PENDING' ? 'bg-blue-100 text-blue-700' :
-                        'bg-red-100 text-red-700'
-                    }`}>
-                      {student.status}
-                    </span>
+                 <td className="py-4 px-4">
+                    {/* ENHANCED STATUS BADGES */}
+                    {student.status === 'ALREADY PROMOTED' ? (
+                      <span className="flex items-center gap-1.5 w-fit px-3 py-1 rounded-full text-[10px] font-black bg-emerald-600 text-white shadow-sm">
+                        <CheckCircle size={10} strokeWidth={3} />
+                        PREVIOUSLY PROMOTED
+                      </span>
+                    ) : (
+                      <span className={`px-3 py-1 rounded-full text-[10px] font-bold ${
+                          student.status === 'IN GOOD STANDING' ? 'bg-green-100 text-green-700 border border-green-200' :
+                          student.status === 'SPECIAL EXAM PENDING' ? 'bg-blue-100 text-blue-700 border border-blue-200' :
+                          'bg-red-100 text-red-700 border border-red-200'
+                      }`}>
+                        {student.status}
+                      </span>
+                    )}
                   </td>
                   {activeTab === 'blocked' && (
                     <td className="py-4 px-4">
@@ -255,7 +261,11 @@ export default function PromotionPreviewModal({ data, params, onClose, onConfirm
               onClick={onConfirm}
               className="bg-green-600 text-white px-6 py-2 rounded-xl font-bold flex items-center gap-2 hover:bg-green-700 disabled:opacity-50 transition shadow-lg shadow-green-200"
             >
-              Promote {data.eligibleCount} <ArrowRight size={18} />
+              {/* If everyone is already promoted, the button can reflect that */}
+              {data.eligible.every(s => s.status === 'ALREADY PROMOTED') 
+                ? "Re-verify Promotion" 
+                : `Promote ${data.eligibleCount} Students`} 
+              <ArrowRight size={18} />
             </button>
           </div>
         </div>
