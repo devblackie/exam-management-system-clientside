@@ -15,7 +15,7 @@ export default function StudentProfileHeader({ student }: StudentProfileHeaderPr
             <div className="flex-1 space-y-2 text-center md:text-left">
                 <div>
                     <div className="flex items-center justify-between md:justify-start gap-3">
-                    <h2 className=" font-black text-md text-green-darkest/70  uppercase">
+                    <h2 className=" font-black text-sm text-green-darkest/70  uppercase">
                         {student.name}
                     </h2>
                     <span className="bg-green-darkest text-lime-bright text-[10px] font-bold px-2 py-1 rounded">
@@ -23,10 +23,10 @@ export default function StudentProfileHeader({ student }: StudentProfileHeaderPr
             </span>
           </div>
                     <div className="flex flex-wrap justify-center md:justify-start gap-1 mt-2">
-                        <p className=" font-mon font-bol text-md text-green-darkest/70 uppercase">
+                        <p className=" font-mon font-bol text-sm text-green-darkest/70 uppercase">
                             {student.regNo} •
                         </p>
-                        <p className=" font-mon  text-md text-green-darkest/70 ">
+                        <p className=" font-mon  text-sm text-green-darkest/70 ">
                             {student.program}
                         </p>
 

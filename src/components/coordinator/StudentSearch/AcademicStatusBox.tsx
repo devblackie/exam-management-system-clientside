@@ -93,7 +93,7 @@ export default function AcademicStatusBox({ status, currentYearOfStudy, viewingY
       <div className="flex-1">
         <div className="flex justify-between items-center mb-1">
           <div className="flex flex-col gap-2">
-          <h3 className="font-bold text-md leading-tight mb-1">{status.status}</h3>
+          <h3 className="font-bold text-sm leading-tight mb-1">{status.status}</h3>
                {/* PROMOTE BUTTON */}
           {canPromote && (
             <button

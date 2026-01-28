@@ -51,7 +51,7 @@ export default function RawMarksTable({ marks, studentName, onEdit, onAddNew, on
 };
 
   return (
-    <div className="bg-green-dark/5 rounded-2xl p-6 border border-green-dark/10">
+    <div className="bg-green-dark/5 rounded-lg p-6 border border-green-dark/10">
       <div className="flex justify-between items-center mb-6">
         <div>
         <h3 className="text-lg font-bold text-green-darkest">
@@ -64,7 +64,7 @@ export default function RawMarksTable({ marks, studentName, onEdit, onAddNew, on
         {!isReadOnly && (
         <button
           onClick={onAddNew}
-          className="px-6 py-2 bg-green-darkest text-lime-bright rounded-lg hover:bg-black transition-colors font-bold shadow-md"
+          className="px-6 py-2 text-xs bg-green-darkest text-lime-bright rounded-lg hover:bg-black transition-colors font-bold shadow-md"
         >
           Add / Edit Missing Marks
         </button>
@@ -76,10 +76,10 @@ export default function RawMarksTable({ marks, studentName, onEdit, onAddNew, on
           <p className="text-xl text-green-darkest/40 font-medium italic">No raw marks uploaded for this academic cycle.</p>
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-green-dark/20">
+        <div className="overflow-x-auto rounded-lg border border-green-dark/20">
           <table className="w-full">
             <thead className="bg-green-darkest text-xs text-lime-bright uppercase">
-              <tr>
+              <tr className="">
                 <th className="p-4 text-left">Year</th>
                 <th className="p-4 text-left">Unit</th>
                 <th className="p-4 text-center">CA /30</th>
@@ -95,12 +95,12 @@ export default function RawMarksTable({ marks, studentName, onEdit, onAddNew, on
                
                const isEligibleForSpecial = (m.caTotal30 || 0) > 0 && (m.examTotal70 || 0) === 0 && !m.isSpecial;
                 return (
-                  <tr key={m._id} className="border-t border-green-dark/10 hover:bg-green-50 transition-colors font-mono text-sm text-green-darkest">
-                    <td className="p-4 font-sans">{m.academicYear.year}</td>
-                    <td className="p-4 font-bold">{unitCode}</td>
-                    <td className="p-4 text-center font-bold text-blue-700">{m.caTotal30 ?? 0}</td>
-                    <td className="p-4 text-center font-bold text-indigo-700">{m.examTotal70 ?? 0}</td>
-                    <td className="p-4 text-center font-black bg-green-50/50">{m.agreedMark ?? 0}</td>
+                  <tr key={m._id} className="border-t border-green-dark/10 hover:bg-green-50 transition-colors font-mono text-xs text-green-darkest">
+                    <td className="p-4  font-sans">{m.academicYear.year}</td>
+                    <td className="p-4  font-bold">{unitCode}</td>
+                    <td className="p-4  text-center font-bold text-blue-700">{m.caTotal30 ?? 0}</td>
+                    <td className="p-4  text-center font-bold text-indigo-700">{m.examTotal70 ?? 0}</td>
+                    <td className="p-4  text-center font-black bg-green-50/50">{m.agreedMark ?? 0}</td>
                     <td className="p-4 text-center text-[10px]">
                       <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${m.isSpecial ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-500'}`}>
                         {m.isSpecial ? 'SPECIAL' : m.attempt || '1ST'}

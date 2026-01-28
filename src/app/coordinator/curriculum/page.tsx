@@ -15,6 +15,7 @@ import type { AxiosExpectedError, Program, ProgramUnit, Unit } from "@/api/types
 import { useToast } from "@/context/ToastContext";
 import { X, Trash2, PenLine } from "lucide-react";
 import CommonButton from "@/components/ui/CommonButton";
+import { LoadingState } from "@/components/ui/LoadingState";
 
 // Define the shape of the form state
 interface CurriculumFormState {
@@ -284,32 +285,20 @@ const [templateForm, setTemplateForm] = useState({
 
   // --- Render UI ---
 
-  if (loading && programs.length === 0) {
-    // Initial loading state
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-100 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-24 h-24 border-8 border-green-darkest border-t-transparent rounded-full animate-spin mx-auto mb-8"></div>
-          <p className="text-3xl font-black text-green-dark">Loading Academic Data...</p>
-          <p className="text-green-darkest mt-4">Fetching programs and curriculum structures</p>
-        </div>
-      </div>
-    );
-  }
+ if (loading) return <LoadingState message="Fetching academic structures..." />;
 
   return (
     <div className="max-w-8xl h-full ml-48 my-10 ">
-      <div className="bg-white rounded-3xl shadow-2xl p-10 min-h-screen">
+      <div className="bg-white rounded-xl shadow-2xl p-10 min-h-screen">
         
+        {/* Header Section */}
         <div className="flex justify-between items-center rounded-lg shadow-md border border-green-dark/20 p-4 ">
-          <h1 className="text-2xl font-bold text-green-darkest">Curriculum Management</h1>
-          
+          <h1 className="text-xl font-bold text-green-darkest">Curriculum Management</h1>
           <div className="flex space-x-4">
-            {/* NEW BUTTON: Triggers the Template Creation Modal */}
             <button
               onClick={() => setShowTemplateModal(true)}
               disabled={submitting || showForm} // Disable if another form is active
-              className="px-4 py-2 bg-gradient-to-r from-green-dark to-lime-bright text-white-pure rounded-2xl hover:shadow-4xl hover:scale-105 font-bold disabled:opacity-50 disabled:cursor-not-allowed transition shadow-2xl"
+              className="px-4 py-2 bg-gradient-to-r from-green-dark to-green-500 text-white-pure rounded-lg hover:shadow-4xl hover:scale-105 text-sm font-bold disabled:opacity-50 disabled:cursor-not-allowed transition shadow-2xl"
             >
               + New Unit 
             </button>
@@ -318,7 +307,7 @@ const [templateForm, setTemplateForm] = useState({
               <button
                 onClick={() => setShowForm(true)}
                 disabled={submitting}
-                className=" px-4 py-2 bg-gradient-to-r from-green-darkest to-green-dark text-white-pure rounded-2xl hover:from-green-700 hover:to-emerald-800 hover:scale-105 font-bold disabled:opacity-50 disabled:cursor-not-allowed transition shadow-2xl"
+                className=" px-4 py-2 bg-gradient-to-r from-green-darkest to-green-dark text-white-pure rounded-lg hover:from-green-700 hover:to-emerald-800 hover:scale-105  text-sm font-bold disabled:opacity-50 disabled:cursor-not-allowed transition shadow-2xl"
               >
                 Link Unit to Program
               </button>
@@ -329,7 +318,7 @@ const [templateForm, setTemplateForm] = useState({
         <div className="mt-8 space-y-8">
           
           {/* Program Selector */}
-          {/* <div className=" flex mb-8 max-w-l mx-uto"> */}
+ 
                 <div className="flex justify-between bg-gray-200   rounded-lg shadow-md border border-green-dark/20 p-4 ">
             <label className="block text-green-darkest font-bold mb-">
               Viewing Curriculum for:
@@ -337,7 +326,7 @@ const [templateForm, setTemplateForm] = useState({
             <select
               value={selectedProgramId}
               onChange={(e) => setSelectedProgramId(e.target.value)}
-              className="w-full rounded-md border border-transparent border-green-darkest  bg-transparent px-3 py-3 text-green-dark outline-0 transition-all focus:border-t-transparent focus:outline-0"
+              className="w-full rounded-md border border-transparent   bg-transparent px-3 py-3 text-green-dark outline-0 transition-all focus:border-t-transparent focus:outline-0"
               disabled={submitting || loading}
             >
               <option value="">Select Program</option>

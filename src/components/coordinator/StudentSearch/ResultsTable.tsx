@@ -35,19 +35,19 @@ export default function ResultsTable({ results, onSelect, visible, searching }: 
             <th className="p-4 font-bold uppercase text-xs tracking-wider">Reg No</th>
             <th className="p-4 font-bold uppercase text-xs tracking-wider">Full Name</th>
             <th className="p-4 font-bold uppercase text-xs tracking-wider">Program</th>
-            <th className="p-4 text-right">Action</th>
+            <th className="p-4 text-xs text-right">Action</th>
           </tr>
         </thead>
         <tbody className="bg-white">
           {results.map((student) => (
             <tr key={student._id} className="border-t border-gray-100 hover:bg-green-50 transition-colors">
-              <td className="p-4 font-mono font-bold text-green-800">{student.regNo}</td>
-              <td className="p-4 font-medium text-gray-900">{student.name}</td>
+              <td className="p-4 text-sm font-mono font-bold text-green-800">{student.regNo}</td>
+              <td className="p-4 text-sm font-medium text-gray-900">{student.name}</td>
               <td className="p-4 text-sm text-gray-600 italic">{student.program?.name || "N/A"}</td>
               <td className="p-4 text-right">
                 <button
                   onClick={() => onSelect(student.regNo)}
-                  className="text-green-dark hover:text-green-darkest hover:scale-105 font-medium"
+                  className="text-green-dark text-xs hover:text-green-darkest hover:scale-105 font-medium"
                 >
                   View Record →
                 </button>

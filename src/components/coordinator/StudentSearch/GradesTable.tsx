@@ -96,7 +96,7 @@ export default function GradesTable({ grades }: GradesTableProps) {
           {grades.map((grade) => (
             <tr
               key={grade._id}
-              className="border-t border-gray-100 text-sm text-green-darkest hover:bg-green-50/50 transition-colors"
+              className="border-t border-gray-100 text-xs text-green-darkest hover:bg-green-50/50 transition-colors"
             >
               <td className="p-4 font-medium text-gray-500">
                 {grade.academicYear?.year || "N/A"}
@@ -110,7 +110,7 @@ export default function GradesTable({ grades }: GradesTableProps) {
               </td>
               <td className="p-4 font-mono font-bold text-blue-700">{grade.unit?.code || "N/A"}</td>
               <td className="p-4 font-medium">{grade.unit?.name || "Unit details missing"}</td>
-              <td className="p-4 text-center font-black text-lg">
+              <td className="p-4 text-center font-black ">
                 {grade.grade || "--"}
               </td>
               <td className="p-4 text-center">

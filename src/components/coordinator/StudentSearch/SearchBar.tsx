@@ -35,7 +35,7 @@ export default function SearchBar({
         <select
           value={selectedYearOfStudy}
           onChange={(e) => setSelectedYearOfStudy(Number(e.target.value))}
-          className="px-4 py-2 bg-white border border-l-transparent border-green-dark/20 text-green-darkest font-bold outline-none cursor-pointer"
+          className="px-4 py-2 bg-white text-sm border border-l-transparent border-green-dark/20 text-green-darkest font-bold outline-none cursor-pointer"
         >
           <option value={1}>Year 1</option>
           <option value={2}>Year 2</option>
@@ -48,7 +48,7 @@ export default function SearchBar({
         <button
           onClick={onSearch}
           disabled={searching}
-          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-darkest to-green-dark text-white-pure rounded-lg rounded-bl-none rounded-tl-none hover:from-green-700 hover:to-emerald-800 font-bold disabled:opacity-50 transition shadow-2xl"
+          className="flex text-sm items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-darkest to-green-dark text-white-pure rounded-lg rounded-bl-none rounded-tl-none hover:from-green-700 hover:to-emerald-800 font-bold disabled:opacity-50 transition shadow-2xl"
         >
           <MagnifyingGlassIcon className="h-5 w-5" />
           {searching ? "Searching..." : "Search Student"}
