@@ -24,7 +24,12 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     message: string,
     type: "success" | "error" | "warning" = "success" // 3. Updated function signature
   ) => {
-    const id = crypto.randomUUID();
+    // const id = crypto.randomUUID();
+
+    // Fallback: Use randomUUID if available, otherwise use a timestamp + random string
+  const id = typeof crypto !== 'undefined' && crypto.randomUUID 
+    ? crypto.randomUUID() 
+    : `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
     setToasts((prev) => [...prev, { id, message, type }]);
     setTimeout(() => {

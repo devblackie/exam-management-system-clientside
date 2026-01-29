@@ -84,6 +84,14 @@ export interface Unit {
   updatedAt?: string;
 }
 
+export interface CurriculumFormState {
+  programId: string;
+  unitId: string;
+  requiredYear: string;
+  requiredSemester: string;
+  isElective?: boolean;
+}
+
 export interface StudentFromAPI {
   _id?: string;
   regNo: string;
