@@ -5,127 +5,12 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/context/AuthContext";
-import { 
-  UserPlusIcon,
-  UsersIcon,
-  BookOpenIcon,
-  UserGroupIcon,
-  ChartBarSquareIcon, 
-  Bars3Icon,
-  XMarkIcon,
-} from "@heroicons/react/24/outline";
-import { Home, BookOpenText,BookOpenCheck,CalendarDays,Cog, FileCog,Users, Upload, UserRoundSearch,FileText } from "lucide-react";
+import { Menu, X, Home } from "lucide-react";
 import { branding } from "@/config/branding";
-import type { SVGProps } from "react";
+import { MENU_ITEMS, UserRole } from "@/config/navigation";
 
-interface MenuItem {
-  name: string;
-  icon: React.ComponentType<SVGProps<SVGSVGElement>>;
-  href: string;
-  roles: Array<"admin" | "lecturer" | "coordinator">;
-}
-
-const menuItems: MenuItem[] = [
-  {
-    name: "Send Invites",
-    icon: UserPlusIcon,
-    href: "/admin/invite",
-    roles: ["admin"],
-  },
-  {
-    name: "Manage Invites",
-    icon: UsersIcon,
-    href: "/admin/invites",
-    roles: ["admin"],
-  },
-  {
-    name: "Manage Users",
-    icon: UserGroupIcon,
-    href: "/admin/users",
-    roles: ["admin"],
-  },
-  {
-    name: "Programs",
-    icon: BookOpenIcon,
-    href: "/admin/programs",
-    roles: ["admin", "coordinator"],
-  },
-    {
-    name: "Units",
-    icon: BookOpenText,
-    href: "/coordinator/unit-templates",
-    roles: ["admin", "coordinator"],
-  },
-  {
-    name: "Curriculum",
-    icon: BookOpenCheck,
-    href: "/coordinator/curriculum",
-    roles: ["admin", "coordinator"],
-  },
-  {
-    name: "Lecturers",
-    icon: UserGroupIcon,
-    href: "/admin/lecturers",
-    roles: ["admin"],
-  },
-  {
-    name: "Logs",
-    icon: ChartBarSquareIcon,
-    href: "/admin/logs",
-    roles: ["admin"],
-  },
-   {
-    name: "Academic Year",
-    icon: CalendarDays,
-    href: "/coordinator/academic-years",
-    roles: ["coordinator"],
-  },
-
-  // {
-  //   name: "Lecturers",
-  //   icon: DocumentArrowUpIcon,
-  //   href: "/coordinator/lecturers",
-  //   roles: ["coordinator"],
-  // },
-    {
-    name: "Register Students",
-    icon: Users,
-    href: "/coordinator/students",
-    roles: ["coordinator"],
-  },
-    {
-    name: "Upload Results",
-    icon: Upload,
-    href: "/coordinator/upload",
-    roles: ["coordinator"],
-  },
-  {
-    name: "Search",
-    icon: UserRoundSearch,
-    href: "/coordinator/student-search",
-    roles: ["coordinator"],
-  },
-  // {
-  //   name: "Reports",
-  //   icon: FileText,
-  //   href: "/coordinator/reports",
-  //   roles: ["coordinator"],
-  // },
-  //  {
-  //   name: "Settings",
-  //   icon: FileCog,
-  //   href: "/coordinator/institution-settings",
-  //   roles: ["coordinator"],
-  // },
-  //    {
-  //   name: "System Health",
-  //   icon: Cog,
-  //   href: "/admin/health",
-  //   roles: ["coordinator"],
-  // },
-];
 
 export default function Sidebar() {
   const [open, setOpen] = useState(false);
@@ -134,111 +19,88 @@ export default function Sidebar() {
 
   if (!user) return null;
 
-  // Determine dashboard link dynamically
-  // const dashboardLink = {
-  //   admin: "/admin",
-  //   lecturer: "/lecturer",
-  //   coordinator: "/coordinator",
-  // }[user.role];
+  const role = user.role?.toLowerCase() as UserRole;
 
-const dashboardLink = (() => {
-  const role = user.role?.toLowerCase().trim();
-  if (role === "admin") return "/admin";
-  if (role === "lecturer") return "/lecturer";
-  if (role === "coordinator") return "/coordinator";
-  return "/"; // safe fallback
-})();
+  const dashboardLink = {
+    admin: "/admin/invite",
+    lecturer: "/lecturer/upload",
+    coordinator: "/coordinator",
+  }[role] || "/";
+
+// const dashboardLink = (() => {
+//   const role = user.role?.toLowerCase().trim();
+//   if (role === "admin") return "/admin";
+//   if (role === "lecturer") return "/lecturer";
+//   if (role === "coordinator") return "/coordinator";
+//   return "/"; // safe fallback
+// })();
 
   // Combine dashboard + other menu items filtered by role
-  const filteredMenu: MenuItem[] = [
-    {
-      name: "Dashboard",
-      icon: Home,
-      href: dashboardLink,
-      roles: [user.role],
-    },
-    ...menuItems.filter((item) => item.roles.includes(user.role)),
+  const filteredMenu = [
+    { name: "Dashboard", icon: Home, href: dashboardLink, roles: [role] },
+    ...MENU_ITEMS.filter((item) => item.roles.includes(role)),
   ];
 
-  // const filteredMenu = menuItems.filter((item) => item.roles.includes(user.role));
+  const NavContent = () => (
+    <nav className="flex-1 px-3 py-4 space-y-2">
+      {filteredMenu.map((item) => {
+        const Icon = item.icon;
+        // Use startsWith to keep parent links active during sub-routing
+        const isActive = pathname.startsWith(item.href);
+        
+        return (
+          <Link key={item.name} href={item.href} onClick={() => setOpen(false)}>
+            <div className={`flex items-center p-3 rounded-xl transition-all duration-200 group ${
+              isActive 
+                ? "bg-yellow-gold text-green-darkest shadow-lg" 
+                : "text-white/80 hover:bg-green-dark hover:text-white"
+            }`}>
+              <Icon className={`h-5 w-5 mr-3 ${isActive ? "" : "group-hover:scale-110 transition-transform"}`} />
+              <span className="font-medium text-sm">{item.name}</span>
+            </div>
+          </Link>
+        );
+      })}
+    </nav>
+  );
 
   return (
     <>
       {/* Desktop Sidebar */}
-      <aside className="hidden md:flex md:flex-col min-h-screen bg-green-darkest p-3 fixed z-20">
-        <div className="flex items-center justify-center h-16">
-          <Image
-            src={branding.institutionLogo}
-            alt={branding.logoAltText}
-            width={40}
-            height={40}
-              priority            
-  style={{ height: 'auto', width: 'auto' }}
-          />
+     <aside className="hidden md:flex md:flex-col min-h-screen bg-green-darkest  fixed left-0 top-0 z-30">
+        <div className="p-6 flex justify-center ">
+          <Image src={branding.institutionLogo} alt="Logo" width={50} height={50} priority />
         </div>
-
-        {/* Navigation */}
-        <nav className="flex-1 px-2 py-4 space-y-2  ">
-          {filteredMenu.map((item) => {
-            const Icon = item.icon;
-            return (
-              <Link key={item.name} href={item.href}>
-                <div
-                  className={`flex items-center mt-2 p-2 rounded-lg text-white hover:bg-green-dark/90 transition ${
-                    pathname === item.href
-                      ? "bg-yellow-gold/50 text-green-darkest"
-                      : ""
-                  }`}
-                >
-                  <Icon className="h-5 w-5 mr-2" />
-                  {item.name}
-                </div>
-              </Link>
-            );
-          })}
-        </nav>
+        <NavContent />
       </aside>
 
-      {/* Mobile Sidebar */}
-      <motion.div
-        initial={{ x: "-100%" }}
-        animate={{ x: open ? "0%" : "-100%" }}
-        transition={{ duration: 0.3 }}
-        className="fixed inset-y-0 left-0  bg-green-darkest shadow-lg z-50 p-4 md:hidden"
-      >
-        <div className="flex justify-end mb-4">
-          <button onClick={() => setOpen(false)}>
-            <XMarkIcon className="h-6 w-6 text-white" />
-          </button>
-        </div>
-        <nav className="space-y-2">
-          {filteredMenu.map((item) => {
-            const Icon = item.icon;
-            return (
-              <Link key={item.name} href={item.href}>
-                <div
-                  className={`flex items-center mt-2 p-2 rounded-lg text-white hover:bg-green-dark/90 transition ${
-                    pathname === item.href
-                      ? "bg-yellow-gold/50 text-green-500"
-                      : ""
-                  }`}
-                >
-                  <Icon className="h-5 w-5 mr-2" />
-                  {item.name}
-                </div>
-              </Link>
-            );
-          })}
-        </nav>
-      </motion.div>
-
-      {/* Mobile toggle button */}
-      <button
-        onClick={() => setOpen(true)}
-        className="md:hidden fixed top-3 left-4 z-40 p-1 rounded-md bg-green-dark shadow"
-      >
-        <Bars3Icon className="h-6 w-6 text-white" />
+      {/* Mobile Toggle */}
+      <button onClick={() => setOpen(true)} className="md:hidden fixed top-4 left-4 z-40 p-2 rounded-lg bg-green-dark text-white shadow-xl">
+        <Menu size={24} />
       </button>
+
+ {/* Mobile Sidebar Overlay */}
+      <AnimatePresence>
+        {open && (
+          <>
+            <motion.div 
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              onClick={() => setOpen(false)}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden"
+            />
+            <motion.div 
+              initial={{ x: "-100%" }} animate={{ x: 0 }} exit={{ x: "-100%" }}
+              className="fixed inset-y-0 left-0 w-72 bg-green-darkest z-50 p-6 md:hidden shadow-2xl"
+            >
+              <div className="flex justify-between items-center mb-8">
+                <Image src={branding.institutionLogo} alt="Logo" width={40} height={40} />
+                <button onClick={() => setOpen(false)} className="text-white hover:text-yellow-gold"><X /></button>
+              </div>
+              <NavContent />
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </>
   );
 }
