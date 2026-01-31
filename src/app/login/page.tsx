@@ -118,7 +118,7 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
+import {  useState } from "react";
 import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
 import { Lock, Mail, Eye, EyeOff, Loader2 } from "lucide-react"; // Switched to Lucide

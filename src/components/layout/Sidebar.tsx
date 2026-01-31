@@ -46,11 +46,15 @@ export default function Sidebar() {
       {filteredMenu.map((item) => {
         const Icon = item.icon;
         // Use startsWith to keep parent links active during sub-routing
-        const isActive = pathname.startsWith(item.href);
+        // const isActive = pathname.startsWith(item.href);
+
+        const isActive = item.name === "Dashboard" 
+        ? pathname === item.href 
+        : pathname.startsWith(item.href);
         
         return (
           <Link key={item.name} href={item.href} onClick={() => setOpen(false)}>
-            <div className={`flex items-center p-3 rounded-xl transition-all duration-200 group ${
+            <div className={`flex items-center p-3 rounded-lg transition-all duration-200 group ${
               isActive 
                 ? "bg-yellow-gold text-green-darkest shadow-lg" 
                 : "text-white/80 hover:bg-green-dark hover:text-white"
