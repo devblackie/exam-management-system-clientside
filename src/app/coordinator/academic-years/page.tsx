@@ -4,13 +4,12 @@
 import { useState, useEffect } from "react";
 import { createAcademicYear, getAcademicYears } from "@/api/academicYearsApi";
 import { useToast } from "@/context/ToastContext";
-import { Plus } from "lucide-react";
 import { AcademicYear } from "@/api/types";
 import { YearFormModal } from "@/components/coordinator/AcademicYears/YearFormModal";
 import { YearTable } from "@/components/coordinator/AcademicYears/YearTable";
 import { LoadingState } from "@/components/ui/LoadingState";
 import PageHeader from "@/components/ui/PageHeader";
-
+import { History } from "lucide-react";
 
 export default function AcademicYearsPage() {
   const [years, setYears] = useState<AcademicYear[]>([]);
@@ -87,18 +86,17 @@ export default function AcademicYearsPage() {
 
   return (
     <div className="max-w-8xl  ml-48  my-10 ">
-      <div className="bg-white max-w-full min-h-screen rounded-3xl shadow-2xl p-10">
+      <div className="bg-[#F8F9FA] max-w-full min-h-screen rounded-3xl shadow-2xl p-10">
        
                 {/* Header */}
                  <PageHeader 
           title="Academic Years" 
           highlightedTitle="Management"
           actions={
-            <>
-            
+            <>            
               {!showForm && (
               <button onClick={() => setShowForm(true)} className="px-5 py-2.5 bg-gradient-to-r from-green-darkest to-green-dark text-yellow-gold rounded-xl text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all">
-                + Add New Academic Year
+                + Open New Session
               </button>
               )}
             </>
@@ -106,11 +104,14 @@ export default function AcademicYearsPage() {
         />
 
         {/* Table */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 mt-8 overflow-hidden">
-          <div className="px-8 py-2 border-b border-green-dark bg-green-dark/10">
-            <h2 className="text-lg font-semibold text-green-darkest">
-              All Academic Years
-            </h2>
+       <div className="mt-12">
+          <div className="flex items-center justify-between mb-6 px-4">
+            <div className="flex items-center gap-3 text-green-darkest/40">
+              <History size={18} />
+              <h2 className="text-[11px] font-black uppercase tracking-[0.3em]">
+                Session History & Active Calendars
+              </h2>
+            </div>
           </div>
 
           <YearTable years={years} />
