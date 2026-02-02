@@ -9,7 +9,8 @@ import {
 } from "@/api/unitsApi";
 import type { Unit } from "@/api/types";
 import { useToast } from "@/context/ToastContext";
-import { X, Trash2, PenLine, Check, ChevronLeft, ChevronRight, Search } from "lucide-react";
+import { X, Trash2, PenLine, ChevronLeft, ChevronRight, Search } from "lucide-react";
+import PageHeader from "@/components/ui/PageHeader";
 
 // Assuming you have the AxiosExpectedError type defined
 interface AxiosExpectedError {
@@ -143,20 +144,15 @@ export default function UnitTemplateManagementPage() {
   return (
     <div className="max-w-8xl h-full ml-48  my-10 ">
       <div className="bg-white min-h-screen rounded-3xl shadow-2xl p-10">
-       
-       
-
-         <div className="rounded-lg shadow-md border border-green-dark/20 p-4 ">
-          <h1 className="text-2xl font-bold text-green-darkest">
-            Academic Units Management
-          </h1>
-
-         
-        </div>
+      
+        {/* 1. PAGE HEADER */}
+                  <PageHeader
+                    title="Academic Units"
+                    highlightedTitle="Management"
+                    systemLabel=" "
+                  />
         
         {/* Search Bar and Controls */}
- 
-
         <div className=" rounded-lg  my-4">
           <div className="flex ">
             {/* <div className=""> */}

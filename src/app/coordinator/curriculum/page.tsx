@@ -16,8 +16,7 @@ import { LoadingState } from "@/components/ui/LoadingState";
 import { CurriculumTable } from "@/components/coordinator/Curriculum/CurriculumTable";
 import { CurriculumLinkForm } from "@/components/coordinator/Curriculum/CurriculumLinkForm";
 import { UnitTemplateModal } from "@/components/coordinator/Curriculum/UnitTemplateModal";
-
-
+import PageHeader from "@/components/ui/PageHeader";
 
 export default function CurriculumManagementPage() {
   const [programs, setPrograms] = useState<Program[]>([]);
@@ -153,19 +152,24 @@ export default function CurriculumManagementPage() {
       <div className="bg-white rounded-xl shadow-2xl p-10 min-h-screen">
         
         {/* Header */}
-        <div className="flex justify-between items-center rounded-lg shadow-md border border-green-dark/20 p-4 mb-8">
-          <h1 className="text-lg font-bold text-green-darkest">Curriculum Management</h1>
-          <div className="flex space-x-4">
-            <button onClick={() => setShowTemplateModal(true)} className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-bold hover:scale-105  disabled:opacity-50 disabled:cursor-not-allowed transition  shadow-md">
-              + New Unit
-            </button>
-            {!showForm && (
-              <button onClick={() => setShowForm(true)} className="px-4 py-2 bg-green-800 text-white rounded-lg  hover:scale-105 text-sm font-bold disabled:opacity-50 disabled:cursor-not-allowed transition shadow-md">
-                Link Unit to Program
-              </button>
-            )}
-          </div>
-        </div>
+         <PageHeader 
+  title="Curriculum" 
+  highlightedTitle="Management"
+  actions={
+    <>
+      <button onClick={() => setShowTemplateModal(true)} className="px-5 py-2.5 bg-green-darkest text-yellow-gold rounded-xl text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-xl">
+        + New Unit
+      </button>
+      {!showForm && (
+      <button onClick={() => setShowForm(true)} className="px-5 py-2.5 border border-green-darkest/10 text-green-darkest rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-50 transition-all">
+        Link Program
+      </button>
+      )}
+    </>
+  }
+/>
+
+        {/* add a "Server Latency" number (e.g., 24ms) next to the pulse so the Coordinator can see exactly how fast the connection is */}
 
         {/* Program Selector */}
         <div className="flex items-center bg-gray-100 rounded-lg px-4 py-2 mb-8 border border-gray-200">

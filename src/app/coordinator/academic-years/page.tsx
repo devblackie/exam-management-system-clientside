@@ -9,6 +9,7 @@ import { AcademicYear } from "@/api/types";
 import { YearFormModal } from "@/components/coordinator/AcademicYears/YearFormModal";
 import { YearTable } from "@/components/coordinator/AcademicYears/YearTable";
 import { LoadingState } from "@/components/ui/LoadingState";
+import PageHeader from "@/components/ui/PageHeader";
 
 
 export default function AcademicYearsPage() {
@@ -87,28 +88,22 @@ export default function AcademicYearsPage() {
   return (
     <div className="max-w-8xl  ml-48  my-10 ">
       <div className="bg-white max-w-full min-h-screen rounded-3xl shadow-2xl p-10">
-        {/* Header */}
-
-        <div className=" rounded-lg shadow-md border border-green-dark/20 p-4 ">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r  from-green-darkest to-green-dark">
-                Academic Years Management
-              </h1>
-              <p className="text-sm text-green-darkest">
-                Configure and manage academic calendar periods
-              </p>
-            </div>
-
-            <button
-              onClick={() => setShowForm(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-darkest to-green-dark text-lime-bright font-bold text-sm rounded-lg shadow-lg hover:shadow-xl hover:scale-105 transition"
-            >
-              <Plus className="w-6 h-6" />
-              Add New Academic Year
-            </button>
-          </div>
-        </div>
+       
+                {/* Header */}
+                 <PageHeader 
+          title="Academic Years" 
+          highlightedTitle="Management"
+          actions={
+            <>
+            
+              {!showForm && (
+              <button onClick={() => setShowForm(true)} className="px-5 py-2.5 bg-gradient-to-r from-green-darkest to-green-dark text-yellow-gold rounded-xl text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all">
+                + Add New Academic Year
+              </button>
+              )}
+            </>
+          }
+        />
 
         {/* Table */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 mt-8 overflow-hidden">

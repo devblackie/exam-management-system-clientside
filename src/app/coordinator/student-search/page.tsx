@@ -24,6 +24,7 @@ import RawMarksTable from "@/components/coordinator/StudentSearch/RawMarksTable"
 import AcademicStatusBox from "@/components/coordinator/StudentSearch/AcademicStatusBox";
 import StudentProfileHeader from "@/components/coordinator/StudentSearch/StudentProfileHeader";
 import EditMarksModal from "@/components/coordinator/StudentSearch/EditMarksModal";
+import PageHeader from "@/components/ui/PageHeader";
 
 export default function StudentSearchPage() {
   const [query, setQuery] = useState("");
@@ -100,9 +101,13 @@ const viewStudent = async (regNo: string) => {
   return (
     <div className="max-w-8xl ml-48 my-10">
       <div className="bg-white rounded-3xl shadow-2xl p-10 min-h-screen">
-        <div className="rounded-lg shadow-md border border-green-dark/20 p-4 mb-4">
-          <h1 className="text-2xl font-bold text-green-darkest">Student Academic Records Portal</h1>
-        </div>
+        
+        {/* 1. PAGE HEADER */}
+                 <PageHeader
+                    title="Student Academic"
+                    highlightedTitle="Records Portal"
+                    systemLabel=" "
+                  />
 
      <SearchBar
           query={query} setQuery={setQuery} onSearch={handleSearch} searching={searching}
@@ -111,14 +116,11 @@ const viewStudent = async (regNo: string) => {
 
         <ResultsTable results={searchResults} onSelect={viewStudent} visible={!selectedStudent && !loading} />
 
-   
-
         {loading ? (
           <div className="text-center py-20">
             <div className="inline-block w-12 h-12 border-4 border-green-dark border-t-transparent rounded-full animate-spin"></div>
             <p className="mt-4 text-green-darkest">Loading student record...</p>
-         
-          </div>
+         </div>
         ) : selectedStudent && (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="flex flex-col lg:flex-row gap-6 mb-8">
@@ -128,7 +130,6 @@ const viewStudent = async (regNo: string) => {
               <div className="lg:w-1/2">
                 <AcademicStatusBox
                   status={selectedStudent.academicStatus}
-                  // currentYearOfStudy={selectedStudent.student.currentYearOfStudy}
                   currentYearOfStudy={selectedStudent.student.currentYear}
                   viewingYear={selectedYearOfStudy}
                   studentId={selectedStudent.student._id}

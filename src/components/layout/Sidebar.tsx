@@ -37,8 +37,6 @@ export default function Sidebar() {
     <nav className="flex-1 px-3 py-4 space-y-2">
       {filteredMenu.map((item) => {
         const Icon = item.icon;
-        // Use startsWith to keep parent links active during sub-routing
-        // const isActive = pathname.startsWith(item.href);
 
         const isActive = item.name === "Dashboard"
           ? pathname === item.href

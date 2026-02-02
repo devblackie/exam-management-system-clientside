@@ -9,7 +9,8 @@ import { getPrograms } from "@/api/programsApi";
 import { getAcademicYears } from "@/api/academicYearsApi";
 import { getProgramUnits } from "@/api/programUnitsApi";
 import type { Program, AcademicYear, ProgramUnit } from "@/api/types";
-import { CloudCheck } from 'lucide-react';
+import { CloudCheck, FileDown, UploadCloud, CheckCircle2, AlertTriangle, Cpu, Database } from 'lucide-react';
+import PageHeader from "@/components/ui/PageHeader";
 
 interface UploadResult {
   message: string;
@@ -18,7 +19,6 @@ interface UploadResult {
   errors: string[];
 }
 
-// Static lists for simple selections
 const YEARS_OF_STUDY = [1, 2, 3, 4, 5, 6];
 const SEMESTERS = [1, 2];
 
@@ -32,14 +32,9 @@ export default function UploadMarks() {
 
   // --- State for Template Selection ---
   const [selectedProgramId, setSelectedProgramId] = useState<string>("");
-  const [selectedAcademicYearId, setSelectedAcademicYearId] =
-    useState<string>("");
-  const [selectedYearOfStudy, setSelectedYearOfStudy] = useState<
-    number | undefined
-  >(undefined);
-  const [selectedSemester, setSelectedSemester] = useState<number | undefined>(
-    undefined
-  );
+  const [selectedAcademicYearId, setSelectedAcademicYearId] = useState<string>("");
+  const [selectedYearOfStudy, setSelectedYearOfStudy] = useState<number | undefined>(undefined);
+  const [selectedSemester, setSelectedSemester] = useState<number | undefined>(undefined);
   const [selectedUnitId, setSelectedUnitId] = useState<string>("");
   const [examMode, setExamMode] = useState<"standard" | "mandatory_q1">("standard");
 
@@ -49,449 +44,284 @@ export default function UploadMarks() {
   const [result, setResult] = useState<UploadResult | null>(null);
   const [dragActive, setDragActive] = useState(false);
 
-  // Fetch initial data: Programs and Academic Years
   useEffect(() => {
-    
-    getPrograms()
-      .then(setPrograms)
-      .catch((e) => addToast("Failed to load programs.", "error"));
-    getAcademicYears()
-      .then(setAcademicYears)
-      .catch((e) => addToast("Failed to load academic years.", "error"));
+    getPrograms().then(setPrograms).catch(() => addToast("Failed to load programs.", "error"));
+    getAcademicYears().then(setAcademicYears).catch(() => addToast("Failed to load academic years.", "error"));
   }, [addToast]);
 
-  // Fetch Units based on Selected Program
   useEffect(() => {
     if (selectedProgramId) {
-      getProgramUnits(selectedProgramId)
-        .then(setProgramUnits)
-        .catch((e) =>
-          addToast("Failed to load units for selected program.", "error")
-        );
+      getProgramUnits(selectedProgramId).then(setProgramUnits).catch(() => addToast("Failed to load units.", "error"));
     } else {
-      setProgramUnits([]); // Clear units if program is deselected
+      setProgramUnits([]);
     }
-    setSelectedUnitId(""); // Reset unit selection when program changes
+    setSelectedUnitId("");
   }, [selectedProgramId, addToast]);
 
-  // Filter units based on Year/Semester selection for better UX
   const filteredProgramUnits = useMemo(() => {
     if (!selectedYearOfStudy || !selectedSemester) return programUnits;
-
-    return programUnits.filter(
-      (pu) =>
-        pu.requiredYear === selectedYearOfStudy &&
-        pu.requiredSemester === selectedSemester
-    );
+    return programUnits.filter(pu => pu.requiredYear === selectedYearOfStudy && pu.requiredSemester === selectedSemester);
   }, [programUnits, selectedYearOfStudy, selectedSemester]);
 
-  // Check if the download button should be enabled
+  // Logic to determine if Unit Selection should be unlocked
+  const isUnitUnlocked = !!selectedProgramId && !!selectedYearOfStudy && !!selectedSemester;
+
   const isDownloadEnabled = useMemo(() => {
-    return (
-      !!selectedProgramId &&
-      !!selectedUnitId &&
-      !!selectedAcademicYearId &&
-      !!selectedYearOfStudy &&
-      !!selectedSemester
-    );
-  }, [
-    selectedProgramId,
-    selectedUnitId,
-    selectedAcademicYearId,
-    selectedYearOfStudy,
-    selectedSemester,
-  ]);
+    return !!selectedProgramId && !!selectedUnitId && !!selectedAcademicYearId && !!selectedYearOfStudy && !!selectedSemester;
+  }, [selectedProgramId, selectedUnitId, selectedAcademicYearId, selectedYearOfStudy, selectedSemester]);
 
   const handleDownloadTemplate = async () => {
-    // Use the state variables for the required parameters
-    if (!isDownloadEnabled) {
-      addToast("Please select all options before downloading.", "error");
-      return;
-    }
-
+    if (!isDownloadEnabled) return;
     try {
-      await downloadTemplate(
-        selectedProgramId,
-        selectedUnitId,
-        selectedAcademicYearId,
-        selectedYearOfStudy!,
-        selectedSemester!,
-        examMode
-      );
-      addToast("Template download started!", "success");
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Download failed";
-      addToast(`Download failed: ${errorMessage}`, "error");
-      console.error("Download Error:", error);
-    }
-  };
-
-  const handleDrag = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
-      setDragActive(true);
-    } else if (e.type === "dragleave") {
-      setDragActive(false);
-    }
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragActive(false);
-
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      handleFile(e.dataTransfer.files[0]);
+      await downloadTemplate(selectedProgramId, selectedUnitId, selectedAcademicYearId, selectedYearOfStudy!, selectedSemester!, examMode);
+      addToast("Scoresheet template generated.", "success");
+    } catch {
+      addToast("Template generation failed.", "error");
     }
   };
 
   const handleFile = (selectedFile: File) => {
-    const valid =
-      selectedFile.name.endsWith(".csv") ||
-      selectedFile.name.endsWith(".xlsx") ||
-      selectedFile.name.endsWith(".xls");
-
+    const valid = selectedFile.name.endsWith(".csv") || selectedFile.name.endsWith(".xlsx") || selectedFile.name.endsWith(".xls");
     if (valid) {
       setFile(selectedFile);
       setResult(null);
-      addToast(`${selectedFile.name} ready for upload`, "success");
     } else {
-      addToast("Invalid file type. Only .csv, .xlsx allowed", "error");
+      addToast("Invalid file format. Use .xlsx or .csv", "error");
     }
   };
 
   const handleUpload = async () => {
     if (!file) return;
-
     setUploading(true);
-    setResult(null);
     try {
       const data = await uploadMarks(file);
       setResult(data);
-      if (data.success === data.total) {
-        addToast(
-          `PERFECT! All ${data.success} records uploaded successfully!`,
-          "success"
-        );
-      } else if (data.success > 0) {
-        addToast(
-          `${data.success}/${data.total} records uploaded. Check errors below.`,
-          "success"
-        );
-      } else {
-        addToast("No records uploaded. See errors.", "error");
-      }
-    } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : "Upload failed";
-      addToast(`Upload failed: ${errorMessage}`, "error");
+      addToast(data.success === data.total ? "All records synced." : "Upload processed with remarks.", "success");
+    } catch {
+      addToast("Server failed to process file.", "error");
     } finally {
       setUploading(false);
     }
   };
 
+  const inputClass = "w-full p-3 bg-white border border-slate-200 text-green-darkest font-semibold text-xs rounded-lg transition-all outline-none appearance-none";
+  const disabledStyles = "bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed opacity-60";
+
   return (
-    <div className="max-w-8xl ml-48  my-10 ">
-      <div className="bg-white max-w-full min-h-screen rounded-3xl shadow-2xl p-10">
-        <div className=" rounded-lg shadow-md border border-green-dark/20 p-4 ">
-          <h1 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r  from-green-darkest to-green-dark">
-            Upload Student Marks
-          </h1>
-          <p className=" text-green-darkest">
-            Select the Academic Context and download the official{" "}
-            {branding.school} scoresheet template.
-          </p>
+    // <div className="max-w-8xl ml-48 my-10">
+    <div className="ml-48 my-10 min-h-screen bg-[#F8F9FA] overflow-hidden">
+
+      <div className="bg-[#F8F9FA] min-h-screen rounded-lg shadow-2xl p-12 border border-white">
+
+        <PageHeader
+          title="Upload"
+          highlightedTitle="Student Marks"
+          systemLabel=""
+          subtitle={`Select the Academic Context and download the official ${branding.school} scoresheet template.`}
+        />
+
+        {/* STEP 1: CONTEXT SELECTION */}
+        <div className="mb-8">
+          <div className="flex items-center gap-4 mb-4 px-2">
+            <h2 className="text-[10px] font-black uppercase tracking-[0.5em] text-green-darkest/30">
+              01. Define Academic Context
+            </h2>
+            <div className="h-[1px] flex-1 bg-gradient-to-r from-green-darkest/10 to-transparent" />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-6 bg-white p-8 rounded-lg border border-green-darkest/5 shadow-sm">
+            {/* Program Selection - Full Name */}
+            <div className="space-y-2">
+              <label className="text-[9px] font-black uppercase text-slate-400 tracking-widest ml-1">Program</label>
+              <select className={inputClass} value={selectedProgramId} onChange={(e) => setSelectedProgramId(e.target.value)}>
+                <option value="">Select Program</option>
+                {programs.map((p: Program) => (
+                  <option key={p._id} value={p._id}>{p.code} — {p.name}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Academic Year Selection */}
+            <div className="space-y-2">
+              <label className="text-[9px] font-black uppercase text-slate-400 tracking-widest ml-1">Academic Year</label>
+              <select className={inputClass} value={selectedAcademicYearId} onChange={(e) => setSelectedAcademicYearId(e.target.value)}>
+                <option value="">Academic Year...</option>
+                {academicYears.map((y: AcademicYear) => (
+                  <option key={y._id} value={y._id}>{y.year} {y.isActive ? "(Current)" : ""}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Year of Study Selection */}
+            <div className="space-y-2">
+              <label className="text-[9px] font-black uppercase text-slate-400 tracking-widest ml-1">Year of Study</label>
+              <select className={inputClass} value={selectedYearOfStudy || ""} onChange={(e) => setSelectedYearOfStudy(parseInt(e.target.value))}>
+                <option value="">Year of Study...</option>
+                {YEARS_OF_STUDY.map((y) => (
+                  <option key={y} value={y}>Year {y}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Semester Selection */}
+            <div className="space-y-2">
+              <label className="text-[9px] font-black uppercase text-slate-400 tracking-widest ml-1">Semester</label>
+              <select className={inputClass} value={selectedSemester || ""} onChange={(e) => setSelectedSemester(parseInt(e.target.value))}>
+                <option value="">Semester...</option>
+                {SEMESTERS.map((s) => (
+                  <option key={s} value={s}>Semester {s}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Unit - ENFORCED LOCKING LOGIC */}
+            <div className="space-y-2 relative">
+              <label className="text-[9px] font-black uppercase text-slate-400 tracking-widest ml-1">Unit Module</label>
+              <select
+                className={`${inputClass} ${!isUnitUnlocked ? disabledStyles : ""}`}
+                value={selectedUnitId}
+                onChange={(e) => setSelectedUnitId(e.target.value)}
+                disabled={!isUnitUnlocked}
+              >
+                <option value="">{isUnitUnlocked ? "Choose Unit..." : "Select Context First..."}</option>
+                {filteredProgramUnits.map((pu) => (
+                  <option key={pu._id} value={pu.unit._id}>{pu.unit.code}: {pu.unit.name}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Exam Mode Selection */}
+            <div className="space-y-2">
+              <label className="text-[9px] font-black uppercase text-slate-400 tracking-widest ml-1">Exam Format</label>
+              <select className={inputClass} value={examMode} onChange={(e) => setExamMode(e.target.value as "standard" | "mandatory_q1")}>
+                <option value="standard">Standard Grading</option>
+                <option value="mandatory_q1">Compulsory Q1 Strategy</option>
+              </select>
+            </div>
+
+          </div>
         </div>
 
-        {/* --- SELECTION CONTROLS (New Section) --- */}
-        <div className="mt-8 grid grid-cols-2 md:grid-cols-6 gap-4 p-4 bg-gray-50 rounded-xl border border-gray-200">
-          {/* 1. Program Select */}
-          <div>
-            <label className="block text-sm font-medium text-green-darkest mb-1">
-              Program
-            </label>
-            <select
-              value={selectedProgramId}
-              onChange={(e) => setSelectedProgramId(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-lg text-green-darkest/40 shadow-sm focus:ring-green-500 focus:border-green-500"
-            >
-              <option value="" >Select Program</option>
-              {programs.map((p) => (
-                <option key={p._id} value={p._id} className="text-green-darkest text-sm">
-                  {p.code} - {p.name}
-                </option>
-              ))}
-            </select>
-          </div>
+        {/* STEP 2: TEMPLATE & UPLOAD */}
+        <div className="grid grid-cols-12 gap-10">
 
-          {/* 2. Academic Year Select */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Academic Year
-            </label>
-            <select
-              value={selectedAcademicYearId}
-              onChange={(e) => setSelectedAcademicYearId(e.target.value)}
-              className="w-full p-2 border border-gray-300 text-green-darkest/40 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500"
-            >
-              <option value="">Select Year</option>
-              {academicYears.map((y) => (
-                <option key={y._id} value={y._id}>
-                  {y.year}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* 3. Year of Study Select */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Year of Study
-            </label>
-            <select
-              value={selectedYearOfStudy || ""}
-              onChange={(e) =>
-                setSelectedYearOfStudy(parseInt(e.target.value) || undefined)
-              }
-              className="w-full p-2 border border-gray-300  text-green-darkest/40 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500"
-            >
-              <option value="">Select Year</option>
-              {YEARS_OF_STUDY.map((y) => (
-                <option key={y} value={y}>
-                  Year {y}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* 4. Semester Select */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Semester
-            </label>
-            <select
-              value={selectedSemester || ""}
-              onChange={(e) =>
-                setSelectedSemester(parseInt(e.target.value) || undefined)
-              }
-              className="w-full p-2 border border-gray-300 text-green-darkest/40 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500"
-            >
-              <option value="">Select Sem</option>
-              {SEMESTERS.map((s) => (
-                <option key={s} value={s}>
-                  Semester {s}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* 5. Unit Select (Filtered) */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Unit
-            </label>
-
-            <select
-              value={selectedUnitId}
-              onChange={(e) => setSelectedUnitId(e.target.value)}
-              disabled={
-                !selectedProgramId || !selectedYearOfStudy || !selectedSemester
-              }
-              className={`w-full p-2 border rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 ${!selectedProgramId || !selectedYearOfStudy || !selectedSemester
-                ? "bg-gray-200 cursor-not-allowed text-gray-400"
-                : "border-gray-300 text-green-darkest/40"
+          {/* Download Template Card */}
+          <div className="col-span-12 lg:col-span-4">
+            <div className="bg-white border border-green-darkest/5 rounded-lg p-8 h-full flex flex-col justify-between">
+              <div>
+                <h3 className="text-lg font-black text-green-darkest uppercase tracking-tight mb-2">Protocol Template</h3>
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest leading-relaxed">
+                  Download the pre-formatted scoresheet. System validation requires this exact structure.
+                </p>
+              </div>
+              <button
+                onClick={handleDownloadTemplate}
+                disabled={!isDownloadEnabled}
+                className="mt-8 w-full py-4 bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl flex items-center justify-center gap-3 text-green-darkest font-black text-[11px] uppercase tracking-widest hover:bg-yellow-gold hover:border-yellow-gold transition-all disabled:opacity-30"
+              >
+                <FileDown size={18} />
+                Generate Scoresheet
+              </button>         
+            </div>
+          </div>           
+      
+          {/* Drag & Drop Zone */}
+          <div className="col-span-12 lg:col-span-8">
+            <div
+              onDragOver={(e) => { e.preventDefault(); setDragActive(true); }}
+              onDragLeave={() => setDragActive(false)}
+              onDrop={(e) => { e.preventDefault(); setDragActive(false); if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); }}
+              className={`relative border-2 border-dashed rounded-lg p-12 transition-all duration-500 flex flex-col items-center justify-center min-h-[300px] ${dragActive ? "border-yellow-gold bg-yellow-gold/5 scale-[1.01]" : "border-slate-200 bg-white"
                 }`}
             >
-              <option value="">Select Unit</option>
-              {filteredProgramUnits.map((pu) => (
-                <option key={pu._id} value={pu.unit._id}>
-                  {pu.unit.code} - {pu.unit.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-         {/* 6. Exam mode */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Exam Format
-            </label>
-            <select
-              value={examMode}
-              onChange={(e) => setExamMode(e.target.value as "standard" | "mandatory_q1")}
-              className="w-full p-2 border border-gray-300 text-green-darkest/70 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500"
-            >
-              <option value="standard">Standard (5 Questions)</option>
-              <option value="mandatory_q1">Mandatory Q1 (30m + Best 2)</option>
-            </select>
-          </div>
-        </div>
-
-        {/* Template Download Button (Updated onClick handler) */}
-        <div className="text-center my-8">
-          <button
-            onClick={handleDownloadTemplate} // 👈 Call the new handler
-            disabled={!isDownloadEnabled}
-            className="  inline-flex items-center gap-4 px-3 py-2 bg-gradient-to-r from-green-darkest to-green-dark text-white-pure rounded-2xl hover:from-green-700 hover:to-emerald-800 font-bold disabled:opacity-50 disabled:cursor-not-allowed transition shadow-2xl"
-          >
-            <svg
-              className="w-8 h-8"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-              />
-            </svg>
-            Download Scoresheet Template
-          </button>
-        </div>
-
-        {/* Drag & Drop Zone */}
-        <div
-          onDragEnter={handleDrag}
-          onDragLeave={handleDrag}
-          onDragOver={handleDrag}
-          onDrop={handleDrop}
-          className={`relative border-2 border-dashed rounded-3xl p-16 mx-32  text-center transition-all duration-300 ${dragActive
-            ? "border-green-darkest bg-green-dark/20 shadow-2xl scale-105"
-            : "border-gray-400 bg-white shadow-xl"
-            }`}
-        >
-
-          {dragActive && (
-            <div className="absolute inset-0 bg-green-dark/50 bg-opacity-10 rounded-3xl animate-pul" />
-          )}
-
-          {!file ? (
-            <>
-              <div className="mb-8 p-10">
-                <svg
-                  className="w-20 h-20 mx-auto text-green-darkest/50"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={1.5}
-                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                  />
-                </svg>
-              </div>
-              <p className="text-lg font-bold text-green-darkest mb-6">
-                Drop your marks file here
-              </p>
-              <p className="text-2xl text-green-darkest mb-10">or</p>
-              <label className="inline-block px-4 py-2 bg-gradient-to-r from-green-darkest to-green-dark text-white text-lg font-bold rounded-2xl cursor-pointer hover:shadow-2xl transition transform hover:scale-105">
-                Browse Files
-                <input
-                  type="file"
-                  accept=".csv,.xlsx"
-                  onChange={(e) =>
-                    e.target.files?.[0] && handleFile(e.target.files[0])
-                  }
-                  className="hidden"
-                />
-              </label>
-            </>
-          ) : (
-            <div className="text-center">
-              <div className="mb-8">
-                <svg
-                  className="w-20 h-20 mx-auto text-green-600"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </div>
-              <p className="text-lg font-bold text-green-dark mb-4">
-                {file.name}
-              </p>
-              <p className="text-lg text-green-darkest/50 mb-10">
-                {(file.size / 1024 / 1024).toFixed(2)} MB
-              </p>
-              <button
-                onClick={() => setFile(null)}
-                className="px-5 py-2 bg-red-600 hover:bg-red-700 text-white text-lg font-bold rounded-xl transition"
-              >
-                Remove File
-              </button>
-            </div>
-          )}
-        </div>
-
-        {/* Upload Button */}
-        {file && (
-          <div className="text-center mt-12">
-            <button
-              onClick={handleUpload}
-              disabled={uploading}
-              className="px-4 py-2 bg-gradient-to-r from-green-darkest to-green-dark text-white text-md font-black rounded-3xl shadow-3xl hover:shadow-4xl disabled:opacity-70 disabled:cursor-not-allowed transition transform hover:scale-105 flex items-center gap-6 mx-auto"
-            >
-              {uploading ? (
+              {!file ? (
                 <>
-                  <span className="inline-block w-12 h-12 border-8 border-white border-t-transparent rounded-full animate-spin"></span>
-                  Uploading & Calculating Grades...
+                  <div className="h-16 w-16 bg-slate-50 rounded-lg flex items-center justify-center text-slate-300 mb-6">
+                    <UploadCloud size={32} />
+                  </div>
+                  <p className="text-[11px] font-black text-green-darkest uppercase tracking-[0.3em] mb-4">Awaiting Document Upload</p>
+                  <label className="px-8 py-3 bg-green-darkest text-yellow-gold font-black text-[10px] uppercase tracking-widest rounded-lg cursor-pointer hover:shadow-xl transition-all">
+                    Browse Files
+                    <input type="file" accept=".csv,.xlsx" onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])} className="hidden" />
+                  </label>
                 </>
               ) : (
-                <>
-                  <CloudCheck />
-                  Upload & Process Marks
-                </>
-              )}
-            </button>
-          </div>
-        )}
-
-        {/* Result */}
-        {result && (
-          <div
-            className={`mt-16 p-12 rounded-3xl shadow-2xl text-center ${result.success === result.total
-              ? "bg-gradient-to-br from-green-dark to-green-dark border-8 border-green-dark"
-              : "bg-gradient-to-br from-yellow-gold to-yellow-gold border-8 border-yellow-gold"
-              }`}
-          >
-            <h3 className="text-xl text-white-pure font-black mb-6">
-              {result.success === result.total ? "SUCCESS!" : "PARTIAL SUCCESS"}
-            </h3>
-            <p className="text-2xl font-black text-white-pure mb-8">
-              {result.success} / {result.total}
-            </p>
-            <p className="text-xl font-bold text-white-pure">
-              records processed successfully
-            </p>
-
-            {result.errors.length > 0 && (
-              <details className="mt-10">
-                <summary className="cursor-pointer text-xl font-bold text-red-700 hover:underline">
-                  Show {result.errors.length} error(s)
-                </summary>
-                <div className="mt-6 bg-red-50 border-4 border-red-400 rounded-2xl p-8 text-left">
-                  {result.errors.map((error, i) => (
-                    <p
-                      key={i}
-                      className="text-lg text-red-800 font-medium py-2"
+                <div className="text-center animate-in fade-in zoom-in duration-300">
+                  <div className="h-16 w-16 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 mx-auto mb-6">
+                    <Database size={32} />
+                  </div>
+                  <p className="text-sm font-black text-green-darkest mb-1">{file.name}</p>
+                  <p className="text-[10px] text-slate-400 font-mono mb-8 uppercase">{(file.size / 1024).toFixed(1)} KB Ready for Processing</p>
+                  <div className="flex gap-4 justify-center">
+                    <button onClick={() => setFile(null)} className="text-[10px] font-black text-red-400 uppercase tracking-widest hover:text-red-600 transition">Remove</button>
+                    <button
+                      onClick={handleUpload}
+                      disabled={uploading}
+                      className="px-8 py-3 bg-green-darkest text-yellow-gold font-black text-[10px] uppercase tracking-widest rounded-xl flex items-center gap-3 shadow-2xl"
                     >
-                      • {error}
-                    </p>
-                  ))}
+                      {uploading ? <Cpu className="animate-spin" size={14} /> : <CloudCheck size={16} />}
+                      {uploading ? "Processing..." : "Process Results"}
+                    </button>
+                  </div>
                 </div>
-              </details>
-            )}
+              )}
+            </div>
           </div>
-        )}
+        </div>
+
+        {/* RESULTS SECTION */}
+         {result && (
+          <div className="mt-12 animate-in slide-in-from-bottom-6 duration-700">
+            <div className="flex items-center gap-4 mb-6 px-2">
+              <h2 className="text-[10px] font-black uppercase tracking-[0.5em] text-green-darkest/30">
+                03. Ingestion Summary
+              </h2>
+              <div className="h-[1px] flex-1 bg-gradient-to-r from-green-darkest/10 to-transparent" />
+            </div>
+
+            <div className={`p-1 bg-white border rounded-lg overflow-hidden ${result.success === result.total ? 'border-emerald-500/20' : 'border-yellow-gold/20'}`}>
+              <div className="flex items-center p-4 gap-10">
+                <div className={`h-12 w-12 rounded-lg flex items-center justify-center ${result.success === result.total ? 'bg-emerald-50 text-emerald-600' : 'bg-yellow-50 text-yellow-600'}`}>
+                  {result.success === result.total ? <CheckCircle2 size={24} /> : <AlertTriangle size={24} />}
+                </div>
+
+                <div className="flex-1 grid grid-cols-3 gap-8">
+                  <div>
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Status</p>
+                    <p className="text-sm font-black text-green-darkest uppercase tracking-tighter">
+                      {result.success === result.total ? "Success" : "Partial Success"}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Records</p>
+                    <p className="text-xl font-black text-green-darkest">
+                      {result.success} <span className="text-slate-500">/ {result.total}</span>
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Integrity</p>
+                    <p className="text-xl font-black text-emerald-600">
+                      {((result.success / result.total) * 100).toFixed(1)}%
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {result.errors.length > 0 && (
+                <div className="border-t border-slate-100 p-8 bg-slate-50/50">
+                  <summary className="cursor-pointer text-[10px] font-black text-red-500 tracking-[0.3em] mb-4 hover:underline">Conflict Resolution Log ({result.errors.length} error(s))</summary>
+                  <div className="space-y-2">
+                    {result.errors.map((error, i) => (
+                      <div key={i} className="flex gap-3 text-xs font-medium text-slate-600 bg-white p-3 rounded-lg border border-slate-100 shadow-sm">
+                        <span className="text-red-400">•</span> {error}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )} 
       </div>
     </div>
   );

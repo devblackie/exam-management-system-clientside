@@ -1,17 +1,17 @@
 import api from "@/config/axiosInstance";
-import type { User, Role } from "./types";
+import type { User, Role } from "./types"; 
 
-export type Role = "admin" | "lecturer" | "coordinator";
+// export type Role = "admin" | "lecturer" | "coordinator";
 export type Status = "active" | "suspended";
 
-export interface User {
-  _id: string;
-  name: string;
-  email: string;
-  role: Role;
-  status: Status;
-  createdAt: string;
-}
+// export interface User {
+//   _id: string;
+//   name: string;
+//   email: string;
+//   role: Role;
+//   status: Status;
+//   createdAt: string;
+// }
 
 // --- Auth ---
 export async function login(email: string, password: string) {

@@ -116,15 +116,16 @@
 //   );
 // }
 
+
 "use client";
 
-import {  useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
-import { Lock, Mail, Eye, EyeOff, Loader2 } from "lucide-react"; // Switched to Lucide
+import { Lock, Mail, Eye, EyeOff, Loader2, ShieldCheck } from "lucide-react";
 import { branding } from "@/config/branding";
 import CommonButton from "@/components/ui/CommonButton";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -134,8 +135,6 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const { loginUser } = useAuth();
 
-
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -143,86 +142,149 @@ export default function LoginPage() {
     
     try {
       await loginUser(email, password);
-    } catch  {
-      setError("Invalid credentials. Please try again.");
+    } catch {
+      setError("AUTHENTICATION_FAILED: Invalid Credentials");
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="flex flex-col items-center justify-center bg-green-darkest min-h-screen p-4">
-      {/* Animated Logo Section */}
-      <div className="relative w-32 h-32 mb-8">
-        <motion.div
-          animate={{ rotateY: 360 }}
-          transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-          className="w-full h-full"
-        >
-          <Image src={branding.institutionLogo} alt="Logo" fill className="object-contain" />
-        </motion.div>
+    <div className="flex min-h-screen bg-green-darkest overflow-hidden relative">
+      
+      {/* BACKGROUND TEXTURE (Subtle Institutional Watermark) */}
+      <div className="absolute inset-0 opacity-[0.03] pointer-events-none overflow-hidden select-none">
+        <div className="text-[11rem] font-black leading-none transform -rotate-24 translate-y-48 translate-x-48">
+          {branding.devName.split(' ')[0]}
+        </div>
       </div>
 
-      <div className="w-full max-w-md bg-white/5 backdrop-blur-lg p-8 rounded-2xl border border-white/10 shadow-2xl">
-        <h2 className="text-3xl font-bold text-white-pure text-center mb-2">{branding.appName}</h2>
-        <p className="text-yellow-gold/60 text-center mb-8 text-sm">Sign in to manage your curriculum</p>
+      {/* LEFT SIDE: Branding & Visuals (Visible on Desktop) */}
+      <div className="hidden lg:flex w-1/2 flex-col justify-between p-16 relative z-10">
+        <div className="flex items-center gap-4">
+          <div className="h-1 w-12 bg-yellow-gold rounded-full" />
+          <span className="text-[10px] font-black uppercase tracking-[0.5em] text-white/40">
+            {branding.school} 
+          </span>
+        </div>
 
-        {error && (
-          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
-            className="bg-red-500/10 border border-red-500/50 text-red-500 p-3 rounded-lg text-sm mb-6 text-center">
-            {error}
-          </motion.div>
-        )}
+        <div>
+          <h1 className="text-7xl font-black text-white leading-tight tracking-tighter">
+            Exams<br />
+            <span className="text-5xl text-yellow-gold font-light">Management System.</span>
+          </h1>
+          <p className="text-white/40 max-w-md mt-6 text-sm font-medium leading-relaxed tracking-wide">
+            Access the institutional grade synchronization and curriculum management protocol. Restricted to authorized coordinators only.
+          </p>
+        </div>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div className="space-y-2">
-            <label className="text-xs font-bold text-yellow-gold uppercase ml-1">Email Address</label>
-            <div className="relative group">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-yellow-gold/50 group-focus-within:text-yellow-gold transition-colors" />
-              <input
-                type="email"
-                disabled={isSubmitting}
-                className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-11 pr-4 text-white outline-none focus:border-yellow-gold/50 transition-all"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
+        <div className="flex items-center gap-6 text-white/20">
+          <ShieldCheck size={40} strokeWidth={1} />
+          <div className="text-[9px] font-mono tracking-widest uppercase">
+            End-to-End <br /> Encryption Active
           </div>
+        </div>
+      </div>
 
-          <div className="space-y-2">
-            <label className="text-xs font-bold text-yellow-gold uppercase ml-1">Password</label>
-            <div className="relative group">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-yellow-gold/50 group-focus-within:text-yellow-gold transition-colors" />
-              <input
-                type={showPassword ? "text" : "password"}
+      {/* RIGHT SIDE: The Login Terminal */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 relative z-10">
+        <motion.div 
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="w-full max-w-md flex flex-col items-center "
+        >
+          {/* Mobile Logo Only */}
+        <div className="relative w-32 h-32 mb-5">
+       <motion.div
+          animate={{ rotateY: 360 }}
+          transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+         className="w-full h-full"
+         >
+           <Image src={branding.institutionLogo} alt="Logo" fill className="object-contain" />
+        </motion.div>
+       </div>
+
+          <div className="bg-white/5 backdrop-blur-2xl p-8 rounded-[2.5rem] border border-white/10 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)]">
+            <div className="mb-6">
+              <h2 className="text-2xl font-black text-white tracking-tight uppercase">Portal Login</h2>
+              <div className="h-1 w-12 bg-yellow-gold mt-2 rounded-full" />
+            </div>
+
+            <AnimatePresence>
+              {error && (
+                <motion.div 
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="bg-red-500/10 border-l-4 border-red-500 text-red-500 px-1 py-2 rounded-r-lg text-[10px] font-black uppercase tracking-widest mb-3"
+                >
+                  {error}
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            <form onSubmit={handleSubmit} className="space-y-8">
+              {/* EMAIL FIELD */}
+              <div className="space-y-3">
+                <label className="text-[9px] font-black text-yellow-gold uppercase tracking-[0.3em] ml-1">Official Identifier</label>
+                <div className="relative border-b border-white/10 focus-within:border-yellow-gold transition-all duration-500">
+                  <Mail className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
+                  <input
+                    type="email"
+                    disabled={isSubmitting}
+                    placeholder="name@institution.edu"
+                    className="w-full bg-transparent py-4 pl-8 pr-4 text-white text-sm outline-none placeholder:text-white/10"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* PASSWORD FIELD */}
+              <div className="space-y-3">
+                <label className="text-[9px] font-black text-yellow-gold uppercase tracking-[0.3em] ml-1">Security Key</label>
+                <div className="relative border-b border-white/10 focus-within:border-yellow-gold transition-all duration-500">
+                  <Lock className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    disabled={isSubmitting}
+                    placeholder="••••••••"
+                    className="w-full bg-transparent py-4 pl-8 pr-12 text-white text-sm outline-none placeholder:text-white/10"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-0 top-1/2 -translate-y-1/2 text-white/20 hover:text-yellow-gold transition-colors"
+                  >
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
+              </div>
+
+              <CommonButton
+                type="submit"
                 disabled={isSubmitting}
-                className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-11 pr-12 text-white outline-none focus:border-yellow-gold/50 transition-all"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-yellow-gold transition-colors"
+                className="w-full py-5 bg-yellow-gold hover:bg-yellow-400 text-green-darkest font-black text-[11px] uppercase tracking-[0.3em] rounded-2xl shadow-2xl transition-all active:scale-95 disabled:opacity-50"
               >
-                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-              </button>
+                {isSubmitting ? (
+                  <span className="flex items-center justify-center gap-3">
+                    <Loader2 className="animate-spin" size={16} /> Verifying...
+                  </span>
+                ) : "Establish Connection"}
+              </CommonButton>
+            </form>
+
+            <div className="mt-10 text-center">
+              <p className="text-[9px] font-bold text-white/20 uppercase tracking-widest leading-relaxed">
+                Protected by {branding.school} Infrastructure <br /> 
+                Internal Personnel Only
+              </p>
             </div>
           </div>
-
-          <CommonButton
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full py-4 mt-4 bg-yellow-gold hover:bg-yellow-500 text-green-darkest font-black rounded-xl shadow-xl shadow-yellow-gold/10"
-          >
-            {isSubmitting ? (
-              <span className="flex items-center justify-center gap-2">
-                <Loader2 className="animate-spin" size={20} /> Authenticating...
-              </span>
-            ) : "ACCESS DASHBOARD"}
-          </CommonButton>
-        </form>
+        </motion.div>
       </div>
     </div>
   );

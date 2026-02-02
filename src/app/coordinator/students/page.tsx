@@ -6,6 +6,7 @@ import { getStudents, bulkRegisterStudents, downloadStudentRegistrationTemplate 
 import type { StudentFromAPI, StudentFormRow, Program, AcademicYear } from "@/api/types";
 import { useToast } from "@/context/ToastContext";
 import { getAcademicYears, getPrograms } from "@/api/marksApi";
+import PageHeader from "@/components/ui/PageHeader";
 
 export default function RegisterStudents() {
   const [students, setStudents] = useState<StudentFormRow[]>([
@@ -285,15 +286,13 @@ export default function RegisterStudents() {
   return (
     <div className="max-w-8xl ml-48 my-10 ">
       <div className="bg-white min-h-screen rounded-3xl shadow-2xl p-10">
-        <div className="rounded-lg shadow-md border border-green-dark/20 p-4 ">
-          <h1 className="text-xl font-bold text-green-darkest">
-            Register Students
-          </h1>
-          <p className="text-sm text-green-dark">
-            Add students to your institution. Required:{" "}
-            <strong>Reg No, Name, Program</strong>
-          </p>
-        </div>
+
+
+<PageHeader 
+  title="Register" 
+  highlightedTitle="Students"
+  subtitle="Requirements: Reg No, Full Legal Name, Active Program Code"
+/>
 
         {duplicates.size > 0 && (
           <div className="fixed right-6 top-24 z-50">
