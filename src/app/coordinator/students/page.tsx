@@ -2,11 +2,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import {
-  getStudents,
-  bulkRegisterStudents,
-  downloadStudentRegistrationTemplate,
-} from "@/api/studentsApi";
+import { getStudents, bulkRegisterStudents, downloadStudentRegistrationTemplate } from "@/api/studentsApi";
 import type { StudentFormRow, Program, AcademicYear } from "@/api/types";
 import { useToast } from "@/context/ToastContext";
 import { getAcademicYears, getPrograms } from "@/api/marksApi";

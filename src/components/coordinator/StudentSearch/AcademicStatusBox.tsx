@@ -43,10 +43,10 @@ export default function AcademicStatusBox({ status, currentYearOfStudy, viewingY
   const canPromote = viewingYear === currentYearOfStudy && status.variant === 'success';
 
   const variantClasses: Record<AcademicStatus['variant'], string> = {
-    success: 'bg-green-50 border-green-500 text-green-800',
-    warning: 'bg-yellow-50 border-yellow-500 text-yellow-800',
-    error: 'bg-red-50 border-red-500 text-red-800',
-    info: 'bg-blue-50 border-blue-500 text-blue-800'
+    success: 'bg-green-50 border-green-500/20 text-green-900',
+    warning: 'bg-yellow-50 border-yellow-500/20 text-yellow-900',
+    error: 'bg-red-50 border-red-500/20 text-red-900',
+    info: 'bg-blue-50 border-blue-500/20 text-blue-900'
   };
 
   const handlePromote = async () => {

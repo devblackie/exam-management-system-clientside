@@ -40,19 +40,19 @@ export default function PageHeader({
     .toUpperCase();
 
   return (
-    <header className="mb-10 w-full animate-in fade-in slide-in-from-top-4 duration-700">
-      <div className="flex justify-between items-end border-b border-green-darkest/10 pb-6">
+    <header className="mb-8 w-full animate-in fade-in slide-in-from-top-4 duration-700">
+      <div className="flex justify-between items-end border-b border-green-darkest/10 pb-2">
         
         {/* LEFT: Identity & Context */}
         <div className="flex flex-col">
-          <div className="flex items-center gap-3 mb-2">
+          <div className="flex items-center gap-3 mb-1">
             <span className={`h-1 w-8 rounded-full transition-colors duration-500 ${isOnline ? 'bg-yellow-gold' : 'bg-red-500'}`} />
             <span className="text-[10px] font-black uppercase tracking-[0.4em] text-green-darkest/40">
               {systemLabel}
             </span>
           </div>
           
-          <h1 className="text-2xl font-black text-green-darkest tracking-tight">
+          <h1 className="text-xl font-black text-green-darkest tracking-tight">
             {title} {highlightedTitle && <span className="text-yellow-gold/80 font-light">{highlightedTitle}</span>}
           </h1>
 

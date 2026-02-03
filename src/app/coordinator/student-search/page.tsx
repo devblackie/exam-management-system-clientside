@@ -15,6 +15,7 @@ import type {
   SaveMarksPayload,
 } from "@/api/types";
 import { useToast } from "@/context/ToastContext";
+import { LayoutGrid, Search, Loader2, FileText, Activity } from "lucide-react";
 
 // New Components
 import SearchBar from "@/components/coordinator/StudentSearch/SearchBar";
@@ -100,12 +101,12 @@ const viewStudent = async (regNo: string) => {
 
   return (
     <div className="max-w-8xl ml-48 my-10">
-      <div className="bg-white rounded-3xl shadow-2xl p-10 min-h-screen">
+      <div className="bg-[#F8F9FA] rounded-3xl shadow-2xl p-10 min-h-screen">
         
         {/* 1. PAGE HEADER */}
                  <PageHeader
                     title="Student Academic"
-                    highlightedTitle="Records Portal"
+                    highlightedTitle="Records"
                     systemLabel=" "
                   />
 
@@ -117,17 +118,18 @@ const viewStudent = async (regNo: string) => {
         <ResultsTable results={searchResults} onSelect={viewStudent} visible={!selectedStudent && !loading} />
 
         {loading ? (
-          <div className="text-center py-20">
-            <div className="inline-block w-12 h-12 border-4 border-green-dark border-t-transparent rounded-full animate-spin"></div>
-            <p className="mt-4 text-green-darkest">Loading student record...</p>
-         </div>
+        <div className="flex flex-col items-center justify-center py-32 bg-white rounded-[2rem]">
+            <Loader2 className="w-12 h-12 text-yellow-gold animate-spin" strokeWidth={3} />
+            <p className="mt-6 text-[10px] font-black uppercase tracking-[0.4em] text-green-darkest/40">Fetching Ledger...</p>
+          </div>
         ) : selectedStudent && (
-          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <div className="animate-in fade-in slide-in-from-bottom-6 duration-700">
             <div className="flex flex-col lg:flex-row gap-6 mb-8">
               <div className="flex-1">
                 <StudentProfileHeader student={selectedStudent.student} />
               </div>
               <div className="lg:w-1/2">
+             
                 <AcademicStatusBox
                   status={selectedStudent.academicStatus}
                   currentYearOfStudy={selectedStudent.student.currentYear}
@@ -139,7 +141,7 @@ const viewStudent = async (regNo: string) => {
               </div>
             </div>
 
-            <div className="flex gap-10 border-b-2 border-green-darkest/10 mb-6">
+            {/* <div className="flex gap-10 border-b-2 border-green-darkest/10 mb-6">
               {(["grades", "raw"] as const).map((tab) => (
                 <button
                   key={tab}
@@ -151,11 +153,33 @@ const viewStudent = async (regNo: string) => {
                   {tab === "grades" ? "Official Grades" : "Raw Assessment Marks"}
                 </button>
               ))}
-            </div>
+            </div> */}
 
-            {activeTab === "grades" ? (
+            {/* TABS CONTEXT */}
+          <div className="flex gap-12 border-b border-green-darkest/10 mb-5 px-4">
+      {(["grades", "raw"] as const).map((tab) => (
+        <button
+          key={tab}
+          onClick={() => setActiveTab(tab)}
+          className={`pb-5 text-[10px] font-black uppercase tracking-[0.3em] transition-all relative ${
+            activeTab === tab ? "text-green-darkest" : "text-slate-400 hover:text-green-darkest/60"
+          }`}
+        >
+          {tab === "grades" ? "Official Grades" : "Raw Assessment Data"}
+          {activeTab === tab && (
+            <div className="absolute bottom-0 left-0 w-full h-1 bg-yellow-gold rounded-t-full animate-in fade-in zoom-in" />
+          )}
+        </button>
+      ))}
+    </div>
+
+            {/* {activeTab === "grades" ? (
               <GradesTable grades={selectedStudent.grades} />
-            ) : (
+            ) : ( */}
+            <div className="bg-white rounded-lg border border-green-darkest/5 shadow-sm overflow-hidden">
+               {activeTab === "grades" ? (
+                  <GradesTable grades={selectedStudent.grades} />
+                ) : (
               <RawMarksTable
                 marks={rawMarks}
                 studentName={selectedStudent.student.name}
@@ -165,6 +189,7 @@ const viewStudent = async (regNo: string) => {
                 isReadOnly={isReadOnly}
               />
             )}
+            </div>
           </div>
         )}
 
