@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { X } from "lucide-react";
-import CommonButton from "@/components/ui/CommonButton";
+import { X, Cpu, Fingerprint } from "lucide-react";
 
 interface UnitTemplateModalProps {
   isOpen: boolean;
@@ -27,69 +26,91 @@ export const UnitTemplateModal: React.FC<UnitTemplateModalProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     await onSubmit(templateForm.code, templateForm.name);
-    // Reset form only on success (handled by parent or reset here)
     setTemplateForm({ code: "", name: "" });
   };
 
+  const inputStyle = "w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl text-green-darkest font-bold text-sm transition-all outline-none placeholder:text-slate-300";
+  const labelStyle = "text-[9px] font-black uppercase text-slate-400 tracking-widest ml-2 mb-2 block";
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-      <div className="bg-white p-2 rounded-lg shadow-2xl w-full max-w-md animate-in fade-in zoom-in duration-200">
-        <div className="flex justify-between items-center border-b-2 border-green-darkest/40 p-4 mb-6">
-          <h2 className="text-lg font-bold text-green-darkest">Create New Unit</h2>
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+      {/* Backdrop with sophisticated blur */}
+      <div 
+        className="absolute inset-0 bg-green-darkest/40 backdrop-blur-md animate-in fade-in duration-300" 
+        onClick={!submitting ? onClose : undefined}
+      />
+      
+      {/* Modal Container */}
+      <div className="relative bg-white w-full max-w-md rounded-lg shadow-[0_32px_64px_-15px_rgba(0,0,0,0.3)] border border-white overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-4 duration-300">
+        
+        {/* Header Block */}
+        <div className="p-8 border-b border-slate-50 flex justify-between items-center">
+          <div className="flex items-center gap-4">
+            <div className="h-12 w-12 bg-yellow-gold/10 text-yellow-gold rounded-2xl flex items-center justify-center">
+              <Fingerprint size={24} />
+            </div>
+            <div>
+              <h2 className="text-xl font-black text-green-darkest tracking-tight">New Unit</h2>
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Add New Unit</p>
+            </div>
+          </div>
           <button
             onClick={onClose}
-            className="text-gray-500 hover:text-red-500 transition"
+            className="p-3 hover:bg-red-50 text-slate-300 hover:text-red-500 rounded-2xl transition-all"
             disabled={submitting}
           >
-            <X size={24} />
+            <X size={20} />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4 px-4">
-            <label className="block text-sm text-green-darkest font-bold mb-1">Unit Code</label>
+        {/* Content Body */}
+        <form onSubmit={handleSubmit} className="p-10 space-y-8">
+          <div>
+            <label className={labelStyle}>Unit Code</label>
             <input
               type="text"
-              placeholder="e.g. ICS 2107"
+              placeholder="e.g. SIT 3102"
               value={templateForm.code}
               onChange={(e) =>
                 setTemplateForm({ ...templateForm, code: e.target.value.toUpperCase() })
               }
-              className="w-full rounded-md border border-green-darkest/50 px-3 py-2 text-sm text-green-dark outline-0 "
+              className={inputStyle}
               required
               disabled={submitting}
             />
           </div>
 
-          <div className="mb-6 px-4">
-            <label className="block text-sm text-green-darkest font-bold mb-1">Unit Name</label>
+          <div>
+            <label className={labelStyle}>Unit Designation (Name)</label>
             <input
               type="text"
-              placeholder="e.g. Database Systems"
+              placeholder="e.g. Distributed Systems"
               value={templateForm.name}
               onChange={(e) => setTemplateForm({ ...templateForm, name: e.target.value })}
-              className="w-full rounded-md border border-green-darkest/50 px-3 py-2 text-green-dark outline-0 "
+              className={inputStyle}
               required
               disabled={submitting}
             />
           </div>
 
-          <div className="px-4 mb-4">
-            <CommonButton
+          <div className="pt-2">
+            <button
               type="submit"
               disabled={submitting}
-              className="font-bold w-full"
-              textColor="text-white-pure"
+              className="w-full py-5 bg-gradient-to-r from-green-darkest to-green-dark text-yellow-gold font-black text-xs uppercase tracking-[0.3em] rounded-[1.5rem] shadow-xl hover:shadow-2xl hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50 disabled:scale-100 flex items-center justify-center gap-3"
             >
               {submitting ? (
-                <div className="flex items-center justify-center">
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                  Creating...
-                </div>
+                <>
+                  <Cpu className="animate-spin" size={16} />
+                  <span>Committing to Registry...</span>
+                </>
               ) : (
-                "Create Unit"
+                "Register Unit "
               )}
-            </CommonButton>
+            </button>
+            <p className="text-center mt-6 text-[9px] font-bold text-slate-300 uppercase tracking-widest">
+              Unit will be globally available for curriculum linking
+            </p>
           </div>
         </form>
       </div>

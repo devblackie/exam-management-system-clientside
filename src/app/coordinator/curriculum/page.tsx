@@ -10,13 +10,19 @@ import {
   deleteProgramUnitLink,
   ProgramUnitLinkFormData,
 } from "@/api/programUnitsApi";
-import type { CurriculumFormState, Program, ProgramUnit, Unit } from "@/api/types";
+import type {
+  CurriculumFormState,
+  Program,
+  ProgramUnit,
+  Unit,
+} from "@/api/types";
 import { useToast } from "@/context/ToastContext";
 import { LoadingState } from "@/components/ui/LoadingState";
 import { CurriculumTable } from "@/components/coordinator/Curriculum/CurriculumTable";
 import { CurriculumLinkForm } from "@/components/coordinator/Curriculum/CurriculumLinkForm";
 import { UnitTemplateModal } from "@/components/coordinator/Curriculum/UnitTemplateModal";
 import PageHeader from "@/components/ui/PageHeader";
+import { Layers, Plus, Link as LinkIcon, Activity } from "lucide-react";
 
 export default function CurriculumManagementPage() {
   const [programs, setPrograms] = useState<Program[]>([]);
@@ -41,7 +47,10 @@ export default function CurriculumManagementPage() {
   const loadInitialData = async () => {
     setLoading(true);
     try {
-      const [progs, templates] = await Promise.all([getPrograms(), getUnitTemplates()]);
+      const [progs, templates] = await Promise.all([
+        getPrograms(),
+        getUnitTemplates(),
+      ]);
       setPrograms(progs);
       setUnitTemplates(templates);
       if (progs.length > 0) setSelectedProgramId(progs[0]._id);
@@ -52,11 +61,13 @@ export default function CurriculumManagementPage() {
     }
   };
 
-  useEffect(() => { loadInitialData(); }, []);
+  useEffect(() => {
+    loadInitialData();
+  }, []);
 
   useEffect(() => {
     if (selectedProgramId) {
-      setForm(prev => ({ ...prev, programId: selectedProgramId }));
+      setForm((prev) => ({ ...prev, programId: selectedProgramId }));
       loadProgramCurriculum(selectedProgramId);
     }
   }, [selectedProgramId]);
@@ -71,13 +82,16 @@ export default function CurriculumManagementPage() {
   };
 
   const handleCreateTemplate = async (code: string, name: string) => {
-   const normalizedCode = code.trim().toUpperCase();
-  const exists = unitTemplates.some(u => u.code === normalizedCode);
-  
-  if (exists) {
-    addToast(`Unit ${normalizedCode} already exists in the template library.`, "error");
-    return;
-  }
+    const normalizedCode = code.trim().toUpperCase();
+    const exists = unitTemplates.some((u) => u.code === normalizedCode);
+
+    if (exists) {
+      addToast(
+        `Unit ${normalizedCode} already exists in the template library.`,
+        "error",
+      );
+      return;
+    }
     setSubmitting(true);
     try {
       await createUnitTemplate({ code, name });
@@ -94,13 +108,18 @@ export default function CurriculumManagementPage() {
   const handleSubmitLink = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingId) {
-    const isAlreadyLinked = curriculum.some(item => item.unit._id === form.unitId);
-    if (isAlreadyLinked) {
-      const unitName = unitTemplates.find(u => u._id === form.unitId)?.code;
-      addToast(`${unitName} is already part of this program's curriculum.`, "error");
-      return;
+      const isAlreadyLinked = curriculum.some(
+        (item) => item.unit._id === form.unitId,
+      );
+      if (isAlreadyLinked) {
+        const unitName = unitTemplates.find((u) => u._id === form.unitId)?.code;
+        addToast(
+          `${unitName} is already part of this program's curriculum.`,
+          "error",
+        );
+        return;
+      }
     }
-  }
     setSubmitting(true);
     const linkData: ProgramUnitLinkFormData = {
       programId: form.programId,
@@ -145,49 +164,67 @@ export default function CurriculumManagementPage() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  if (loading) return <LoadingState message="Fetching academic structures..." />;
+  if (loading)
+    return <LoadingState message="Fetching academic structures..." />;
 
   return (
     <div className="max-w-8xl h-full ml-48 my-10 ">
-      <div className="bg-white rounded-xl shadow-2xl p-10 min-h-screen">
-        
+      <div className="bg-[#F8F9FA] rounded-xl shadow-2xl p-10 min-h-screen">
         {/* Header */}
-         <PageHeader 
-  title="Curriculum" 
-  highlightedTitle="Management"
-  actions={
-    <>
-      <button onClick={() => setShowTemplateModal(true)} className="px-5 py-2.5 bg-green-darkest text-yellow-gold rounded-xl text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-xl">
-        + New Unit
-      </button>
-      {!showForm && (
-      <button onClick={() => setShowForm(true)} className="px-5 py-2.5 border border-green-darkest/10 text-green-darkest rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-50 transition-all">
-        Link Program
-      </button>
-      )}
-    </>
-  }
-/>
+        <PageHeader
+          title="Curriculum"
+          highlightedTitle="Management"
+          actions={
+            <>
+            {!showForm && (
+   <button
+                onClick={() => setShowTemplateModal(true)}
+                className="px-5 py-2.5 bg-green-darkest text-yellow-gold rounded-xl text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-xl"
+              >
+                + New Unit
+              </button>
+            )}
+           
+              {!showForm && (
+                <button
+                  onClick={() => setShowForm(true)}
+                  className="px-5 py-2.5 border border-green-darkest/10 text-green-darkest rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-50 transition-all"
+                >
+                  Link Program
+                </button>
+              )}
+            </>
+          }
+        />
 
         {/* add a "Server Latency" number (e.g., 24ms) next to the pulse so the Coordinator can see exactly how fast the connection is */}
 
         {/* Program Selector */}
-        <div className="flex items-center bg-gray-100 rounded-lg px-4 py-2 mb-8 border border-gray-200">
-          <label className="text-green-darkest font-bold text-sm mr-4">Program:</label>
-          <select 
-            value={selectedProgramId} 
-            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSelectedProgramId(e.target.value)}
-            className="flex-1 text-sm bg-transparent border-none focus:ring-0 text-green-dark"
+     <div className="flex items-center bg-white rounded-lg px-6 py-4 mb-10 border border-green-darkest/5 shadow-sm">
+          <div className="flex items-center gap-3 mr-6 border-r border-slate-100 pr-6">
+            <Layers size={18} className="text-yellow-gold" />
+            <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">
+          Program
+            </label>
+          </div>
+          <select
+            value={selectedProgramId}
+            onChange={(e) => setSelectedProgramId(e.target.value)}
+            className="flex-1 text-sm font-bold bg-transparent border-0 outline-0 text-green-darkest cursor-pointer"
           >
-            {programs.map(p => <option key={p._id} value={p._id}>{p.code} - {p.name}</option>)}
+            {programs.map((p) => (
+              <option key={p._id} value={p._id}>
+                {p.code} — {p.name}
+              </option>
+            ))}
           </select>
         </div>
 
         {/* 1. The Link Form Component */}
         {showForm && (
-          <CurriculumLinkForm 
-            form={form} 
-            setForm={setForm} 
+          <CurriculumLinkForm
+            form={form}
+            setForm={setForm}
             unitTemplates={unitTemplates}
             editingId={editingId}
             curriculum={curriculum}
@@ -198,14 +235,19 @@ export default function CurriculumManagementPage() {
         )}
 
         {/* 2. The Data Table Component */}
-        <CurriculumTable 
+        <CurriculumTable
           curriculum={curriculum}
           programs={programs}
           selectedProgramId={selectedProgramId}
           loading={loading}
           submitting={submitting}
           onEdit={startEdit}
-          onDelete={(id) => { if(confirm("Delink unit?")) deleteProgramUnitLink(id).then(() => loadProgramCurriculum(selectedProgramId)); }}
+          onDelete={(id) => {
+            if (confirm("Delink unit?"))
+              deleteProgramUnitLink(id).then(() =>
+                loadProgramCurriculum(selectedProgramId),
+              );
+          }}
         />
 
         {/* 3. The Modal Component */}

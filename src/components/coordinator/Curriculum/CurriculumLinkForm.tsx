@@ -21,117 +21,72 @@ interface CurriculumLinkFormProps {
 }
 
 export const CurriculumLinkForm: React.FC<CurriculumLinkFormProps> = ({
-  form,
-  setForm,
-  unitTemplates,
-  editingId,
-  curriculum,
-  submitting,
-  onSubmit,
-  onClose,
+  form, setForm, unitTemplates, editingId, curriculum, submitting, onSubmit, onClose,
 }) => {
-  const editingUnit = curriculum.find((c) => c._id === editingId);
+  const inputStyle = "w-full p-4 bg-slate-50 border border-slate-200 rounded-lg text-green-darkest font-bold text-sm  transition-all outline-none";
+  const labelStyle = "text-[9px] font-black uppercase text-slate-400 tracking-widest ml-2 mb-2 block";
 
   return (
-    <div className="shadow-lg animate-in slide-in-from-top duration-300">
-     
-      <div className="flex justify-between px-8 border-b-2 ">
-        <h2 className="text-md font-black text-center mb-8 text-green-darkest">
-          {editingId ? "Edit Curriculum Slot" : "Link New Unit"}
+    <div className="bg-white rounded-lg border border-green-darkest/5 shadow-2xl overflow-hidden animate-in slide-in-from-top-6 duration-500 mb-10">
+      <div className="p-8 flex justify-between items-center border-b border-slate-50">
+        <h2 className="text-xl font-black text-green-darkest tracking-tight">
+          {editingId ? "Modify Structure" : "Curriculum Linkage"}
         </h2>
-        <button
-          onClick={onClose}
-          className="relative w-10 h-10 bg-green-dark hover:bg-red-400 hover:text-green-darkest text-yellow-gold rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-all duration-200 z-10 group"
-          disabled={submitting}
-        >
-          <X size={17} />
-          <span className="absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs px-3 py-1 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap">
-            Close Form
-          </span>
+        <button onClick={onClose} className="p-3 hover:bg-red-50 text-slate-300 hover:text-red-500 rounded-2xl transition-all">
+          <X size={20} />
         </button>
       </div>
 
-      <form
-        onSubmit={onSubmit}
-        className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto bg-white-pure p-6  border-gray-100"
-      >
-        {!editingId ? (
-          <div>
-            <label className="block text-green-darkest font-bold mb-2">Unit Template</label>
+      <form onSubmit={onSubmit} className="p-10 grid grid-cols-12 gap-8">
+        <div className="col-span-12 lg:col-span-4">
+          <label className={labelStyle}>Unit Template</label>
+          {!editingId ? (
             <select
               value={form.unitId}
-              onChange={(e) => setForm((prev) => ({ ...prev, unitId: e.target.value }))}
-              className="w-full rounded-md border border-green-darkest bg-transparent px-3 py-3 text-green-dark outline-0 focus:ring-2 focus:ring-green-500"
+              onChange={(e) => setForm(prev => ({ ...prev, unitId: e.target.value }))}
+              className={inputStyle}
               required
-              disabled={submitting}
             >
-              <option value="">Select Unit Template</option>
-              {unitTemplates.map((u) => (
-                <option key={u._id} value={u._id}>
-                  {u.code} - {u.name}
-                </option>
-              ))}
+              <option value="">Select Unit...</option>
+              {unitTemplates.map(u => <option key={u._id} value={u._id}>{u.code} - {u.name}</option>)}
             </select>
-          </div>
-        ) : (
-          <div className="md:col-span-2 lg:col-span-1">
-            <label className="block text-green-darkest font-bold mb-2">Unit Being Edited</label>
-            <div className="p-3 bg-gray-100 rounded-md font-semibold text-green-darkest border border-gray-200">
-              {editingUnit?.unit.code} - {editingUnit?.unit.name}
+          ) : (
+            <div className="p-4 bg-slate-100 rounded-lg font-bold text-green-darkest/50 text-sm">
+              {curriculum.find(c => c._id === editingId)?.unit.code}
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
-        <div>
-          <label className="block text-green-darkest font-bold mb-2">Required Year</label>
+        <div className="col-span-6 lg:col-span-4">
+          <label className={labelStyle}>Academic Year</label>
           <select
+            className={inputStyle}
             value={form.requiredYear}
-            onChange={(e) => setForm((prev) => ({ ...prev, requiredYear: e.target.value }))}
-            className="w-full rounded-md border border-green-darkest bg-transparent px-3 py-3 text-green-dark outline-0"
-            disabled={submitting}
+            onChange={(e) => setForm(prev => ({ ...prev, requiredYear: e.target.value }))}
           >
-            {[1, 2, 3, 4, 5, 6].map((y) => (
-              <option key={y} value={String(y)}>Year {y}</option>
-            ))}
+            {[1,2,3,4,5,6].map(y => <option key={y} value={String(y)}>Year {y}</option>)}
           </select>
         </div>
 
-        <div>
-          <label className="block text-green-darkest font-bold mb-2">Required Semester</label>
+        <div className="col-span-6 lg:col-span-4">
+          <label className={labelStyle}>Semester</label>
           <select
+            className={inputStyle}
             value={form.requiredSemester}
-            onChange={(e) => setForm((prev) => ({ ...prev, requiredSemester: e.target.value }))}
-            className="w-full rounded-md border border-green-darkest bg-transparent px-3 py-3 text-green-dark outline-0"
-            disabled={submitting}
+            onChange={(e) => setForm(prev => ({ ...prev, requiredSemester: e.target.value }))}
           >
             <option value="1">Semester 1</option>
             <option value="2">Semester 2</option>
           </select>
         </div>
 
-        <div className="flex gap-4 items-center mt-5 md:col-span-2 lg:col-span-3">
-          <CommonButton
-            type="submit"
-            disabled={submitting}
-            className="font-bold min-w-[200px]"
-            textColor="text-white-pure"
-          >
-            {submitting ? (
-              <div className="flex items-center gap-2">
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                Processing...
-              </div>
-            ) : editingId ? "Update Curriculum Link" : "Create Curriculum Link"}
-          </CommonButton>
-
+        <div className="col-span-12 flex gap-4 pt-4">
+          <button type="submit" disabled={submitting} className="flex-1 py-5 bg-gradient-to-r from-green-darkest to-green-dark text-yellow-gold font-black text-xs uppercase tracking-[0.3em] rounded-[1.5rem] shadow-xl transition-all">
+            {submitting ? "Processing..." : editingId ? "Update Link" : "Finalize Linkage"}
+          </button>
           {editingId && (
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-6 py-2 bg-gray-500 text-white font-bold rounded-xl hover:bg-gray-600 transition shadow-md"
-              disabled={submitting}
-            >
-              Cancel Edit
+            <button type="button" onClick={onClose} className="px-10 py-5 border border-slate-200 text-slate-400 font-black text-xs uppercase tracking-widest rounded-[1.5rem] hover:bg-slate-200 transition-all">
+              Cancel
             </button>
           )}
         </div>

@@ -15,86 +15,60 @@ interface CurriculumTableProps {
 }
 
 export const CurriculumTable: React.FC<CurriculumTableProps> = ({
-  curriculum,
-  programs,
-  selectedProgramId,
-  loading,
-  submitting,
-  onEdit,
-  onDelete,
+  curriculum, programs, selectedProgramId, loading, submitting, onEdit, onDelete,
 }) => {
   const selectedProgram = programs.find((p) => p._id === selectedProgramId);
-
-  const sortedCurriculum = [...curriculum].sort((a, b) => {
-  if (a.requiredYear !== b.requiredYear) return a.requiredYear - b.requiredYear;
-  return a.requiredSemester - b.requiredSemester;
-});
+  const sortedCurriculum = [...curriculum].sort((a, b) => 
+    a.requiredYear !== b.requiredYear ? a.requiredYear - b.requiredYear : a.requiredSemester - b.requiredSemester
+  );
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 mt-8 overflow-hidden">
-      {/* Table Header/Title */}
-      <div className="px-4 py-2 border-b border-green-dark bg-green-dark/10">
-        <h2 className="text-md font-semibold text-green-darkest">
-          Curriculum List for: {selectedProgram?.code || "N/A"}
+    <div className="bg-white rounded-lg border border-green-darkest/5 shadow-sm overflow-hidden">
+      <div className="px-8 py-5 border-b border-slate-50 bg-slate-50/30 flex justify-between items-center">
+        <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-green-darkest/60">
+          Structure: {selectedProgram?.name || "Unselected"}
         </h2>
       </div>
 
-      {curriculum.length === 0 && !loading ? (
-        <div className="col-span-full text-center py-20">
-          <p className="text-lg font-bold text-gray-400">
-            No units linked to this program yet.
-          </p>
-          <p className="text-sm text-gray-500 mt-4">
-            Use the &apos;Link Unit to Program&apos; button above to define the curriculum.
-          </p>
-        </div>
-      ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full text-xs">
-            <thead className="bg-gradient-to-r from-green-darkest to-green-dark text-lime-bright">
-              <tr>
-                <th className="px-4 py-2 text-left font-bold">Unit Code</th>
-                <th className="px-4 py-2 text-left font-bold">Unit Name</th>
-                <th className="px-4 py-2 text-center font-bold">Year</th>
-            <th className="px-4 py-2 text-center font-bold">Semester</th>
-                <th className="px-4 py-2 text-center font-bold">Edit/Delete</th>
-              </tr>
-            </thead>
-            <tbody>
-              {sortedCurriculum.map((link) => (
-                <tr key={link._id} className="text-green-darkest hover:bg-green-50/50 transition-colors">
-                  <td className="px-2 py-3 border border-green-darkest/30">{link.unit.code}</td>
-                  <td className="px-2 py-3 border border-green-darkest/30">{link.unit.name}</td>
-                  <td className="border border-green-darkest/30 text-center">{link.requiredYear}</td>
-                  <td className="border border-green-darkest/30 text-center">{link.requiredSemester}</td>
-
-                  {/* Action Buttons */}
-                  <td className="border border-green-darkest/30">
-                    <div className="flex justify-center gap-4">
-                      <button
-                        onClick={() => onEdit(link)}
-                        disabled={submitting}
-                        title="Edit Unit"
-                        className="py-1 text-green-dark hover:scale-110 transition-all disabled:opacity-50"
-                      >
-                        <PenLine size={15} />
-                      </button>
-                      <button
-                        onClick={() => onDelete(link._id)}
-                        disabled={submitting}
-                        title="Delete Unit"
-                        className="py-1 text-red-600 hover:scale-110 transition-all disabled:opacity-50"
-                      >
-                        <Trash2 size={15} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+      <table className="w-full">
+        <thead>
+          <tr className="border-b border-slate-50">
+            <th className="px-8 py-5 text-left text-[9px] font-black text-slate-400 uppercase tracking-widest">Code</th>
+            <th className="px-8 py-5 text-left text-[9px] font-black text-slate-400 uppercase tracking-widest">Unit Specification</th>
+            <th className="px-8 py-5 text-center text-[9px] font-black text-slate-400 uppercase tracking-widest">Level/Term</th>
+            <th className="px-8 py-5 text-right text-[9px] font-black text-slate-400 uppercase tracking-widest">Edit/Delete</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-slate-50">
+          {sortedCurriculum.map((link) => (
+            <tr key={link._id} className="group hover:bg-slate-50/50 transition-all">
+              <td className="px-8 py-6">
+                <span className="px-3 py-1.5 bg-green-darkest text-yellow-gold text-xs font-mono font-bold rounded-lg shadow-sm">
+                  {link.unit.code}
+                </span>
+              </td>
+              <td className="px-8 py-4">
+                <p className="text-sm font-bold text-green-darkest tracking-tight">{link.unit.name}</p>
+              </td>
+              <td className="px-8 py-4 text-center">
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-slate-100 rounded-full text-[10px] font-black text-green-darkest uppercase">
+                  Y{link.requiredYear} • S{link.requiredSemester}
+                </div>
+              </td>
+              <td className="px-8 py-4 text-right">
+                <div className="flex justify-end gap-3">
+                  <button onClick={() => onEdit(link)} className="p-2 text-slate-300 hover:text-green-dark hover:bg-green-50 rounded-xl transition-all">
+                    <PenLine size={16} />
+                  </button>
+                  <button onClick={() => onDelete(link._id)} className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all">
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };

@@ -2,11 +2,16 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { getStudents, bulkRegisterStudents, downloadStudentRegistrationTemplate } from "@/api/studentsApi";
-import type { StudentFromAPI, StudentFormRow, Program, AcademicYear } from "@/api/types";
+import {
+  getStudents,
+  bulkRegisterStudents,
+  downloadStudentRegistrationTemplate,
+} from "@/api/studentsApi";
+import type { StudentFormRow, Program, AcademicYear } from "@/api/types";
 import { useToast } from "@/context/ToastContext";
 import { getAcademicYears, getPrograms } from "@/api/marksApi";
 import PageHeader from "@/components/ui/PageHeader";
+import { FileDown, Trash2, AlertCircle, ClipboardCheck, Zap } from "lucide-react";
 
 export default function RegisterStudents() {
   const [students, setStudents] = useState<StudentFormRow[]>([
@@ -19,7 +24,8 @@ export default function RegisterStudents() {
   const [academicYears, setAcademicYears] = useState<AcademicYear[]>([]);
   const [selectedProgramId, setSelectedProgramId] = useState<string>("");
   const [loadingPrograms, setLoadingPrograms] = useState(false);
-  const [selectedAcademicYearId, setSelectedAcademicYearId] = useState<string>(""); // Add this
+  const [selectedAcademicYearId, setSelectedAcademicYearId] =
+    useState<string>(""); 
   const [loadingData, setLoadingData] = useState(false);
   const { addToast } = useToast();
 
@@ -32,17 +38,20 @@ export default function RegisterStudents() {
       try {
         const [progData, yearData] = await Promise.all([
           getPrograms(),
-          getAcademicYears()
+          getAcademicYears(),
         ]);
 
         setPrograms(progData);
         setAcademicYears(yearData);
 
-        // 2. Safely auto-select the current year
-        const current = yearData.find((y: AcademicYear) => y.isCurrent);
-        if (current) {
-          setSelectedAcademicYearId(current._id);
-        }
+      // 2. Safely auto-select the current year
+      const current = yearData.find((y: AcademicYear) => y.isCurrent || y.isActive);
+      if (current) {
+        setSelectedAcademicYearId(current._id);
+      } else if (yearData.length > 0) {
+        // Fallback: Select the first one if no "current" is flagged
+        setSelectedAcademicYearId(yearData[0]._id);
+      }
       } catch (error) {
         console.error("Fetch error:", error);
         addToast("Failed to load programs and years", "error");
@@ -53,6 +62,19 @@ export default function RegisterStudents() {
     };
     fetchData();
   }, [addToast]);
+
+  const getDuplicates = () => {
+    const seen = new Set<string>();
+    const duplicates = new Set<string>();
+    students.forEach((s) => {
+      const reg = s.regNo.trim().toUpperCase();
+      if (reg) {
+        if (seen.has(reg)) duplicates.add(reg);
+        seen.add(reg);
+      }
+    });
+    return duplicates;
+  };
 
   // Add a new empty row
   const addRow = () => {
@@ -65,7 +87,7 @@ export default function RegisterStudents() {
   const updateStudent = (
     index: number,
     field: keyof StudentFormRow,
-    value: string | number
+    value: string | number,
   ) => {
     setStudents((prev) => {
       const updated = [...prev];
@@ -80,20 +102,6 @@ export default function RegisterStudents() {
       return;
     }
     setStudents(students.filter((_, i) => i !== index));
-  };
-
-  // Add this inside your component, after the state declarations
-  const getDuplicates = () => {
-    const seen = new Set<string>();
-    const duplicates = new Set<string>();
-    students.forEach((s) => {
-      const reg = s.regNo.trim().toUpperCase();
-      if (reg) {
-        if (seen.has(reg)) duplicates.add(reg);
-        seen.add(reg);
-      }
-    });
-    return duplicates;
   };
 
   const duplicates = getDuplicates();
@@ -121,8 +129,8 @@ export default function RegisterStudents() {
           .replace(/["“”‘’]/g, "") // remove quotes
           .replace(/\u00A0/g, " ") // non-breaking spaces
           .replace(/[\u200B-\u200F]/g, "") // zero-width
-          .trim()
-      )
+          .trim(),
+      ),
     );
 
     // Remove empty rows
@@ -164,14 +172,20 @@ export default function RegisterStudents() {
 
   const handleDownloadTemplate = async () => {
     if (!selectedProgramId || !selectedAcademicYearId) {
-      addToast("Please select both a programme and an academic year.", "warning");
+      addToast(
+        "Please select both a programme and an academic year.",
+        "warning",
+      );
       return;
     }
 
     setIsDownloading(true);
     try {
       // Pass both IDs to your API utility
-      await downloadStudentRegistrationTemplate(selectedProgramId, selectedAcademicYearId);
+      await downloadStudentRegistrationTemplate(
+        selectedProgramId,
+        selectedAcademicYearId,
+      );
       addToast("Template downloaded successfully!", "success");
     } catch {
       addToast("Could not download template", "error");
@@ -195,24 +209,25 @@ export default function RegisterStudents() {
   };
 
   const handleSubmit = async () => {
-    // Find the label of the selected year for the payload
-    const selectedYearDoc = academicYears.find(y => y._id === selectedAcademicYearId);
-    // Fallback if no year is selected but the user tries to submit
-    if (!selectedYearDoc && !selectedAcademicYearId) {
-      addToast("Please select an academic year", "error");
-      return;
-    }
-    const yearLabel = selectedYearDoc?.year;
+       // 1. Strict Validation: Must have a Year ID selected
+  if (!selectedAcademicYearId) {
+    addToast("Please select an academic session from the dropdown", "error");
+    return;
+  }
+
+  const selectedYearDoc = academicYears.find(y => y._id === selectedAcademicYearId);
 
     const filled = students
-      .filter((s) => s.regNo.trim() && s.name.trim() && s.program.trim())
-      .map((s) => ({
-        ...s,
-        // Priority: 1. Dropdown Selection, 2. Regex Extraction, 3. Hardcoded Fallback
-        admissionAcademicYear: yearLabel || extractAcademicYear(s.regNo),
-        // We also send the ID to the backend for direct DB linking
-        academicYearId: selectedAcademicYearId
-      }));
+    .filter((s) => s.regNo.trim() && s.name.trim() && s.program.trim())
+    .map((s) => ({
+      regNo: s.regNo.trim().toUpperCase(),
+      name: s.name.trim(),
+      program: s.program.trim(),
+      currentYearOfStudy: s.currentYearOfStudy,
+      // FIX: Ensure we send the ObjectId to satisfy the Mongoose ref
+      admissionAcademicYear: selectedAcademicYearId, 
+      academicYearId: selectedAcademicYearId, // redundancy for backend processing
+    }));
 
     if (filled.length === 0) {
       addToast("Please fill at least one student", "error");
@@ -223,13 +238,13 @@ export default function RegisterStudents() {
     const regNos = filled.map((s) => s.regNo.trim().toUpperCase());
     const seen = new Set<string>();
     const clientDuplicates = regNos.filter(
-      (reg) => seen.size === seen.add(reg).size
+      (reg) => seen.size === seen.add(reg).size,
     );
 
     if (clientDuplicates.length > 0) {
       addToast(
         `Duplicate reg numbers found in list: ${clientDuplicates.join(", ")}`,
-        "error"
+        "error",
       );
       return;
     }
@@ -250,7 +265,9 @@ export default function RegisterStudents() {
         toastMessage = "All students in the list are already registered.";
       }
       addToast(toastMessage, "success");
-      setStudents([{ regNo: "", name: "", program: "", currentYearOfStudy: 1 }]);
+      setStudents([
+        { regNo: "", name: "", program: "", currentYearOfStudy: 1 },
+      ]);
     } catch (err: unknown) {
       const error = err as {
         response?: {
@@ -283,99 +300,105 @@ export default function RegisterStudents() {
     }
   };
 
+  const inputBase =
+    "w-full p-3 bg-white border border-slate-200 text-green-darkest font-semibold text-xs rounded-xl transition-all outline-none appearance-none";
+  const labelStyle =
+    "text-[9px] font-black uppercase text-slate-400 tracking-widest ml-1 mb-2 block";
+
   return (
     <div className="max-w-8xl ml-48 my-10 ">
-      <div className="bg-white min-h-screen rounded-3xl shadow-2xl p-10">
-
-
-<PageHeader 
-  title="Register" 
-  highlightedTitle="Students"
-  subtitle="Requirements: Reg No, Full Legal Name, Active Program Code"
-/>
+      <div className="bg-[#F8F9FA] min-h-screen rounded-lg shadow-2xl p-10">
+        <PageHeader
+          title="Student"
+          highlightedTitle="Enrollment"
+          subtitle="Requirements: Reg No, Full Legal Name, Active Program Code"
+        />
 
         {duplicates.size > 0 && (
           <div className="fixed right-6 top-24 z-50">
-            <div className="mb-4 p-4 bg-red-600 text-white font-bold text-center rounded-full shadow-lg animate-pulse">
-              <span className="text-xs animate-bounce">{duplicates.size}</span>
+            <div className="flex items-center gap-3 bg-red-600 text-white px-6 py-3 rounded-2xl shadow-2xl border-2 border-white">
+              <AlertCircle size={18} className="animate-pulse" />
+              <div className="flex flex-col">
+                <span className="text-xs font-black uppercase tracking-tighter">
+                  {duplicates.size} Conflict(s)
+                </span>
+                <span className="text-[8px] font-bold opacity-80 uppercase">
+                  Duplicate Reg Numbers
+                </span>
+              </div>
             </div>
           </div>
         )}
 
-
-
-        {/* Selectors Grid */}
-        <div className="my-6 grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Program Selector */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Select Program
-            </label>
+        <div className="grid grid-cols-12 gap-8 bg-white p-8 rounded-lg border border-green-darkest/5 shadow-sm mb-12">
+          <div className="col-span-12 lg:col-span-4">
+            <label className={labelStyle}>Academic Program</label>
             <select
+              className={`${inputBase} ${!selectedProgramId ? "border-yellow-gold/30 bg-yellow-gold/5" : ""}`}
               value={selectedProgramId}
               onChange={(e) => setSelectedProgramId(e.target.value)}
-              disabled={loadingData}
-              className={`w-full p-2 text-sm border rounded-lg text-green-darkest/50 transition-colors ${!selectedProgramId ? "border-orange-300 bg-orange-50" : "border-gray-300"
-                }`}
             >
-              <option value="" className="text-gray-400">Select Programme</option>
-              {programs.map((prog) => (
-                <option key={prog._id} value={prog._id}>
-                  {prog.name}
+              <option value="">Select Program...</option>
+              {programs.map((p) => (
+                <option key={p._id} value={p._id}>
+                  {" "}
+                  {p.name}{" "}
                 </option>
               ))}
             </select>
           </div>
-
-          {/* Academic Year Selector */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Academic Year
-            </label>
+          <div className="col-span-12 lg:col-span-4">
+            <label className={labelStyle}>Academic Session</label>
             <select
+              className={`${inputBase} ${!selectedAcademicYearId ? "border-yellow-gold/30 bg-yellow-gold/5" : ""}`}
               value={selectedAcademicYearId}
               onChange={(e) => setSelectedAcademicYearId(e.target.value)}
-              disabled={loadingData}
-              className={`w-full p-2 text-sm border rounded-lg text-green-darkest/50  transition-colors ${!selectedAcademicYearId ? "border-orange-300 bg-orange-50" : "border-gray-300"
-                }`}
             >
-              <option value="" className="text-gray-400">Select Academic Year</option>
-              {academicYears && academicYears.length > 0 ? (
-                academicYears.map((year) => (
-                  <option key={year._id} value={year._id} className="text-green-darkest/50">
-                    {year.year} {year.isCurrent ? "(Current)" : ""}
-                  </option>
-                ))
-              ) : (
-                <option disabled>No years found</option>
-              )}
+              <option value="">Choose Session...</option>
+              {academicYears.map((y) => (
+                <option key={y._id} value={y._id}>
+                  {y.year}
+                </option>
+              ))}
             </select>
           </div>
-
-          {/* Download Button Section */}
-          <div className="mt-3 text-center">
+          <div className="col-span-12 lg:col-span-4 flex items-center justify-center bg-gradient-to-r from-green-darkest to-green-dark rounded-lg p-1 shadow-xl">
             <button
               onClick={handleDownloadTemplate}
-              disabled={isDownloading}
-              className="inline-flex text-sm items-center gap-3 mt-3 px-6 py-2 bg-gradient-to-r from-green-darkest to-green-dark text-white-pure rounded-lg font-bold shadow-xl hover:from-green-700 hover:to-emerald-800 disabled:opacity-60 disabled:cursor-not-allowed transition transform hover:scale-105"
+              disabled={ isDownloading || !selectedProgramId || !selectedAcademicYearId }
+              className="group flex items-center gap-3 text-yellow-gold  disabled:opacity-30 disabled:grayscale  transition-all"
             >
-              {isDownloading ? (
-                <><span className="animate-spin h-5 w-5 border-4 border-white border-t-transparent rounded-full" /> Downloading...</>
-              ) : (
-                <>
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                  </svg>
-                  Download Student Reg. Template
-                </>
-              )}
+              <div className="p-2 rounded-lg bg-white/10 group-hover:bg-yellow-gold group-hover:text-green-darkest transition-all">
+                <FileDown size={10} />
+              </div>
+              <div className="flex flex-col items-center">
+                <span className="text-[10px] font-black uppercase tracking-[0.2em]">
+                  Download Template
+                </span>
+                {!selectedProgramId && (
+                  <span className="text-[8px] font-bold text-white/40 uppercase tracking-[0.3em]">
+                    Awaiting Selection
+                  </span>
+                )}
+              </div>
             </button>
-            {(!selectedProgramId || !selectedAcademicYearId) && (
-              <p className="mt-2 text-sm text-orange-600 font-medium">
-                ⚠ Select both programme and year above to enable download
-              </p>
-            )}
           </div>
+        </div>
+
+       
+
+        {/* STEP 2: DATA INGESTION (PASTE AREA) */}
+        <div className="mb-4 flex items-center justify-between px-4">
+          <div className="flex items-center gap-3">
+            <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+            <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-green-darkest/60">
+              Active Data Ledger
+            </h3>
+          </div>
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+            <Zap size={12} className="text-yellow-gold" />
+            Pro Tip: Click table and press Ctrl+V to paste from Excel
+          </p>
         </div>
 
         {/* PASTE AREA */}
@@ -383,29 +406,22 @@ export default function RegisterStudents() {
           ref={tableRef}
           onPaste={handlePaste}
           tabIndex={0}
-          className="overflow-x-auto border-0 border-dashed border-blue-300 rounded-lg p-2 mb-10 focus:border-blue-600 transition-all"
+          className="bg-white rounded-lg shadow-sm overflow-hidden mb-10 focus-within:ring-2 focus-within:ring-blue-200 transition-all"
+          // className="overflow-x-auto border-0 border-dashed border-blue-300 rounded-lg p-2 mb-10 focus:border-blue-600 transition-all"
           style={{ outline: "none" }}
         >
           {/* Your table and inputs here */}
           <table className="w-full rounded-lg">
-            <thead className="bg-gradient-to-r text-sm from-green-darkest to-green-dark text-lime-bright">
-              <tr>
-                <th className="px-4 py-2 text-left font-bold ">
-                  Reg No
-                </th>
-                <th className="px-6 py-2 text-left font-bold ">
-                  Full Name
-                </th>
-                <th className="px-6 py-2 text-left font-bold ">
-                  Program
-                </th>
-                <th className="px-6 py-2 text-left font-bold ">Year</th>
-                <th className="px-4 py-2 text-center font-bold ">
-                  Action
-                </th>
+            <thead className=" ">
+              <tr className="bg-slate-100 border-b text-xs text-slate-400 border-slate-100">
+                <th className="px-4 py-2 text-left font-bold ">Reg No</th>
+                <th className="px-4 py-2 text-left font-bold ">Full Name</th>
+                <th className="px-4 py-2 text-left font-bold ">Program</th>
+                <th className="px-4 py-2 text-left font-bold ">Year</th>
+                <th className="px-4 py-2 text-center font-bold ">Action</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200 border">
+            <tbody className="divide-y divide-slate-100 ">
               {students.map((student, i) => {
                 const safeReg = String(student.regNo || "");
                 const safeName = String(student.name || "");
@@ -419,13 +435,14 @@ export default function RegisterStudents() {
                   <tr
                     key={i}
                     className={`
-        hover:bg-green-base/20 transition-all duration-200 text-sm 
-        ${isDuplicate ? "bg-red-100 border-l-4 border-red-600 shadow-lg" : ""}
-        ${!isDuplicate && isIncomplete
-                        ? "bg-orange-50 border-l-4 border-orange-500 "
-                        : ""
-                      }
-        ${!isDuplicate && !isIncomplete ? "bg-white" : ""}
+        hover:bg-green-base/10 transition-all duration-200 text-xs 
+        ${isDuplicate ? "bg-red-50 border-l-4 border-red-600 rounded-xl shadow-lg" : ""}
+        ${
+          !isDuplicate && isIncomplete
+            ? "bg-orange-50 border-l-4 border-orange-500 "
+            : ""
+        }
+        ${!isDuplicate && !isIncomplete ? "bg-white rounded-xl" : ""}
       `}
                   >
                     <td className="px-1 py-2   ">
@@ -437,18 +454,19 @@ export default function RegisterStudents() {
                             updateStudent(
                               i,
                               "regNo",
-                              e.target.value.toUpperCase()
+                              e.target.value.toUpperCase(),
                             )
                           }
                           placeholder="SC/ICT/001/2023"
                           className={`
-              w-full px-3 py-2 text-green-darkest rounded-lg font-bold transition-all outline-none
-              ${isDuplicate
-                              ? "bg-red-200 border-2 border-red-700 text-red-900 placeholder-red-400 shadow-md"
-                              : !student.regNo.trim()
-                                ? "bg-orange-100  "
-                                : "bg-gray-50 hover:bg-yellow-gold/70 focus:ring-0"
-                            }
+              w-full p-2.5 text-green-darkest rounded-mono font-bold transition-all outline-none
+              ${
+                isDuplicate
+                  ? "bg-white border-red-500 text-red-700 placeholder-red-400 shadow-md"
+                  : !student.regNo.trim()
+                    ? "bg-orange-100  "
+                    : "bg-gray-50 hover:bg-yellow-gold/70 focus:ring-0"
+              }
             `}
                         />
                       </div>
@@ -460,8 +478,8 @@ export default function RegisterStudents() {
                         onChange={(e) =>
                           updateStudent(i, "name", e.target.value)
                         }
-                        placeholder="Patrick Kim"
-                        className="text-green-darkest w-full px-2 rounded focus:ring-0 outline-0  "
+                        placeholder="Patrick Kimani"
+                        className="text-green-darkest  w-full px-2 rounded focus:ring-0 outline-0  "
                       />
                     </td>
                     <td className="px-4 py-2">
@@ -483,20 +501,20 @@ export default function RegisterStudents() {
                           updateStudent(
                             i,
                             "currentYearOfStudy",
-                            Number(e.target.value)
+                            Number(e.target.value),
                           )
                         }
-                        className="text-green-darkest text-center w-12  rounded focus:ring-0 outline-0  "
+                        className="mx-auto p-2.5 bg-transparent text-xs text-green-darkest text-center w-12  rounded outline-0  "
                         min="1"
                         max="6"
                       />
                     </td>
-                    <td className="px-4 py-2 text-center">
+                    <td className="px-4 py-2 text-right">
                       <button
                         onClick={() => removeRow(i)}
-                        className="text-red-600 hover:text-red-800 font-bold  transition"
+                        className="p-2 text-slate-300 hover:text-red-600 transition-colors"
                       >
-                        Remove
+                        <Trash2 size={16} />
                       </button>
                     </td>
                   </tr>
@@ -506,10 +524,11 @@ export default function RegisterStudents() {
           </table>
         </div>
 
+        {/* Footer */}
         <div className="flex gap-8 justify-center">
           <button
             onClick={addRow}
-            className="px-4 py-2 text-sm bg-gradient-to-r from-blue-600 to-indigo-700 text-white-pure rounded-lg hover:from-blue-700 hover:to-indigo-800 font-bold transition shadow-2xl"
+            className="px-4 py-2 text-sm border-2 border-dashed border-slate-200 text-slate-400 rounded-lg tracking-wide hover:border-yellow-gold hover:text-green-darkest font-bold transition-all shadow-2xl"
           >
             + Add New Row
           </button>
@@ -517,17 +536,17 @@ export default function RegisterStudents() {
           <button
             onClick={handleSubmit}
             disabled={loading}
-            className="px-4 py-2 text-sm bg-gradient-to-r from-green-darkest to-green-dark text-white-pure rounded-lg hover:from-green-700 hover:to-emerald-800 font-bold  disabled:opacity-50 disabled:cursor-not-allowed transition shadow-2xl"
+            className="flex gap-2 px-4 py-2 text-sm bg-gradient-to-r from-green-darkest to-green-dark text-white-pure rounded-lg hover:from-green-700 hover:to-emerald-800 font-bold  disabled:opacity-50 disabled:cursor-not-allowed transition shadow-2xl"
           >
+            {loading ? (
+              <div className="animate-spin h-4 w-4 border-2 border-yellow-gold border-t-transparent rounded-full" />
+            ) : (
+              <ClipboardCheck size={18} />
+            )}
             {loading
-              ? "Saving..."
-              : `Register ${students.filter((s) => s.regNo && s.name && s.program).length
-              } Students`}
+              ? "Registering..."
+              : `Register ${students.filter((s) => s.regNo && s.name && s.program).length} Students`}
           </button>
-        </div>
-
-        <div className="text-center mt-12">
-          <p className="text-sm text-green-darkest">Pro tip: Copy from Excel</p>
         </div>
       </div>
     </div>
