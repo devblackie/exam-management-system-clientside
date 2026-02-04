@@ -1,5 +1,7 @@
 "use client";
 
+import Loader from "./Loader";
+
 interface LoadingStateProps {
   message?: string;
   fullScreen?: boolean;
@@ -15,8 +17,10 @@ export const LoadingState = ({
 
   return (
     <div className={containerClasses}>
-      <div className="text-center">
-        <div className="w-16 h-16 border-4 border-green-dark border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
+      <div className="flex flex-col items-center">
+        <div className="mb-12">
+          <Loader />
+        </div>
         <p className="text-xl font-medium text-green-dark">{message}</p>
       </div>
     </div>

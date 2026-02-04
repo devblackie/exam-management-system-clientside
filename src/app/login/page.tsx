@@ -192,8 +192,8 @@ export default function LoginPage() {
           animate={{ opacity: 1, x: 0 }}
           className="w-full max-w-md flex flex-col items-center "
         >
-          {/* Mobile Logo Only */}
-        <div className="relative w-32 h-32 mb-5">
+          
+        <div className="relative w-32 h-32 ">
        <motion.div
           animate={{ rotateY: 360 }}
           transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
@@ -204,7 +204,7 @@ export default function LoginPage() {
        </div>
 
           <div className="bg-white/5 backdrop-blur-2xl p-8 rounded-[2.5rem] border border-white/10 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)]">
-            <div className="mb-6">
+            <div className="mb-4">
               <h2 className="text-2xl font-black text-white tracking-tight uppercase">Portal Login</h2>
               <div className="h-1 w-12 bg-yellow-gold mt-2 rounded-full" />
             </div>
@@ -224,7 +224,7 @@ export default function LoginPage() {
 
             <form onSubmit={handleSubmit} className="space-y-8">
               {/* EMAIL FIELD */}
-              <div className="space-y-3">
+              <div className="space-y-1">
                 <label className="text-[9px] font-black text-yellow-gold uppercase tracking-[0.3em] ml-1">Official Identifier</label>
                 <div className="relative border-b border-white/10 focus-within:border-yellow-gold transition-all duration-500">
                   <Mail className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
@@ -241,7 +241,7 @@ export default function LoginPage() {
               </div>
 
               {/* PASSWORD FIELD */}
-              <div className="space-y-3">
+              <div className="space-y-1">
                 <label className="text-[9px] font-black text-yellow-gold uppercase tracking-[0.3em] ml-1">Security Key</label>
                 <div className="relative border-b border-white/10 focus-within:border-yellow-gold transition-all duration-500">
                   <Lock className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
@@ -277,7 +277,7 @@ export default function LoginPage() {
               </CommonButton>
             </form>
 
-            <div className="mt-10 text-center">
+            <div className="mt-8 text-center">
               <p className="text-[9px] font-bold text-white/20 uppercase tracking-widest leading-relaxed">
                 Protected by {branding.school} Infrastructure <br /> 
                 Internal Personnel Only
