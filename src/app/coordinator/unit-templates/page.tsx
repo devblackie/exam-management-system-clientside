@@ -34,9 +34,14 @@ export default function UnitTemplateManagementPage() {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [editForm, setEditForm] = useState<UnitTemplateFormData>({ code: "", name: "" });
+  const [editForm, setEditForm] = useState<UnitTemplateFormData>({
+    code: "",
+    name: "",
+  });
 
-  useEffect(() => { loadUnits(); }, []);
+  useEffect(() => {
+    loadUnits();
+  }, []);
 
   const loadUnits = async () => {
     setLoading(true);
@@ -54,11 +59,18 @@ export default function UnitTemplateManagementPage() {
     const term = searchTerm.toLowerCase();
     if (currentPage !== 1 && term !== "") setCurrentPage(1);
     if (!term) return units;
-    return units.filter(u => u.code.toLowerCase().includes(term) || u.name.toLowerCase().includes(term));
+    return units.filter(
+      (u) =>
+        u.code.toLowerCase().includes(term) ||
+        u.name.toLowerCase().includes(term),
+    );
   }, [units, searchTerm]);
 
   const totalPages = Math.ceil(filteredUnits.length / UNITS_PER_PAGE);
-  const currentUnits = filteredUnits.slice((currentPage - 1) * UNITS_PER_PAGE, currentPage * UNITS_PER_PAGE);
+  const currentUnits = filteredUnits.slice(
+    (currentPage - 1) * UNITS_PER_PAGE,
+    currentPage * UNITS_PER_PAGE,
+  );
 
   const startEdit = (unit: Unit) => {
     setEditingId(unit._id);
@@ -96,23 +108,16 @@ export default function UnitTemplateManagementPage() {
     }
   };
 
-  
-    if (loading)
-      return <LoadingState message="Loading Units..." />;
-  
+  if (loading) return <LoadingState message="Loading Units..." />;
 
   return (
     <div className="max-w-8xl ml-48 my-10">
       <div className="bg-[#F8F9FA] min-h-screen rounded-lg shadow-2xl p-10 border border-white">
-        
-        <PageHeader 
-          title="Unit" 
-          highlightedTitle="Templates"         
-        />
+        <PageHeader title="Unit" highlightedTitle="Templates" />
 
         {/* COMMAND BAR: Search & Meta */}
-        <div className="flex flex-col md:flex-row gap-6 mb-10">
-          <div className="relative flex-1">
+        <div className="flex flex-col md:flex-row gap-6 -mt-3 mb-4">
+          <div className="relative flex-1 items-center">
             <div className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300">
               <Search size={18} />
             </div>
@@ -137,37 +142,63 @@ export default function UnitTemplateManagementPage() {
           <table className="w-full text-left">
             <thead>
               <tr className="bg-slate-50 border-b border-slate-100">
-                <th className="px-10 py-5 text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">Unit Code</th>
-                <th className="px-10 py-5 text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">Unit Name</th>
-                <th className="px-10 py-5 text-right text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">Management Actions</th>
+                <th className="px-10 py-3 text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                  Unit Code
+                </th>
+                <th className="px-10 py-3 text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                  Unit Name
+                </th>
+                <th className="px-10 py-3 text-right text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                  Management Actions
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
               {currentUnits.map((unit) => (
-                <tr key={unit._id} className={`group transition-all ${editingId === unit._id ? 'bg-yellow-gold/5' : 'hover:bg-slate-50/50'}`}>
+                <tr
+                  key={unit._id}
+                  className={`group transition-all ${editingId === unit._id ? "bg-yellow-gold/5" : "hover:bg-slate-50/50"}`}
+                >
                   {editingId === unit._id ? (
                     /* INLINE EDIT MODE */
                     <td colSpan={3} className="px-10 py-6">
-                      <form onSubmit={handleUpdate} className="flex gap-4 items-center animate-in fade-in zoom-in-95 duration-300">
+                      <form
+                        onSubmit={handleUpdate}
+                        className="flex gap-4 items-center animate-in fade-in zoom-in-95 duration-300"
+                      >
                         <input
                           type="text"
                           value={editForm.code}
-                          onChange={(e) => setEditForm({ ...editForm, code: e.target.value.toUpperCase() })}
+                          onChange={(e) =>
+                            setEditForm({
+                              ...editForm,
+                              code: e.target.value.toUpperCase(),
+                            })
+                          }
                           className="w-32 p-3 bg-white border-2 border-yellow-gold rounded-lg font-mono font-bold text-green-darkest text-xs outline-none"
                           required
                         />
                         <input
                           type="text"
                           value={editForm.name}
-                          onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                          onChange={(e) =>
+                            setEditForm({ ...editForm, name: e.target.value })
+                          }
                           className="flex-1 p-3 bg-white border-2 border-yellow-gold rounded-lg font-bold text-green-darkest text-xs outline-none"
                           required
                         />
                         <div className="flex gap-2">
-                          <button type="submit" className="p-2 bg-green-darkest text-yellow-gold rounded-lg hover:shadow-lg transition-all">
+                          <button
+                            type="submit"
+                            className="p-2 bg-green-darkest text-yellow-gold rounded-lg hover:shadow-lg transition-all"
+                          >
                             <Save size={18} />
                           </button>
-                          <button type="button" onClick={() => setEditingId(null)} className="p-2 bg-slate-100 text-slate-400 rounded-xl hover:bg-red-50 hover:text-red-500 transition-all">
+                          <button
+                            type="button"
+                            onClick={() => setEditingId(null)}
+                            className="p-2 bg-slate-100 text-slate-400 rounded-xl hover:bg-red-50 hover:text-red-500 transition-all"
+                          >
                             <X size={18} />
                           </button>
                         </div>
@@ -176,20 +207,28 @@ export default function UnitTemplateManagementPage() {
                   ) : (
                     /* VIEW MODE */
                     <>
-                      <td className="px-10 py-3">
-                        <span className="px-4 py-2 bg-green-darkest text-yellow-gold text-xs font-mono font-bold rounded-lg shadow-sm">
+                      <td className="px-10 py-1">
+                        <span className="px-4 py-1 bg-green-darkest text-yellow-gold text-xs font-mono font-bold rounded-lg shadow-sm">
                           {unit.code}
                         </span>
                       </td>
-                      <td className="px-10 py-3">
-                        <p className="text-sm font-bold text-green-darkest tracking-tight">{unit.name}</p>
+                      <td className="px-10 py-1">
+                        <p className="text-xs text-green-darkest tracking-tight">
+                          {unit.name}
+                        </p>
                       </td>
-                      <td className="px-10 py-3 text-right">
+                      <td className="px-10 py-1 text-right">
                         <div className="flex justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button onClick={() => startEdit(unit)} className="p-3 text-slate-400 hover:text-green-darkest hover:bg-white rounded-xl shadow-none hover:shadow-md transition-all">
+                          <button
+                            onClick={() => startEdit(unit)}
+                            className="p-3 text-slate-400 hover:text-green-darkest hover:bg-white rounded-xl shadow-none hover:shadow-md transition-all"
+                          >
                             <PenLine size={18} />
                           </button>
-                          <button onClick={() => handleDelete(unit._id, unit.code)} className="p-3 text-slate-400 hover:text-red-500 hover:bg-white rounded-xl shadow-none hover:shadow-md transition-all">
+                          <button
+                            onClick={() => handleDelete(unit._id, unit.code)}
+                            className="p-3 text-slate-400 hover:text-red-500 hover:bg-white rounded-xl shadow-none hover:shadow-md transition-all"
+                          >
                             <Trash2 size={18} />
                           </button>
                         </div>
@@ -210,7 +249,7 @@ export default function UnitTemplateManagementPage() {
             </p>
             <div className="flex items-center gap-3">
               <button
-                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                 disabled={currentPage === 1}
                 className="p-3 bg-white border border-slate-200 rounded-xl hover:bg-yellow-gold hover:border-yellow-gold transition-all disabled:opacity-30 shadow-sm"
               >
@@ -220,7 +259,9 @@ export default function UnitTemplateManagementPage() {
                 PAGE {currentPage}
               </div>
               <button
-                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                onClick={() =>
+                  setCurrentPage((p) => Math.min(totalPages, p + 1))
+                }
                 disabled={currentPage === totalPages}
                 className="p-3 bg-white border border-slate-200 rounded-xl hover:bg-yellow-gold hover:border-yellow-gold transition-all disabled:opacity-30 shadow-sm"
               >

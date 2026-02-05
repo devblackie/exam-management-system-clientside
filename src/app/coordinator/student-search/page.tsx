@@ -112,7 +112,7 @@ export default function StudentSearchPage() {
 
   return (
     <div className="max-w-8xl ml-48 my-10">
-      <div className="bg-[#F8F9FA] rounded-3xl shadow-2xl p-10 min-h-screen">
+      <div className="bg-[#F8F9FA] rounded-lg shadow-2xl p-10 min-h-screen">
         {/* 1. PAGE HEADER */}
         <PageHeader
           title="Student Academic"
@@ -136,7 +136,7 @@ export default function StudentSearchPage() {
         />
 
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-32 bg-white rounded-[2rem]">
+          <div className="flex flex-col items-cente justify-cente ">
             <LoadingState message="Fetching academic data..." />
           </div>
         ) : (
