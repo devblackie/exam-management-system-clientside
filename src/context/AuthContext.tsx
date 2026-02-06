@@ -99,6 +99,14 @@ interface AuthContextType {
   logoutUser: () => Promise<void>;
 }
 
+interface ApiErrorResponse {
+  response?: {
+    data?: {
+      message?: string;
+    };
+  };
+  message: string;
+}
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -131,16 +139,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await login(email, password);
       const res = await me();
       setUser(res.data);
-      
-      // Middleware handles the "guards", but we still redirect 
+
+      // Middleware handles the "guards", but we still redirect
       // the user into the app upon successful login.
       const role = res.data.role?.toLowerCase();
       if (role === "admin") router.push("/admin/invite");
       else if (role === "lecturer") router.push("/lecturer/upload");
       else if (role === "coordinator") router.push("/coordinator/students");
       else router.push("/");
-    } catch (err) {
+    } catch (err: unknown) {
       setUser(null);
+      // Re-throw the error so the component can read the status code/message
       throw err;
     }
   }

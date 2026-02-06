@@ -22,9 +22,11 @@ export default function PageHeader({
 }: PageHeaderProps) {
   const isOnline = useServerHealth();
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [mounted, setMounted] = useState(false);
 
   // Clock Synchronization
   useEffect(() => {
+    setMounted(true);
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
@@ -42,18 +44,24 @@ export default function PageHeader({
   return (
     <header className="mb-8 w-full animate-in fade-in slide-in-from-top-4 duration-700">
       <div className="flex justify-between items-end border-b border-green-darkest/10 pb-2">
-        
         {/* LEFT: Identity & Context */}
         <div className="flex flex-col">
           <div className="flex items-center gap-3 mb-1">
-            <span className={`h-1 w-8 rounded-full transition-colors duration-500 ${isOnline ? 'bg-yellow-gold' : 'bg-red-500'}`} />
+            <span
+              className={`h-1 w-8 rounded-full transition-colors duration-500 ${isOnline ? "bg-yellow-gold" : "bg-red-500"}`}
+            />
             <span className="text-[10px] font-black uppercase tracking-[0.4em] text-green-darkest/40">
               {systemLabel}
             </span>
           </div>
-          
+
           <h1 className="text-xl font-black text-green-darkest tracking-tight">
-            {title} {highlightedTitle && <span className="text-yellow-gold/80 font-light">{highlightedTitle}</span>}
+            {title}{" "}
+            {highlightedTitle && (
+              <span className="text-yellow-gold/80 font-light">
+                {highlightedTitle}
+              </span>
+            )}
           </h1>
 
           {subtitle && (
@@ -65,11 +73,7 @@ export default function PageHeader({
 
         {/* RIGHT: Actions & Live Telemetry */}
         <div className="flex items-center  gap-8">
-          {actions && (
-            <div className="flex items-center gap-3 ">
-              {actions}
-            </div>
-          )}
+          {actions && <div className="flex items-center gap-3 ">{actions}</div>}
 
           {showStatus && (
             <div className="text-right hidden sm:block border-l border-green-darkest/10 pl-6">
@@ -79,16 +83,25 @@ export default function PageHeader({
                   {isOnline && (
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
                   )}
-                  <span className={`relative inline-flex rounded-full h-2 w-2 transition-colors duration-500 ${isOnline ? 'bg-emerald-500' : 'bg-red-500'}`}></span>
+                  <span
+                    className={`relative inline-flex rounded-full h-2 w-2 transition-colors duration-500 ${isOnline ? "bg-emerald-500" : "bg-red-500"}`}
+                  ></span>
                 </span>
-                
-                <p className={`text-[9px] font-black uppercase tracking-[0.2em] transition-colors duration-500 ${isOnline ? 'text-slate-400' : 'text-red-500'}`}>
+
+                <p
+                  className={`text-[9px] font-black uppercase tracking-[0.2em] transition-colors duration-500 ${isOnline ? "text-slate-400" : "text-red-500"}`}
+                >
                   {isOnline ? "Server Connected" : "Server Disconnected"}
                 </p>
               </div>
 
               <p className="text-xs font-mono font-bold text-green-darkest/80 tabular-nums">
-                {formattedDate} • {formattedTime}
+                {/* {formattedDate} • {formattedTime} */}
+                {mounted ? (
+                  `${formattedDate} • ${formattedTime}`
+                ) : (
+                  <span className="opacity-0">Loading...</span>
+                )}
               </p>
             </div>
           )}

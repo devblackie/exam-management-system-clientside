@@ -33,3 +33,13 @@ export async function me() {
 export async function logout() {
   return api.post<{ message: string }>("/auth/logout");
 }
+
+export async function forgotPassword(email: string) {
+  return api.post<{ message: string }>("/auth/forgot-password", { email });
+}
+
+export async function resetPassword(token: string, password: string) {
+  return api.post<{ message: string }>(`/auth/reset-password/${token}`, {
+    password,
+  });
+}

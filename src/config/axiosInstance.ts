@@ -34,9 +34,13 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-    if (typeof window !== "undefined" && window.location.pathname !== "/login") {
-        // Append ?reason=expired to the URL
-        window.location.href = "/login"; 
+      const isResetPage = window.location.pathname.startsWith("/reset-password");
+      if (
+        typeof window !== "undefined" &&
+        !isResetPage &&
+        window.location.pathname !== "/login"
+      ) {
+        window.location.href = "/login";
       }
     }
     
