@@ -18,10 +18,7 @@ export async function createLecturer(data: {
   return res.data;
 }
 
-export const promoteStudentApi = async (studentId: string) => {
-  const response = await api.post(`/coordinator/promote/${studentId}`);
-  return response.data;
-};
+
 
 // --- Data Cleanup ---
 export async function runDatabaseCleanup() {

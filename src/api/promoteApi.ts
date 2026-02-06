@@ -66,6 +66,11 @@ export async function bulkPromoteClass(data: PromotionParams) {
   return res.data;
 }
 
+export const promoteStudentApi = async (studentId: string) => {
+  const response = await api.post(`/promote/${studentId}`);
+  return response.data;
+};
+
 export async function downloadPromotionReportWithProgress(
   data: PromotionParams,
   programName: string | undefined,

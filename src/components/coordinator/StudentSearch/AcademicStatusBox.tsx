@@ -3,9 +3,9 @@
 
 import { CheckCircle, AlertTriangle, ArrowUpCircle, Loader2, GraduationCap } from "lucide-react";
 import { AcademicStatus } from "@/api/types";
-import { promoteStudentApi } from "@/api/coordinatorApi";
+// import { promoteStudentApi } from "@/api/coordinatorApi";
 import { useState } from "react";
-import { downloadTranscriptsWithProgress } from "@/api/promoteApi";
+import { downloadTranscriptsWithProgress, promoteStudentApi } from "@/api/promoteApi";
 
 // 1. Define types for the sub-components
 type StatusColor = 'blue' | 'amber' | 'orange' | 'red';
@@ -50,6 +50,9 @@ export default function AcademicStatusBox({ status, currentYearOfStudy, viewingY
   };
 
   const handlePromote = async () => {
+    if (!window.confirm(`Are you sure you want to promote this student to Year ${viewingYear + 1}?`)) {
+      return;
+    }
     setIsPromoting(true);
     try {
       // Call your promotion API

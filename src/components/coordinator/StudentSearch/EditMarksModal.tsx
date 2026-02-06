@@ -69,7 +69,7 @@ export default function EditMarksModal({
 
   return (
     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-      <div className="bg-white rounded-3xl shadow-3xl max-w-3xl w-full max-h-[95vh] overflow-y-auto relative">
+      <div className="bg-white rounded-l shadow-3xl max-w-3xl w-full max-h-[95vh] overflow-y-auto relative">
         <div className="sticky top-0 bg-white border-b px-10 py-6 flex justify-between items-center z-10">
           <h2 className="text-xl font-bold text-green-dark">
             {editingMark ? "Edit Unit Marks" : "Add Missing Marks"}
