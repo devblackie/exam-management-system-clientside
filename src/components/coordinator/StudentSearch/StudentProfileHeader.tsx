@@ -27,7 +27,7 @@ export default function StudentProfileHeader({ student }: StudentProfileHeaderPr
                             {student.regNo} •
                         </p>
                         <p className=" font-mon  text-sm text-green-darkest/70 ">
-                            {student.program}
+                            {student.programName}
                         </p>
 
                     </div>

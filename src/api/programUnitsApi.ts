@@ -43,3 +43,18 @@ export const updateProgramUnitLink = async (id: string, data: ProgramUnitUpdateD
 export const deleteProgramUnitLink = async (id: string) => {
   await api.delete(`/program-units/${id}`);
 };
+
+export const getProgramUnitLookup = async (programId: string) => {
+  // Regex to check if string is a valid MongoDB ObjectId
+  const isValidId = /^[0-9a-fA-F]{24}$/.test(programId);
+  
+  if (!isValidId) {
+    console.error("Aborting API call: programId is not a valid ObjectId:", programId);
+    return [];
+  }
+
+  const res = await api.get("/program-units/lookup", { 
+    params: { programId } 
+  });
+  return res.data;
+};

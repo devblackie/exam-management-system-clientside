@@ -1,4 +1,4 @@
-// clientside/src/app/coordinator/student-search/page.tsx
+// // clientside/src/app/coordinator/student-search/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -13,10 +13,14 @@ import type {
   StudentFullRecord,
   RawMark,
   SaveMarksPayload,
+  ProgramUnit,
+  Unit,
 } from "@/api/types";
+import { getAcademicYears } from "@/api/marksApi";
+import { AcademicYear } from "@/api/types";
 import { useToast } from "@/context/ToastContext";
 
-// New Components
+// Components
 import SearchBar from "@/components/coordinator/StudentSearch/SearchBar";
 import ResultsTable from "@/components/coordinator/StudentSearch/ResultsTable";
 import GradesTable from "@/components/coordinator/StudentSearch/GradesTable";
@@ -26,6 +30,7 @@ import StudentProfileHeader from "@/components/coordinator/StudentSearch/Student
 import EditMarksModal from "@/components/coordinator/StudentSearch/EditMarksModal";
 import PageHeader from "@/components/ui/PageHeader";
 import { LoadingState } from "@/components/ui/LoadingState";
+import { getProgramUnitLookup } from "@/api/programUnitsApi";
 
 export default function StudentSearchPage() {
   const [query, setQuery] = useState("");
@@ -39,14 +44,23 @@ export default function StudentSearchPage() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingMark, setEditingMark] = useState<RawMark | null>(null);
   const [selectedYearOfStudy, setSelectedYearOfStudy] = useState<number>(1);
+
+  // States for metadata
+  const [availableUnits, setAvailableUnits] = useState<
+    Array<{ code: string; name: string }>
+  >([]);
+  const [availableYears, setAvailableYears] = useState<AcademicYear[]>([]);
+
   const { addToast } = useToast();
 
+  // 1. Sync student record when Year of Study changes
   useEffect(() => {
     if (selectedStudent?.student.regNo) {
       viewStudent(selectedStudent.student.regNo);
     }
   }, [selectedYearOfStudy]);
 
+  // 2. Fetch Raw Marks when switching to Raw Assessment Data tab
   useEffect(() => {
     const fetchMarks = async () => {
       if (!selectedStudent || activeTab !== "raw") return;
@@ -62,6 +76,36 @@ export default function StudentSearchPage() {
     };
     fetchMarks();
   }, [selectedStudent, activeTab, selectedYearOfStudy]);
+
+  // 3. Fetch Metadata (Units & Academic Years) for the Program
+
+  useEffect(() => {
+    // Use the explicit programId we just added to the backend
+    const programId = selectedStudent?.student?.programId;
+
+    // Defensive check: Ensure it's a valid 24-character hex ID
+    const isValidObjectId = /^[0-9a-fA-F]{24}$/.test(programId || "");
+
+    if (!isValidObjectId) return;
+
+    const fetchMetadata = async () => {
+      try {
+        const [years, units] = await Promise.all([
+          getAcademicYears(),
+          getProgramUnitLookup(programId!),
+        ]);
+
+        setAvailableYears(years);
+        setAvailableUnits(units);
+        console.log("✅ Curriculum loaded for ID:", programId);
+      } catch (err) {
+        console.error("❌ Metadata fetch failed:", err);
+        addToast("Failed to load program units", "error");
+      }
+    };
+
+    fetchMetadata();
+  }, [selectedStudent?.student?._id]); // Trigger on student change
 
   const isReadOnly =
     selectedStudent?.academicStatus?.status === "IN GOOD STANDING" &&
@@ -88,11 +132,16 @@ export default function StudentSearchPage() {
         encodeURIComponent(regNo),
         selectedYearOfStudy,
       );
+
+      if (!record.student) throw new Error("Invalid record structure");
+
       setSelectedStudent(record);
       setActiveTab("grades");
-    } catch {
+    } catch (err) {
+      console.error("View Student Error:", err);
       addToast(
-        "Failed to load records for Year " + selectedYearOfStudy,
+        `Failed to load Year ${selectedYearOfStudy} records.`,
+        // "Failed to load records for Year " + selectedYearOfStudy,
         "error",
       );
     } finally {
@@ -104,7 +153,9 @@ export default function StudentSearchPage() {
     try {
       await saveRawMarks(payload);
       addToast("Marks updated successfully!", "success");
+      // Refresh the view to show newly calculated totals/grades
       if (selectedStudent) await viewStudent(selectedStudent.student.regNo);
+      setShowEditModal(false);
     } catch {
       addToast("Failed to save marks", "error");
     }
@@ -113,7 +164,6 @@ export default function StudentSearchPage() {
   return (
     <div className="max-w-8xl ml-48 my-10">
       <div className="bg-[#F8F9FA] rounded-lg shadow-2xl p-10 min-h-screen">
-        {/* 1. PAGE HEADER */}
         <PageHeader
           title="Student Academic"
           highlightedTitle="Records"
@@ -136,7 +186,7 @@ export default function StudentSearchPage() {
         />
 
         {loading ? (
-          <div className="flex flex-col items-cente justify-cente ">
+          <div className="flex flex-col items-center justify-center py-20">
             <LoadingState message="Fetching academic data..." />
           </div>
         ) : (
@@ -162,20 +212,6 @@ export default function StudentSearchPage() {
                 </div>
               </div>
 
-              {/* <div className="flex gap-10 border-b-2 border-green-darkest/10 mb-6">
-              {(["grades", "raw"] as const).map((tab) => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  className={`pb-4 px-2 text-sm font-black uppercase tracking-widest border-b-4 ${
-                    activeTab === tab ? "border-green-darkest text-green-darkest" : "border-transparent text-gray-400"
-                  }`}
-                >
-                  {tab === "grades" ? "Official Grades" : "Raw Assessment Marks"}
-                </button>
-              ))}
-            </div> */}
-
               {/* TABS CONTEXT */}
               <div className="flex gap-12 border-b border-green-darkest/10 mb-5 px-4">
                 {(["grades", "raw"] as const).map((tab) => (
@@ -198,9 +234,6 @@ export default function StudentSearchPage() {
                 ))}
               </div>
 
-              {/* {activeTab === "grades" ? (
-              <GradesTable grades={selectedStudent.grades} />
-            ) : ( */}
               <div className="bg-white rounded-lg border border-green-darkest/5 shadow-sm overflow-hidden">
                 {activeTab === "grades" ? (
                   <GradesTable grades={selectedStudent.grades} />
@@ -232,6 +265,8 @@ export default function StudentSearchPage() {
             student={selectedStudent}
             editingMark={editingMark}
             onSave={handleSaveMarks}
+            availableUnits={availableUnits}
+            availableYears={availableYears}
           />
         )}
       </div>

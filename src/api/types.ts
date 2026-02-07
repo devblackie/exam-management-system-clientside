@@ -224,14 +224,16 @@ export interface StudentFullRecord {
     _id: string;
     name: string;
     regNo: string;
-    program: string;
-    currentYear: number; 
+    programName: string;
+    programId?: string;
+    currentYear: number;
     currentSemester: number;
   };
   grades: GradeRecord[];
   currentStatus: string;
   academicStatus: AcademicStatus; // Add this line
-  summary: {                       // Update summary to match the backend
+  summary: {
+    // Update summary to match the backend
     totalUnits: number;
     passed: number;
     supplementary: number;

@@ -165,16 +165,6 @@ export const generateStudentTranscript = (regNo: string) => {
   );
 };
 
-/**
- * Get academic years, programs, units, etc.
- */
-// export const getAcademicYears = async () => {
-//   const res = await api.get<Array<{ _id: string; year: string }>>(
-//     "/academic-years"
-//   );
-//   return res.data;
-// };
-
 export const getAcademicYears = async () => {
   // Use the AcademicYear type here instead of the inline literal
   const res = await api.get<AcademicYear[]>("/academic-years");
@@ -196,3 +186,5 @@ export const getUnits = async (filters?: {
   const res = await api.get("/units", { params: filters });
   return res.data;
 };
+
+

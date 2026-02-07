@@ -77,18 +77,20 @@ export default function RawMarksTable({ marks, studentName, onEdit, onAddNew, on
         </div>
       ) : (
         <div className="overflow-x-auto rounded-lg border border-green-dark/20">
-          <table className="w-full">
-            <thead className="bg-green-darkest text-xs text-lime-bright uppercase">
-              <tr className="">
-                <th className="p-4 text-left">Year</th>
-                <th className="p-4 text-left">Unit</th>
-                <th className="p-4 text-center">CA /30</th>
-                <th className="p-4 text-center">Exam /70</th>
-                <th className="p-4 text-center">Agreed</th>
-                <th className="p-4 text-center">Status</th>
-               {!isReadOnly && <th className="p-4 text-center">Actions</th>} {/* HIDE HEADER */}
-              </tr>
-            </thead>
+       <table className="w-full border-collapse">
+  <thead className="bg-green-darkest text-[10px] text-lime-bright uppercase tracking-[0.15em]">
+    <tr>
+      <th className="p-4 text-left font-black border-b border-white/10">Year</th>
+      <th className="p-4 text-left font-black border-b border-white/10">Unit</th>
+      <th className="p-4 text-center font-black border-b border-white/10">CA /30</th>
+      <th className="p-4 text-center font-black border-b border-white/10">Exam /70</th>
+      <th className="p-4 text-center font-black border-b border-white/10">Agreed</th>
+      <th className="p-4 text-center font-black border-b border-white/10">Status</th>
+      {!isReadOnly ? (
+        <th className="p-4 text-center font-black border-b border-white/10">Actions</th>
+      ) : null}
+    </tr>
+  </thead>
             <tbody className="bg-white">
               {marks.map((m) => {
                 const unitCode = m.programUnit?.unit?.code || "N/A";
