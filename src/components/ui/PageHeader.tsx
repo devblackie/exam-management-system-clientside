@@ -1,3 +1,4 @@
+// clientside/src/components/ui/PageHeader.tsx
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -13,12 +14,9 @@ interface PageHeaderProps {
 }
 
 export default function PageHeader({
-  title,
-  highlightedTitle,
-  subtitle,
-  systemLabel = "",
-  actions,
-  showStatus = true,
+  title,  highlightedTitle,
+  subtitle,  systemLabel = "",
+  actions,  showStatus = true,
 }: PageHeaderProps) {
   const isOnline = useServerHealth();
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -32,9 +30,7 @@ export default function PageHeader({
   }, []);
 
   const formattedDate = currentTime.toLocaleDateString("en-GB", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
+    day: "2-digit",    month: "short",    year: "numeric",
   });
   
   const formattedTime = currentTime

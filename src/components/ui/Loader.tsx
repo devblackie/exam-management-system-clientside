@@ -1,3 +1,4 @@
+// clientside/src/components/ui/Loader.tsx
 "use client";
 
 import React from "react";

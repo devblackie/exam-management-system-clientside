@@ -1,4 +1,4 @@
-
+// clientside/src/components/coordinator/StudentSearch/StudentProfileHeader.tsx
 "use client";
 
 import { StudentFullRecord } from "@/api/types";

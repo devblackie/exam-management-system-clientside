@@ -1,56 +1,27 @@
 // clientside/src/components/coordinator/StudentSearch/AcademicStatusBox.tsx
 "use client";
 
-import {
-  CheckCircle,
-  AlertTriangle,
-  ArrowUpCircle,
-  Loader2,
-  Fingerprint,
-  GraduationCap,
-} from "lucide-react";
+import {  Loader2,  Fingerprint,  GraduationCap,} from "lucide-react";
 import { AcademicStatus } from "@/api/types";
 import { useState } from "react";
-import {
-  downloadTranscriptsWithProgress,
-  promoteStudentApi,
-} from "@/api/promoteApi";
+import {  downloadTranscriptsWithProgress,  promoteStudentApi,} from "@/api/promoteApi";
 
 // 1. Define types for the sub-components
 type StatusColor = "blue" | "amber" | "orange" | "red";
 type SummaryColor = "green" | "red" | "blue";
 
-interface UnitSectionProps {
-  label: string;
-  list?: string[];
-  color: StatusColor;
-  icon: string;
-  pulse?: boolean;
-}
+interface UnitSectionProps {  label: string;  list?: string[];  color: StatusColor;  icon: string;  pulse?: boolean;}
 
-interface SummaryItemProps {
-  color: SummaryColor;
-  label: string;
-  value: number;
-}
+interface SummaryItemProps {  color: SummaryColor;  label: string;  value: number;}
 
 interface AcademicStatusBoxProps {
   status: AcademicStatus;
   currentYearOfStudy: number; // The year the student is currently in (from DB)
   viewingYear: number; // The year currently being viewed/filtered in the UI
-  studentId: string;
-  academicYearName: string;
-  onPromoteSuccess: () => void;
+  studentId: string;  academicYearName: string;  onPromoteSuccess: () => void;
 }
 
-export default function AcademicStatusBox({
-  status,
-  currentYearOfStudy,
-  viewingYear,
-  studentId,
-  academicYearName,
-  onPromoteSuccess,
-}: AcademicStatusBoxProps) {
+export default function AcademicStatusBox({  status,  currentYearOfStudy,  viewingYear,  studentId,  academicYearName,  onPromoteSuccess,}: AcademicStatusBoxProps) {
   const [isPromoting, setIsPromoting] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [progress, setProgress] = useState<number | null>(null);

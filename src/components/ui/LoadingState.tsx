@@ -1,3 +1,4 @@
+// clientside/src/components/ui/LoadingState.tsx
 "use client";
 
 import Loader from "./Loader";

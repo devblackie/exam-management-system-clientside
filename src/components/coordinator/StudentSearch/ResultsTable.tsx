@@ -1,4 +1,4 @@
-
+// clientside/src/components/coordinator/StudentSearch/ResultsTable.tsx
 "use client";
 
 import { StudentSearchResult } from "@/api/types";
