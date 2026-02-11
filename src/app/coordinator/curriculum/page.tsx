@@ -1,21 +1,13 @@
+// clientside/src/app/coordinator/curriculum/page.tsx
 "use client";
 
 import { useState, useEffect } from "react";
 import { getPrograms } from "@/api/programsApi";
 import { createUnitTemplate, getUnitTemplates } from "@/api/unitsApi";
-import {
-  getProgramUnits,
-  createProgramUnitLink,
-  updateProgramUnitLink,
-  deleteProgramUnitLink,
-  ProgramUnitLinkFormData,
+import { getProgramUnits, createProgramUnitLink,
+  updateProgramUnitLink, deleteProgramUnitLink, ProgramUnitLinkFormData,
 } from "@/api/programUnitsApi";
-import type {
-  CurriculumFormState,
-  Program,
-  ProgramUnit,
-  Unit,
-} from "@/api/types";
+import type { CurriculumFormState, Program, ProgramUnit, Unit,} from "@/api/types";
 import { useToast } from "@/context/ToastContext";
 import { LoadingState } from "@/components/ui/LoadingState";
 import { CurriculumTable } from "@/components/coordinator/Curriculum/CurriculumTable";
@@ -176,15 +168,15 @@ export default function CurriculumManagementPage() {
           highlightedTitle="Management"
           actions={
             <>
-            {!showForm && (
-   <button
-                onClick={() => setShowTemplateModal(true)}
-                className="px-5 py-2.5 bg-green-darkest text-yellow-gold rounded-xl text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-xl"
-              >
-                + New Unit
-              </button>
-            )}
-           
+              {!showForm && (
+                <button
+                  onClick={() => setShowTemplateModal(true)}
+                  className="px-5 py-2.5 bg-green-darkest text-yellow-gold rounded-xl text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-xl"
+                >
+                  + New Unit
+                </button>
+              )}
+
               {!showForm && (
                 <button
                   onClick={() => setShowForm(true)}
@@ -197,14 +189,12 @@ export default function CurriculumManagementPage() {
           }
         />
 
-        {/* add a "Server Latency" number (e.g., 24ms) next to the pulse so the Coordinator can see exactly how fast the connection is */}
-
         {/* Program Selector */}
-     <div className="flex items-center bg-white rounded-lg px-6 py-4 mb-10 border border-green-darkest/5 shadow-sm">
+        <div className="flex items-center bg-white rounded-lg px-6 py-4 mb-10 border border-green-darkest/5 shadow-sm">
           <div className="flex items-center gap-3 mr-6 border-r border-slate-100 pr-6">
             <Layers size={18} className="text-yellow-gold" />
             <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">
-          Program
+              Program
             </label>
           </div>
           <select
@@ -212,36 +202,25 @@ export default function CurriculumManagementPage() {
             onChange={(e) => setSelectedProgramId(e.target.value)}
             className="flex-1 text-sm font-bold bg-transparent border-0 outline-0 text-green-darkest cursor-pointer"
           >
-            {programs.map((p) => (
-              <option key={p._id} value={p._id}>
-                {p.code} — {p.name}
-              </option>
-            ))}
+            {programs.map((p) => ( <option key={p._id} value={p._id}> {p.code} — {p.name} </option> ))}
           </select>
         </div>
 
         {/* 1. The Link Form Component */}
         {showForm && (
           <CurriculumLinkForm
-            form={form}
-            setForm={setForm}
-            unitTemplates={unitTemplates}
-            editingId={editingId}
-            curriculum={curriculum}
-            submitting={submitting}
-            onSubmit={handleSubmitLink}
-            onClose={resetForm}
+            form={form}  setForm={setForm}
+            unitTemplates={unitTemplates} editingId={editingId}
+            curriculum={curriculum} submitting={submitting}
+            onSubmit={handleSubmitLink}  onClose={resetForm}
           />
         )}
 
         {/* 2. The Data Table Component */}
         <CurriculumTable
-          curriculum={curriculum}
-          programs={programs}
-          selectedProgramId={selectedProgramId}
-          loading={loading}
-          submitting={submitting}
-          onEdit={startEdit}
+          curriculum={curriculum} programs={programs}
+          selectedProgramId={selectedProgramId} loading={loading}
+          submitting={submitting}  onEdit={startEdit}
           onDelete={(id) => {
             if (confirm("Delink unit?"))
               deleteProgramUnitLink(id).then(() =>
@@ -252,10 +231,8 @@ export default function CurriculumManagementPage() {
 
         {/* 3. The Modal Component */}
         <UnitTemplateModal
-          isOpen={showTemplateModal}
-          onClose={() => setShowTemplateModal(false)}
-          onSubmit={handleCreateTemplate}
-          submitting={submitting}
+          isOpen={showTemplateModal} onClose={() => setShowTemplateModal(false)}
+          onSubmit={handleCreateTemplate} submitting={submitting}
         />
       </div>
     </div>
