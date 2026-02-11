@@ -13,7 +13,7 @@ export const LoadingState = ({
 }: LoadingStateProps) => {
   const containerClasses = fullScreen 
     ? "min-h-screen bg-gray-50 flex items-center justify-center" 
-    : "py-20 flex items-center justify-center w-full";
+    : "py-12 flex items-center justify-center w-full";
 
   return (
     <div className={containerClasses}>

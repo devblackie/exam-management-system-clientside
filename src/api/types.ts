@@ -296,6 +296,7 @@ export interface SaveMarksPayload {
   cat3?: number;
   assignment1?: number;
   assignment2?: number;
+  practicalRaw?: number;
   // Exam Questions
   examQ1?: number;
   examQ2?: number;

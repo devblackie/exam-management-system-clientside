@@ -39,6 +39,6 @@ export const MENU_ITEMS: MenuItem[] = [
 //   { name: "Logs", icon: ChartBarSquare, href: "/admin/logs", roles: ["admin"]},
 //    { name: "Lecturers",icon: DocumentArrowUpIcon,href: "/coordinator/lecturers",roles: ["coordinator"]},
 //    { name: "Reports", icon: FileText, href: "/coordinator/reports",roles: ["coordinator"] },
-//    { name: "Settings", icon: FileCog, href: "/coordinator/institution-settings", roles: ["coordinator"] },
-//    { name: "System Health", icon: Cog, href: "/admin/health", roles: ["coordinator"] },
+   { name: "Settings", icon: FileCog, href: "/coordinator/institution-settings", roles: ["coordinator"] },
+  //  { name: "System Health", icon: Cog, href: "/admin/health", roles: ["coordinator"] },
 ];
