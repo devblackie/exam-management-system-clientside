@@ -7,8 +7,10 @@ import { getInstitutionSettings, saveInstitutionSettings} from "@/api/institutio
 import type { InstitutionSettings } from "@/api/types";
 import PageHeader from "@/components/ui/PageHeader";
 import { LoadingState } from "@/components/ui/LoadingState";
+import { useToast } from "@/context/ToastContext";
 
 export default function InstitutionSettingsPage() {
+  const { addToast } = useToast();
   const [settings, setSettings] = useState<InstitutionSettings>({
     cat1Max: 30, cat2Max: 40, cat3Max: 0,
     assignmentMax: 0, practicalMax: 0,
@@ -24,14 +26,24 @@ export default function InstitutionSettingsPage() {
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState<{
-    type: "success" | "error"; text: string; } | null>(null);
-
+ 
   useEffect(() => {
     getInstitutionSettings()
       .then((data) => { if (data) setSettings({ ...settings, ...data });})
       .finally(() => setLoading(false));
   }, []);
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await saveInstitutionSettings(settings);
+      addToast("Configuration synchronized successfully", "success");
+    } catch (err) {
+      addToast("Failed to update institution settings", "error");
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const hasAssignment = settings.assignmentMax > 0;
   const hasPractical = settings.practicalMax > 0;
@@ -53,7 +65,7 @@ export default function InstitutionSettingsPage() {
           actions={
             <>
               <button
-                onClick={() => saveInstitutionSettings(settings)}
+                onClick={handleSave}
                 disabled={saving}
                 className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-green-darkest to-green-dark text-yellow-gold rounded-xl text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all active:scale-95 disabled:opacity-50"
               >
@@ -282,13 +294,7 @@ export default function InstitutionSettingsPage() {
           </div>
         </div>
 
-        {message && (
-          <div
-            className={`fixed bottom-8 right-8 px-8 py-4 rounded-2xl text-white font-bold shadow-2xl animate-bounce ${message.type === "success" ? "bg-emerald-600" : "bg-red-600"}`}
-          >
-            {message.text}
-          </div>
-        )}
+       
       </div>
     </div>
   );
