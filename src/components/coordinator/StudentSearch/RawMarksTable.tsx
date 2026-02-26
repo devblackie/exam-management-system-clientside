@@ -5,50 +5,46 @@ import { approveSpecialExam } from "@/api/marksApi";
 import { RawMark } from "@/api/types";
 import { useState } from "react";
 
-interface RawMarksTableProps {
-  marks: RawMark[];
-  studentName: string;
-  onEdit: (mark: RawMark) => void;
-  onAddNew: () => void;
-  onRefresh: () => void;
-  isReadOnly: boolean;
-}
+interface RawMarksTableProps { marks: RawMark[]; studentName: string; onEdit: (mark: RawMark) => void; onAddNew: () => void; onRefresh: () => void; isReadOnly: boolean; }
 
-export default function RawMarksTable({
-  marks,
-  studentName,
-  onEdit,
-  onAddNew,
-  onRefresh,
-  isReadOnly,
-}: RawMarksTableProps) {
+export default function RawMarksTable({ marks, studentName, onEdit, onAddNew, onRefresh, isReadOnly }: RawMarksTableProps) {
   const [processingId, setProcessingId] = useState<string | null>(null);
 
   const handleGrantSpecial = async (markId: string, unitCode: string) => {
-    if (!confirm(`Grant ${studentName} a Special Exam for ${unitCode}?`)) return;
+    // 1. Ask for reason
+    const reasonInput = window.prompt(
+      `Grant ${studentName} a Special Exam for ${unitCode}?\nType '1' for Financial\nType '2' for Compassionate`,
+      "1",
+    );
+
+    if (reasonInput === null) return; // Cancelled
+    const reason = reasonInput === "2" ? "Compassionate" : "Financial";
 
     setProcessingId(markId);
     try {
-      const response = await approveSpecialExam(markId);
-      if (response.success) {
-        onRefresh();
-      }
-    } catch (err: unknown) {
-      console.error("Grant Special Error:", err);
-      let errorMessage = "Failed to grant special exam.";
+      const response = await approveSpecialExam(markId, reason, false);
+      if (response.success) onRefresh();
+    } catch (err) {
+      alert("Failed to grant special");
+    } finally {
+      setProcessingId(null);
+    }
+  };
 
-      if (err && typeof err === "object" && "response" in err) {
-        const axiosError = err as { 
-          response?: { data?: { error?: string; message?: string } } 
-        };
-        errorMessage =
-          axiosError.response?.data?.error ||
-          axiosError.response?.data?.message ||
-          errorMessage;
-      } else if (err instanceof Error) {
-        errorMessage = err.message;
-      }
-      alert(errorMessage);
+  const handleUndoSpecial = async (markId: string, unitCode: string) => {
+    if (
+      !confirm(
+        `Reverse Special status for ${unitCode}? This will return it to a regular attempt.`,
+      )
+    )
+      return;
+
+    setProcessingId(markId);
+    try {
+      const response = await approveSpecialExam(markId, undefined, true);
+      if (response.success) onRefresh();
+    } catch (err) {
+      alert("Failed to reverse special status");
     } finally {
       setProcessingId(null);
     }
@@ -139,6 +135,11 @@ export default function RawMarksTable({
                       >
                         {m.isSpecial ? "SPECIAL" : m.attempt || "1ST"}
                       </span>
+                      {m.remarks && (
+                        <p className="text-[9px] text-gray-400 mt-1 italic">
+                          {m.remarks}
+                        </p>
+                      )}
                     </td>
 
                     {!isReadOnly && (
@@ -153,10 +154,27 @@ export default function RawMarksTable({
                           {isEligibleForSpecial && (
                             <button
                               disabled={processingId === m._id}
-                              onClick={() => handleGrantSpecial(m._id, unitCode)}
+                              onClick={() =>
+                                handleGrantSpecial(m._id, unitCode)
+                              }
                               className="text-[10px] font-bold uppercase text-blue-600 hover:text-blue-800 hover:underline disabled:opacity-50"
                             >
-                              {processingId === m._id ? "Processing..." : "Grant Special"}
+                              {processingId === m._id
+                                ? "Processing..."
+                                : "Grant Special"}
+                            </button>
+                          )}
+                          {m.isSpecial && (
+                            <button
+                              disabled={processingId === m._id}
+                              onClick={() =>
+                                handleUndoSpecial(m._id, unitCode)
+                              }
+                              className="text-[10px] font-bold uppercase text-red-600 hover:text-red-800 hover:underline disabled:opacity-50"
+                            >
+                              {processingId === m._id
+                                ? "Processing..."
+                                : "Reverse Special"}
                             </button>
                           )}
                         </div>

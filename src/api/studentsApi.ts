@@ -17,11 +17,17 @@ export const getStudents = async (): Promise<StudentFromAPI[]> => {
   return res.data;
 };
 
-// We send only what's needed — backend resolves program name → ID
-export const bulkRegisterStudents = async (students: StudentFormRow[]): Promise<BulkRegisterResponse> => {
-  const res = await api.post<BulkRegisterResponse>("/students/bulk", { students });
+export const bulkRegisterStudents = async (data: { students: StudentFormRow[] }): Promise<BulkRegisterResponse> => {
+  // Now we pass 'data' directly, which is { students: [...] }
+  const res = await api.post<BulkRegisterResponse>("/students/bulk", data);
   return res.data;
 };
+
+// We send only what's needed — backend resolves program name → ID
+// export const bulkRegisterStudents = async (students: StudentFormRow[]): Promise<BulkRegisterResponse> => {
+//   const res = await api.post<BulkRegisterResponse>("/students/bulk", { students });
+//   return res.data;
+// };
 
 export const getStudentStats = async (): Promise<StudentStats> => {
   // Use your existing axios instance
@@ -44,9 +50,7 @@ export const getStudentRecord = async (regNo: string, yearOfStudy: string | numb
 };
 
 export const getRawMarks = async (regNo: string, yearOfStudy: number): Promise<RawMark[]> => {
-  const res = await api.get<RawMark[]>("/student/raw-marks", {
-    params: { regNo, yearOfStudy }, // Pass the level here
-  });
+  const res = await api.get<RawMark[]>("/student/raw-marks", { params: { regNo, yearOfStudy } });
   return res.data;
 };
 

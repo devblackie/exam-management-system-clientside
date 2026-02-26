@@ -277,12 +277,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  searchStudents,
-  getStudentRecord,
-  getRawMarks,
-  saveRawMarks,
-} from "@/api/studentsApi";
+import { searchStudents, getStudentRecord, getRawMarks, saveRawMarks } from "@/api/studentsApi";
 import type {
   StudentSearchResult,
   StudentFullRecord,
@@ -328,9 +323,7 @@ export default function StudentSearchPage() {
 
   // 1. Sync student record when Year of Study changes
   useEffect(() => {
-    if (selectedStudent?.student.regNo) {
-      viewStudent(selectedStudent.student.regNo);
-    }
+    if (selectedStudent?.student.regNo) { viewStudent(selectedStudent.student.regNo); }
   }, [selectedYearOfStudy]);
 
   // 2. Fetch Raw Marks when switching tabs
@@ -421,15 +414,12 @@ export default function StudentSearchPage() {
   return (
     <div className="max-w-8xl ml-48 my-10">
       <div className="bg-[#F8F9FA] rounded-lg shadow-2xl p-10 min-h-screen">
+        
         <PageHeader title="Student Academic" highlightedTitle="Records" systemLabel=" " />
 
         <SearchBar
-          query={query}
-          setQuery={setQuery}
-          onSearch={handleSearch}
-          searching={searching}
-          selectedYearOfStudy={selectedYearOfStudy}
-          setSelectedYearOfStudy={setSelectedYearOfStudy}
+          query={query} setQuery={setQuery} onSearch={handleSearch} searching={searching}
+          selectedYearOfStudy={selectedYearOfStudy} setSelectedYearOfStudy={setSelectedYearOfStudy} 
         />
 
         <ResultsTable results={searchResults} onSelect={viewStudent} visible={!selectedStudent && !loading} />
@@ -483,14 +473,8 @@ export default function StudentSearchPage() {
                     marks={rawMarks}
                     studentName={selectedStudent.student.name}
                     onRefresh={() => viewStudent(selectedStudent.student.regNo)}
-                    onEdit={(m) => {
-                      setEditingMark(m);
-                      setShowEditModal(true);
-                    }}
-                    onAddNew={() => {
-                      setEditingMark(null);
-                      setShowEditModal(true);
-                    }}
+                    onEdit={(m) => { setEditingMark(m); setShowEditModal(true); }}
+                    onAddNew={() => { setEditingMark(null); setShowEditModal(true); }}
                     isReadOnly={isReadOnly}
                   />
                 )}

@@ -18,8 +18,8 @@ export default function InstitutionSettingsPage() {
     supplementaryThreshold: 40,
     retakeThreshold: 5,
     gradingScale: [
-      { min: 69.5, grade: "A" },{ min: 59.5, grade: "B" },
-      { min: 49.5, grade: "C" },{ min: 39.5, grade: "D" },
+      { min: 70, grade: "A" }, { min: 60, grade: "B" },
+      { min: 50, grade: "C" }, { min: 40, grade: "D" },
       { min: 0, grade: "E" },
     ],
   });
@@ -45,12 +45,8 @@ export default function InstitutionSettingsPage() {
     }
   };
 
-  const hasAssignment = settings.assignmentMax > 0;
-  const hasPractical = settings.practicalMax > 0;
-  const fixedWeight = (hasAssignment ? 5 : 0) + (hasPractical ? 5 : 0);
-  const remainingCA = 30 - fixedWeight;
-  const activeCATs = [settings.cat1Max, settings.cat2Max, settings.cat3Max,].filter((m) => m > 0).length;
-  const catWeight = activeCATs > 0 ? (remainingCA / activeCATs).toFixed(1) : 0;
+  const activeCATs = [settings.cat1Max, settings.cat2Max, settings.cat3Max].filter(m => m > 0).length;
+  const catWeight = activeCATs > 0 ? (20 / activeCATs).toFixed(1) : "0";
 
   if (loading) return <LoadingState message="Loading environment settings"/>;
 
@@ -104,36 +100,12 @@ export default function InstitutionSettingsPage() {
                     Continuous Assessment (30%)
                   </label>
                   <div className="space-y-4">
-                    <MinimalInput
-                      label="CAT 01 Max"
-                      value={settings.cat1Max}
-                      onChange={(v) => setSettings({ ...settings, cat1Max: v })}
-                    />
-                    <MinimalInput
-                      label="CAT 02 Max"
-                      value={settings.cat2Max}
-                      onChange={(v) => setSettings({ ...settings, cat2Max: v })}
-                    />
-                    <MinimalInput
-                      label="CAT 03 Max (Optional)"
-                      value={settings.cat3Max}
-                      onChange={(v) => setSettings({ ...settings, cat3Max: v })}
-                    />
+                    <MinimalInput label="CAT 01 Max" value={settings.cat1Max} onChange={(v) => setSettings({ ...settings, cat1Max: v })} />
+                    <MinimalInput label="CAT 02 Max" value={settings.cat2Max} onChange={(v) => setSettings({ ...settings, cat2Max: v })} />
+                    <MinimalInput label="CAT 03 Max (Optional)" value={settings.cat3Max} onChange={(v) => setSettings({ ...settings, cat3Max: v })} />
                     <div className="grid grid-cols-2 gap-4 pt-2">
-                      <MinimalInput
-                        label="Assignment Max"
-                        value={settings.assignmentMax}
-                        onChange={(v) =>
-                          setSettings({ ...settings, assignmentMax: v })
-                        }
-                      />
-                      <MinimalInput
-                        label="Practical Max"
-                        value={settings.practicalMax}
-                        onChange={(v) =>
-                          setSettings({ ...settings, practicalMax: v })
-                        }
-                      />
+                      <MinimalInput label="Assignment Max" value={settings.assignmentMax} onChange={(v) => setSettings({ ...settings, assignmentMax: v }) } />
+                      <MinimalInput label="Practical Max" value={settings.practicalMax} onChange={(v) => setSettings({ ...settings, practicalMax: v }) } />
                     </div>
                   </div>
                 </div>

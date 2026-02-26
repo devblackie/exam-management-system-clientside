@@ -2,31 +2,19 @@
 "use client";
 
 import { useState } from "react";
-import {
-  X,  CheckCircle,  AlertCircle,  ArrowRight,  FileText,
+import { X,  CheckCircle,  AlertCircle,  ArrowRight,  FileText,
   Loader2,  FileWarning,  GraduationCap,  ArrowUpRight,  ShieldCheck,
 } from "lucide-react";
-import {
-  PromotionPreviewResponse,
-  PromotionPreviewRecord,
-  downloadPromotionReportWithProgress,
-  downloadIneligibilityNoticesWithProgress,
-  downloadTranscriptsWithProgress,
-  PromotionParams,
+import { PromotionPreviewResponse, PromotionPreviewRecord,
+  downloadPromotionReportWithProgress, downloadIneligibilityNoticesWithProgress,
+  downloadTranscriptsWithProgress, PromotionParams,
 } from "@/api/promoteApi";
 
-interface PreviewModalProps {
-  data: PromotionPreviewResponse;
-  params: PromotionParams;
-  onClose: () => void;
-  onConfirm: () => void;
-}
+interface PreviewModalProps { data: PromotionPreviewResponse;   params: PromotionParams;   onClose: () => void;   onConfirm: () => void; }
 
 export default function PromotionPreviewModal({
   data,  params,  onClose,  onConfirm,}: PreviewModalProps) {
-  const [activeTab, setActiveTab] = useState<"eligible" | "blocked">(
-    "eligible",
-  );
+  const [activeTab, setActiveTab] = useState<"eligible" | "blocked">( "eligible", );
   const [isDownloading, setIsDownloading] = useState(false);
   const [downloadProgress, setDownloadProgress] = useState<number | null>(null);
   const [statusMsg, setStatusMsg] = useState("");
@@ -38,15 +26,7 @@ export default function PromotionPreviewModal({
     if (!fullName) return "";
     const parts = fullName.trim().split(/\s+/);
     const lastName = parts.pop()?.toUpperCase();
-    return (
-      <span className="">
-        {parts.join(" ")} {lastName}
-      </span>
-    );
-  };
-
-  const getDisplayName = (): string => {
-    return params.academicYearName || "Program";
+    return ( <span className=""> {parts.join(" ")} {lastName} </span> );
   };
 
   const handleDownloadSummaries = async () => {
@@ -56,11 +36,8 @@ export default function PromotionPreviewModal({
     try {
       await downloadPromotionReportWithProgress(
         params,
-        getDisplayName(),
-        (percent, message) => {
-          setDownloadProgress(percent);
-          setStatusMsg(message);
-        },
+        params.programName || "Program",
+        (percent, message) => { setDownloadProgress(percent); setStatusMsg(message); },
       );
     } catch (error) {
       console.error("Summaries download error:", error);
@@ -71,49 +48,42 @@ export default function PromotionPreviewModal({
     }
   };
 
-  const handleDownloadNotices = async () => {
-    setDownloadProgress(0);
-    setStatusMsg("Analyzing blocked students...");
-    setIsDownloading(true);
-    try {
-      await downloadIneligibilityNoticesWithProgress(
-        params,
-        getDisplayName(),
-        (percent, message) => {
-          setDownloadProgress(percent);
-          setStatusMsg(message);
-        },
-      );
-    } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Failed to generate notices.";
-      alert(errorMessage);
-    } finally {
-      setIsDownloading(false);
-      setTimeout(() => setDownloadProgress(null), 1000);
-    }
-  };
+  // const handleDownloadNotices = async () => {
+  //   setDownloadProgress(0);
+  //   setStatusMsg("Analyzing blocked students...");
+  //   setIsDownloading(true);
+  //   try {
+  //     await downloadIneligibilityNoticesWithProgress(
+  //       params,
+  //       getDisplayName(),
+  //       (percent, message) => { setDownloadProgress(percent); setStatusMsg(message); },
+  //     );
+  //   } catch (error: unknown) {
+  //     const errorMessage = error instanceof Error ? error.message : "Failed to generate notices.";
+  //     alert(errorMessage);
+  //   } finally {
+  //     setIsDownloading(false);
+  //     setTimeout(() => setDownloadProgress(null), 1000);
+  //   }
+  // };
 
-  const handleDownloadTranscripts = async () => {
-    setDownloadProgress(0);
-    setStatusMsg("Generating Transcripts...");
-    setIsDownloading(true);
-    try {
-      await downloadTranscriptsWithProgress(
-        params,
-        getDisplayName(),
-        (percent, message) => {
-          setDownloadProgress(percent);
-          setStatusMsg(message);
-        },
-      );
-    } catch {
-      alert("Failed to generate transcripts.");
-    } finally {
-      setIsDownloading(false);
-      setTimeout(() => setDownloadProgress(null), 1000);
-    }
-  };
+  // const handleDownloadTranscripts = async () => {
+  //   setDownloadProgress(0);
+  //   setStatusMsg("Generating Transcripts...");
+  //   setIsDownloading(true);
+  //   try {
+  //     await downloadTranscriptsWithProgress(
+  //       params,
+  //       getDisplayName(),
+  //       (percent, message) => { setDownloadProgress(percent); setStatusMsg(message); },
+  //     );
+  //   } catch {
+  //     alert("Failed to generate transcripts.");
+  //   } finally {
+  //     setIsDownloading(false);
+  //     setTimeout(() => setDownloadProgress(null), 1000);
+  //   }
+  // };
 
   return (
     <div className="fixed inset-0 bg-green-darkest/40 backdrop-blur-md z-50 flex items-center justify-center p-6">
@@ -130,7 +100,7 @@ export default function PromotionPreviewModal({
               </div>
             </div>
             <h3 className="text-white text-xl font-black uppercase tracking-widest mb-2">
-              Generating Dossier
+              Generating Reports
             </h3>
             <p className="text-yellow-gold/50 text-[10px] font-bold uppercase tracking-widest">
               {statusMsg}
@@ -192,8 +162,7 @@ export default function PromotionPreviewModal({
           >
             <CheckCircle
               size={24}
-              className={activeTab === "eligible" ? "text-emerald-500" : ""}
-            />
+              className={activeTab === "eligible" ? "text-emerald-500" : ""}  />
             <div className="text-left">
               <p className="text-[10px] font-black uppercase tracking-widest opacity-60">
                 Verified Eligible
@@ -208,10 +177,7 @@ export default function PromotionPreviewModal({
             onClick={() => setActiveTab("blocked")}
             className={`flex-1 py-2 px-6 rounded-xl transition-all flex items-center justify-center gap-4 ${activeTab === "blocked" ? "bg-white shadow-xl text-red-600 hover:bg-red-100 border border-red-400/50" : "text-red-800/70 hover:text-slate-600"}`}
           >
-            <AlertCircle
-              size={24}
-              className={activeTab === "blocked" ? "text-red-500" : ""}
-            />
+            <AlertCircle size={24}  className={activeTab === "blocked" ? "text-red-500" : ""} />
             <div className="text-left">
               <p className="text-[10px] font-black uppercase tracking-widest opacity-60">
                 Requires Review
@@ -292,7 +258,7 @@ export default function PromotionPreviewModal({
         {/* FOOTER: Dark Control Bar */}
         <div className="px-10 py-8 bg-green-darkest flex justify-between items-center">
           <div className="flex gap-4">
-            <button
+            {/* <button
               disabled={isDownloading}
               onClick={handleDownloadTranscripts}
               className="group flex items-center gap-3 px-5 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest text-white/70 border border-white/10 hover:border-yellow-gold hover:text-yellow-gold transition-all"
@@ -302,7 +268,7 @@ export default function PromotionPreviewModal({
                 className="group-hover:rotate-12 group-hover:scale-110 transition-transform"
               />
               Transcripts
-            </button>
+            </button> */}
             <button
               disabled={isDownloading}
               onClick={handleDownloadSummaries}
@@ -312,9 +278,9 @@ export default function PromotionPreviewModal({
                 size={16}
                 className="group-hover:scale-110 group-hover:rotate-12 transition-transform"
               />
-              Ledger
+              Generate Senate Reports
             </button>
-            {data.blockedCount > 0 && (
+            {/* {data.blockedCount > 0 && (
               <button
                 disabled={isDownloading}
                 onClick={handleDownloadNotices}
@@ -323,7 +289,7 @@ export default function PromotionPreviewModal({
                 <FileWarning size={16} />
                 Issue Notices
               </button>
-            )}
+            )} */}
           </div>
 
           <div className="flex items-center gap-6">

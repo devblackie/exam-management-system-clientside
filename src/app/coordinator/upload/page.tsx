@@ -19,13 +19,11 @@ interface UploadResult {
   errors: string[];
 }
 
-const YEARS_OF_STUDY = [1, 2, 3, 4, 5, 6];
+const YEARS_OF_STUDY = [1, 2, 3, 4, 5];
 const SEMESTERS = [1, 2];
 
 export default function UploadMarks() {
   const { addToast } = useToast();
-
-  // --- State for Data Fetching ---
   const [programs, setPrograms] = useState<Program[]>([]);
   const [academicYears, setAcademicYears] = useState<AcademicYear[]>([]);
   const [programUnits, setProgramUnits] = useState<ProgramUnit[]>([]);
@@ -36,8 +34,9 @@ export default function UploadMarks() {
   const [selectedYearOfStudy, setSelectedYearOfStudy] = useState<number | undefined>(undefined);
   const [selectedSemester, setSelectedSemester] = useState<number | undefined>(undefined);
   const [selectedUnitId, setSelectedUnitId] = useState<string>("");
+  const [unitType, setUnitType] = useState<"theory" | "lab" | "workshop">("theory");
   const [examMode, setExamMode] = useState<"standard" | "mandatory_q1">("standard");
-
+  
   // --- State for Upload ---
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -50,8 +49,7 @@ export default function UploadMarks() {
   }, [addToast]);
 
   useEffect(() => {
-    if (selectedProgramId) {
-      getProgramUnits(selectedProgramId).then(setProgramUnits).catch(() => addToast("Failed to load units.", "error"));
+    if (selectedProgramId) {getProgramUnits(selectedProgramId).then(setProgramUnits).catch(() => addToast("Failed to load units.", "error"));
     } else {
       setProgramUnits([]);
     }
@@ -73,7 +71,7 @@ export default function UploadMarks() {
   const handleDownloadTemplate = async () => {
     if (!isDownloadEnabled) return;
     try {
-      await downloadTemplate(selectedProgramId, selectedUnitId, selectedAcademicYearId, selectedYearOfStudy!, selectedSemester!, examMode);
+      await downloadTemplate(selectedProgramId, selectedUnitId, selectedAcademicYearId, selectedYearOfStudy!, selectedSemester!, examMode, unitType);
       addToast("Scoresheet template generated.", "success");
     } catch {
       addToast("Template generation failed.", "error");
@@ -108,11 +106,9 @@ export default function UploadMarks() {
   const disabledStyles = "bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed opacity-60";
 
   return (
-    // <div className="max-w-8xl ml-48 my-10">
-    <div className="ml-48 my-10 min-h-screen bg-[#F8F9FA] overflow-hidden">
+       <div className="ml-48 my-10 min-h-screen bg-[#F8F9FA] overflow-hidden">
 
       <div className="bg-[#F8F9FA] min-h-screen rounded-lg shadow-2xl p-9 border border-white">
-
         <PageHeader
           title="Upload"
           highlightedTitle="Student Marks"
@@ -129,7 +125,7 @@ export default function UploadMarks() {
             <div className="h-[1px] flex-1 bg-gradient-to-r from-green-darkest/10 to-transparent" />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-6 bg-white p-8 rounded-lg border border-green-darkest/5 shadow-sm">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-7 gap-6 bg-white p-8 rounded-lg border border-green-darkest/5 shadow-sm">
             {/* Program Selection - Full Name */}
             <div className="space-y-2">
               <label className="text-[9px] font-black uppercase text-slate-400 tracking-widest ml-1">Program</label>
@@ -189,6 +185,15 @@ export default function UploadMarks() {
                 ))}
               </select>
             </div>
+            <div className="space-y-2">
+              <label className="text-[9px] font-black uppercase text-slate-400 tracking-widest ml-1">Unit Type</label>
+
+            <select className={inputClass} onChange={e => setUnitType(e.target.value as "theory" | "lab" | "workshop")} value={unitType}>
+          <option value="theory">Theory (20/10)</option>
+          <option value="lab">Lab (15/5/10)</option>
+          <option value="workshop">Workshop (40/60)</option>
+        </select>
+            </div>
 
             {/* Exam Mode Selection */}
             <div className="space-y-2">
@@ -197,8 +202,7 @@ export default function UploadMarks() {
                 <option value="standard">Standard Grading</option>
                 <option value="mandatory_q1">Compulsory Q1 Strategy</option>
               </select>
-            </div>
-
+            </div> 
           </div>
         </div>
 
@@ -326,6 +330,8 @@ export default function UploadMarks() {
     </div>
   );
 }
+
+
 
 
 

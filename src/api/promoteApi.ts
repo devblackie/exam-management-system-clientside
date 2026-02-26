@@ -3,66 +3,44 @@
 import api from "@/config/axiosInstance";
 import { startStreamingDownload } from "@/config/streamingUtils";
 
-export interface PromotionParams {
-  programId?: string;
-  yearToPromote: number;
-  academicYearName: string;
-  programCode?: string;
-  studentId?: string;
-}
+export interface PromotionParams { programId?: string; yearToPromote: number;  academicYearName: string; programName?:string, programCode?: string; studentId?: string; }
 
 export interface PromotionPreviewRecord {
-  id: string;
-  regNo: string;
-  name: string;
-  status: string;
-  summary: {
-    totalExpected: number;
-    passed: number;
-    failed: number;
-    missing: number;
-  };
-  reasons: string[];
+  id: string; regNo: string; name: string; status: string; reasons: string[];
+  summary: { totalExpected: number; passed: number; failed: number; missing: number; };  
 }
 
 export interface PromotionPreviewResponse {
-  totalProcessed: number;
-  eligibleCount: number;
-  blockedCount: number;
-  eligible: PromotionPreviewRecord[];
-  blocked: PromotionPreviewRecord[];
+  totalProcessed: number; eligibleCount: number; blockedCount: number;
+  eligible: PromotionPreviewRecord[]; blocked: PromotionPreviewRecord[];
 }
 
 export interface BulkPromoteResponse {
-  success: boolean;
-  message: string;
-  data: {
-    promoted: number;
-    failed: number;
-    errors: string[];
-  };
+  success: boolean; message: string;
+  data: { promoted: number; failed: number; errors: string[]; };
 }
 
-
 const getSafeFileName = (name: string | undefined): string => {
-  const base =
-    typeof name === "string" && name.trim().length > 0 ? name : "Program";
-  return base.replace(/[^a-z0-9]/gi, "_").toUpperCase();
+  if (!name) return "PROGRAM";
+  // Remove special characters and replace spaces with underscores
+  return name.trim().replace(/[^a-z0-9]/gi, "_").toUpperCase();
 };
 
+export async function downloadPromotionReportWithProgress( data: PromotionParams, programName: string | undefined, onProgress: (percent: number, message: string) => void) {
+  // const safeProgName = getSafeFileName(programName);
+  const safeYearName = getSafeFileName(data.academicYearName);
+  
+  const zipFileName = `SENATE_REPORT_Y${data.yearToPromote}_${safeYearName}.zip`;
+  return startStreamingDownload( "/promote/download-report-progress", data, onProgress, zipFileName);
+}
+
 export async function previewPromotion(data: PromotionParams) {
-  const res = await api.post<{
-    success: boolean;
-    data: PromotionPreviewResponse;
-  }>("/promote/preview-promotion", data);
+  const res = await api.post<{ success: boolean; data: PromotionPreviewResponse;}>("/promote/preview-promotion", data);
   return res.data.data;
 }
 
 export async function bulkPromoteClass(data: PromotionParams) {
-  const res = await api.post<BulkPromoteResponse>(
-    "/promote/bulk-promote",
-    data,
-  );
+  const res = await api.post<BulkPromoteResponse>("/promote/bulk-promote", data);
   return res.data;
 }
 
@@ -71,34 +49,12 @@ export const promoteStudentApi = async (studentId: string) => {
   return response.data;
 };
 
-export async function downloadPromotionReportWithProgress(
-  data: PromotionParams,
-  programName: string | undefined,
-  onProgress: (percent: number, message: string) => void,
-) {
+
+
+export async function downloadIneligibilityNoticesWithProgress( data: PromotionParams, programName: string | undefined, onProgress: (percent: number, message: string) => void) {
   const safeName = getSafeFileName(programName);
 
-  return startStreamingDownload(
-    "/promote/download-report-progress",
-    data,
-    onProgress,
-    `Promotion_Package_${safeName}_Y${data.yearToPromote}.zip`,
-  );
-}
-
-export async function downloadIneligibilityNoticesWithProgress(
-  data: PromotionParams,
-  programName: string | undefined,
-  onProgress: (percent: number, message: string) => void,
-) {
-  const safeName = getSafeFileName(programName);
-
-  return startStreamingDownload(
-    "/promote/download-notices-progress",
-    data,
-    onProgress,
-    `Supplementary_Notices_${safeName}_Y${data.yearToPromote}.zip`,
-  );
+  return startStreamingDownload( "/promote/download-notices-progress", data, onProgress, `Supplementary_Notices_${safeName}_Y${data.yearToPromote}.zip`);
 }
 
 

@@ -166,10 +166,17 @@ export interface InstitutionSettingsInput {
 export interface StudentFormRow {
   regNo: string;
   name: string;
-  program: string;
-  currentYearOfStudy: number; 
-  academicYearId?: string; // Add this
-  admissionAcademicYear?: string; // The "2024/2025" string
+  program: string; // The ID from selectedProgramId or the Name from Paste
+  currentYearOfStudy: number;
+  academicYearId?: string;
+  admissionAcademicYearString?: string;
+}
+
+export interface BulkRegisterResponse {
+  message: string;
+  alreadyRegistered?: string[];
+  duplicates?: string[];
+  registered?: string[];
 }
 
 export interface StudentStats {
@@ -201,10 +208,8 @@ export interface AcademicStatus {
   details: string;
   summary: AcademicSummary;
   missingList: string[];
-  failedList: string[];
-  retakeList: string[];
-  reRetakeList: string[];
-  specialList: string[];
+  failedList: { displayName: string; attempt: number }[];
+  specialList: { displayName: string; grounds: string }[];
   incompleteList: string[];
   academicYearName: string;
 }

@@ -25,13 +25,7 @@ export async function uploadMarks(file: File): Promise<UploadResult> {
 }
 
 export const downloadTemplate = async (
-  programId: string,
-  unitId: string,
-  academicYearId: string,
-  yearOfStudy: number,
-  semester: number,
-  examMode: string
-) => {
+programId: string, unitId: string, academicYearId: string, yearOfStudy: number, semester: number, examMode: string, unitType: string) => {
   // --- Defensive Check ADDED HERE ---
   if (!programId || !unitId || !academicYearId || !yearOfStudy || !semester) {
     console.error(
@@ -51,7 +45,7 @@ export const downloadTemplate = async (
       academicYearId,
       yearOfStudy: yearOfStudy.toString(),
       semester: semester.toString(),
-      examMode
+      examMode, unitType
     }).toString();
 
     // Make the GET request with the parameters
@@ -94,15 +88,15 @@ export const downloadTemplate = async (
 };
 
 
-export async function approveSpecialExam(markId: string, reason: string = "Administrative Approval") {
-  
-try {
-  const res = await api.post("/student/approve-special", {
-    markId,
-    reason
-  });
-  return res.data;}
-  catch (error) {
+export async function approveSpecialExam(
+  markId: string,
+  reason?: string,
+  undo: boolean = false,
+) {
+  try {
+    const res = await api.post("/student/approve-special", { markId, reason, undo });
+    return res.data;
+  } catch (error) {
     // This allows you to see the ACTUAL error in console
     console.error("API Error Details:", error);
     throw error; // Rethrow so the component's catch block can catch it

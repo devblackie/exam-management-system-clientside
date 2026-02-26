@@ -10,7 +10,7 @@ import {  downloadTranscriptsWithProgress,  promoteStudentApi,} from "@/api/prom
 type StatusColor = "blue" | "amber" | "orange" | "red";
 type SummaryColor = "green" | "red" | "blue";
 
-interface UnitSectionProps {  label: string;  list?: string[];  color: StatusColor;  icon: string;  pulse?: boolean;}
+interface UnitSectionProps {  label: string;  list?: (string| { displayName: string; grounds: string })[];  color: StatusColor;  icon: string;  pulse?: boolean;}
 
 interface SummaryItemProps {  color: SummaryColor;  label: string;  value: number;}
 
@@ -139,70 +139,39 @@ export default function AcademicStatusBox({  status,  currentYearOfStudy,  viewi
           {status.details}
         </p>
 
-        <div className="space-y-1 flex px-6">
-          <UnitSection
-            label="Special Exams Approved"
-            list={status.specialList}
-            color="blue"
-            icon="⭐"
-          />
-          <UnitSection
-            label="Incomplete Marks"
-            list={status.incompleteList}
-            color="blue"
-            icon="🔍"
-          />
-          <UnitSection
-            label="Missing Records"
-            list={status.missingList}
-            color="blue"
-            icon="❓"
-          />
-          <UnitSection
-            label="Pending Supplementaries"
-            list={status.failedList}
-            color="amber"
-            icon="📝"
-          />
-          <UnitSection
-            label="Retakes"
-            list={status.retakeList}
-            color="orange"
-            icon="🔄"
-          />
-          <UnitSection
-            label="Critical Failures"
-            list={status.reRetakeList}
-            color="red"
-            icon="🚫"
-            pulse
-          />
+        <div className="space-y-1 mb-2 px-6">
+          <UnitSection label="Special Exams Approved" list={status.specialList} color="blue" icon="⭐" />
+          <div className="flex flex-wrap gap-4">
+  <UnitSection label="Incomplete Marks" list={status.incompleteList} color="blue" icon="🔍" />
+  <UnitSection label="Missing Records" list={status.missingList} color="blue" icon="❓" />
+  
+  {/* Filtered Failed List based on attempts per ENG 15/16 */}
+  <UnitSection 
+    label="Ordinary Failures (Supp Eligible)" 
+    list={status.failedList?.filter(f => f.attempt === 1).map(f => f.displayName)} 
+    color="amber" icon="📝" 
+  />
+  <UnitSection 
+    label="Retakes (Staying Out)" 
+    list={status.failedList?.filter(f => f.attempt > 1 && f.attempt < 5).map(f => f.displayName)} 
+    color="orange" icon="🔄" 
+  />
+  <UnitSection 
+    label="Critical Failure (Disc. Risk)" 
+    list={status.failedList?.filter(f => f.attempt >= 5).map(f => f.displayName)} 
+    color="red" icon="🚫" pulse 
+  />
+</div>
         </div>
 
         <div className="mt-1 px-6 py-2 border-t border-black/5 flex gap-6 text-[11px] font-bold uppercase tracking-tighter">
-          <SummaryItem
-            color="green"
-            label="Passed"
-            value={status.summary.passed}
-          />
-          <SummaryItem
-            color="red"
-            label="Failed"
-            value={status.summary.failed}
-          />
+          <SummaryItem color="green" label="Passed" value={status.summary.passed} />
+          <SummaryItem color="red" label="Failed" value={status.summary.failed} />
           {status.summary.missing > 0 && (
-            <SummaryItem
-              color="blue"
-              label="Missing"
-              value={status.summary.missing}
-            />
+            <SummaryItem color="blue" label="Missing" value={status.summary.missing} />
           )}
           {status.specialList?.length > 0 && (
-            <SummaryItem
-              color="blue"
-              label="Specials"
-              value={status.specialList.length}
-            />
+            <SummaryItem color="blue" label="Specials" value={status.specialList.length} />
           )}
         </div>
       </div>
@@ -230,15 +199,24 @@ function UnitSection({ label, list, color, icon, pulse }: UnitSectionProps) {
       >
         {label}
       </span>
-      <ul className="grid grid-cols-1 md:grid-cols-  gap-2 m-1 ">
-        {list.map((unit, idx) => (
-          <li
-            key={idx}
-            className={`text-[10px] font-mono p-0.5 rounded border flex items-center gap-1 ${colors[color]} ${pulse ? "animate-pulse font-bold" : ""}`}
-          >
-            <span>{icon}</span> {unit}
-          </li>
-        ))}
+      <ul className="grid gap-2 m-1">
+        {list.map((item, idx) => {
+          // Logic to handle both old string format and new object format
+          const isObject = typeof item === "object" && item !== null;
+          const displayContent = isObject
+            ? `${item.displayName} (${item.grounds})`
+            : item;
+
+          return (
+            <li
+              key={idx}
+              className={`text-[10px] font-mono p-1 px-2 rounded border flex items-center gap-1 ${colors[color]} ${pulse ? "animate-pulse font-bold" : ""}`}
+            >
+              <span>{icon}</span>
+              <span>{displayContent}</span>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );
@@ -246,17 +224,9 @@ function UnitSection({ label, list, color, icon, pulse }: UnitSectionProps) {
 
 // 3. Apply the interface to SummaryItem
 function SummaryItem({ color, label, value }: SummaryItemProps) {
-  const textColors: Record<SummaryColor, string> = {
-    green: "text-green-600",
-    red: "text-red-600",
-    blue: "text-blue-600",
-  };
+  const textColors: Record<SummaryColor, string> = { green: "text-green-600", red: "text-red-600", blue: "text-blue-600", };
 
-  const bgColors: Record<SummaryColor, string> = {
-    green: "bg-green-500",
-    red: "bg-red-500",
-    blue: "bg-blue-500",
-  };
+  const bgColors: Record<SummaryColor, string> = { green: "bg-green-500", red: "bg-red-500", blue: "bg-blue-500", };
 
   return (
     <div
