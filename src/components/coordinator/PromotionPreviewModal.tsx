@@ -48,42 +48,7 @@ export default function PromotionPreviewModal({
     }
   };
 
-  // const handleDownloadNotices = async () => {
-  //   setDownloadProgress(0);
-  //   setStatusMsg("Analyzing blocked students...");
-  //   setIsDownloading(true);
-  //   try {
-  //     await downloadIneligibilityNoticesWithProgress(
-  //       params,
-  //       getDisplayName(),
-  //       (percent, message) => { setDownloadProgress(percent); setStatusMsg(message); },
-  //     );
-  //   } catch (error: unknown) {
-  //     const errorMessage = error instanceof Error ? error.message : "Failed to generate notices.";
-  //     alert(errorMessage);
-  //   } finally {
-  //     setIsDownloading(false);
-  //     setTimeout(() => setDownloadProgress(null), 1000);
-  //   }
-  // };
 
-  // const handleDownloadTranscripts = async () => {
-  //   setDownloadProgress(0);
-  //   setStatusMsg("Generating Transcripts...");
-  //   setIsDownloading(true);
-  //   try {
-  //     await downloadTranscriptsWithProgress(
-  //       params,
-  //       getDisplayName(),
-  //       (percent, message) => { setDownloadProgress(percent); setStatusMsg(message); },
-  //     );
-  //   } catch {
-  //     alert("Failed to generate transcripts.");
-  //   } finally {
-  //     setIsDownloading(false);
-  //     setTimeout(() => setDownloadProgress(null), 1000);
-  //   }
-  // };
 
   return (
     <div className="fixed inset-0 bg-green-darkest/40 backdrop-blur-md z-50 flex items-center justify-center p-6">
@@ -162,7 +127,8 @@ export default function PromotionPreviewModal({
           >
             <CheckCircle
               size={24}
-              className={activeTab === "eligible" ? "text-emerald-500" : ""}  />
+              className={activeTab === "eligible" ? "text-emerald-500" : ""}
+            />
             <div className="text-left">
               <p className="text-[10px] font-black uppercase tracking-widest opacity-60">
                 Verified Eligible
@@ -177,7 +143,10 @@ export default function PromotionPreviewModal({
             onClick={() => setActiveTab("blocked")}
             className={`flex-1 py-2 px-6 rounded-xl transition-all flex items-center justify-center gap-4 ${activeTab === "blocked" ? "bg-white shadow-xl text-red-600 hover:bg-red-100 border border-red-400/50" : "text-red-800/70 hover:text-slate-600"}`}
           >
-            <AlertCircle size={24}  className={activeTab === "blocked" ? "text-red-500" : ""} />
+            <AlertCircle
+              size={24}
+              className={activeTab === "blocked" ? "text-red-500" : ""}
+            />
             <div className="text-left">
               <p className="text-[10px] font-black uppercase tracking-widest opacity-60">
                 Requires Review
@@ -217,17 +186,21 @@ export default function PromotionPreviewModal({
                   <td className="py-4 px-4">
                     <span
                       className={`inline-flex items-center gap-2 px-3 py-2 rounded-full text-[9.5px] font-bold uppercase tracking-wider border ${
-                        student.status === "IN GOOD STANDING"
-                          ? "bg-emerald-50 text-emerald-700 border-emerald-100"
-                          : student.status === "ALREADY PROMOTED"
-                            ? "bg-green-darkest text-yellow-gold border-green-darkest shadow-md"
-                            : student.status === "SPECIAL EXAM PENDING"
-                              ? "bg-indigo-50 text-indigo-700 border-indigo-100 shadow-[0_0_10px_rgba(79,70,229,0.1)]"
-                              : "bg-red-50 text-red-700 border-red-100"
+                        student.status === "graduand"
+                          ? "bg-amber-50 text-amber-700 border-amber-200 shadow-sm"
+                          : student.status === "IN GOOD STANDING"
+                            ? "bg-emerald-50 text-emerald-700 border-emerald-100"
+                            : student.status === "ALREADY PROMOTED"
+                              ? "bg-green-darkest text-yellow-gold border-green-darkest shadow-md"
+                              : student.status === "SPECIAL EXAM PENDING"
+                                ? "bg-indigo-50 text-indigo-700 border-indigo-100 shadow-[0_0_10px_rgba(79,70,229,0.1)]"
+                                : "bg-red-50 text-red-700 border-red-100"
                       }`}
                     >
-                      {/* {student.status === 'ALREADY PROMOTED' && <ShieldCheck size={10} />}
-                      {student.status} */}
+                      {student.status === "graduand" && (
+                        <GraduationCap size={12} />
+                      )}
+                      {/* {student.status === "graduand" ? `GRADUAND: ${student.classification}` : student.status} */}
 
                       {student.status === "SPECIAL EXAM PENDING" && (
                         <div className="w-1 h-1 bg-indigo-600 rounded-full animate-pulse" />
@@ -235,7 +208,7 @@ export default function PromotionPreviewModal({
                       {student.status}
                     </span>
                   </td>
-                  {activeTab === "blocked" && (
+                  {/* {activeTab === "blocked" && (
                     <td className="py-4 px-4">
                       <div className="flex flex-wrap gap-1 justify-end">
                         {student.reasons.map((r, i) => (
@@ -248,6 +221,38 @@ export default function PromotionPreviewModal({
                         ))}
                       </div>
                     </td>
+                  )} */}
+                  {/* Inside the mapping of currentList in PromotionPreviewModal.tsx */}
+                  {activeTab === "blocked" && (
+                    <tr
+                      key={student.id}
+                      className="border-l-4 border-red-500 bg-red-50/30"
+                    >
+                      <td className="py-4 px-4 font-mono font-bold text-red-900">
+                        {student.regNo}
+                      </td>
+                      <td className="py-4 px-4 font-semibold text-slate-700">
+                        {student.name}
+                      </td>
+                      <td className="py-4 px-4">
+                        <span className="bg-red-600 text-white px-3 py-1 rounded text-[10px] font-black">
+                          {student.status}
+                        </span>
+                      </td>
+                      <td className="py-4 px-4 text-right">
+                        <div className="flex flex-col items-end gap-1">
+                          {student.reasons.map((reason, idx) => (
+                            <span
+                              key={idx}
+                              className="flex items-center gap-2 text-[10px] text-red-600 font-bold bg-white border border-red-100 px-2 py-1 rounded"
+                            >
+                              <FileWarning size={12} />
+                              {reason.toUpperCase()}
+                            </span>
+                          ))}
+                        </div>
+                      </td>
+                    </tr>
                   )}
                 </tr>
               ))}
@@ -313,3 +318,41 @@ export default function PromotionPreviewModal({
     </div>
   );
 }
+
+
+// const handleDownloadNotices = async () => {
+  //   setDownloadProgress(0);
+  //   setStatusMsg("Analyzing blocked students...");
+  //   setIsDownloading(true);
+  //   try {
+  //     await downloadIneligibilityNoticesWithProgress(
+  //       params,
+  //       getDisplayName(),
+  //       (percent, message) => { setDownloadProgress(percent); setStatusMsg(message); },
+  //     );
+  //   } catch (error: unknown) {
+  //     const errorMessage = error instanceof Error ? error.message : "Failed to generate notices.";
+  //     alert(errorMessage);
+  //   } finally {
+  //     setIsDownloading(false);
+  //     setTimeout(() => setDownloadProgress(null), 1000);
+  //   }
+  // };
+
+  // const handleDownloadTranscripts = async () => {
+  //   setDownloadProgress(0);
+  //   setStatusMsg("Generating Transcripts...");
+  //   setIsDownloading(true);
+  //   try {
+  //     await downloadTranscriptsWithProgress(
+  //       params,
+  //       getDisplayName(),
+  //       (percent, message) => { setDownloadProgress(percent); setStatusMsg(message); },
+  //     );
+  //   } catch {
+  //     alert("Failed to generate transcripts.");
+  //   } finally {
+  //     setIsDownloading(false);
+  //     setTimeout(() => setDownloadProgress(null), 1000);
+  //   }
+  // };

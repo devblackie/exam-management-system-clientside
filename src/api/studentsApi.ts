@@ -23,12 +23,6 @@ export const bulkRegisterStudents = async (data: { students: StudentFormRow[] })
   return res.data;
 };
 
-// We send only what's needed — backend resolves program name → ID
-// export const bulkRegisterStudents = async (students: StudentFormRow[]): Promise<BulkRegisterResponse> => {
-//   const res = await api.post<BulkRegisterResponse>("/students/bulk", { students });
-//   return res.data;
-// };
-
 export const getStudentStats = async (): Promise<StudentStats> => {
   // Use your existing axios instance
   const res = await api.get<StudentStats>("/students/stats");

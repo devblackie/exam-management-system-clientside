@@ -5,26 +5,39 @@ import { approveSpecialExam } from "@/api/marksApi";
 import { RawMark } from "@/api/types";
 import { useState } from "react";
 
-interface RawMarksTableProps { marks: RawMark[]; studentName: string; onEdit: (mark: RawMark) => void; onAddNew: () => void; onRefresh: () => void; isReadOnly: boolean; }
+interface RawMarksTableProps {
+  marks: RawMark[];
+  studentName: string;
+  onEdit: (mark: RawMark) => void;
+  onAddNew: () => void;
+  onRefresh: () => void;
+  isReadOnly: boolean;
+}
 
-export default function RawMarksTable({ marks, studentName, onEdit, onAddNew, onRefresh, isReadOnly }: RawMarksTableProps) {
+export default function RawMarksTable({
+  marks,
+  studentName,
+  onEdit,
+  onAddNew,
+  onRefresh,
+  isReadOnly,
+}: RawMarksTableProps) {
   const [processingId, setProcessingId] = useState<string | null>(null);
 
   const handleGrantSpecial = async (markId: string, unitCode: string) => {
-    // 1. Ask for reason
     const reasonInput = window.prompt(
       `Grant ${studentName} a Special Exam for ${unitCode}?\nType '1' for Financial\nType '2' for Compassionate`,
-      "1",
+      "1"
     );
 
-    if (reasonInput === null) return; // Cancelled
+    if (reasonInput === null) return;
     const reason = reasonInput === "2" ? "Compassionate" : "Financial";
 
     setProcessingId(markId);
     try {
       const response = await approveSpecialExam(markId, reason, false);
       if (response.success) onRefresh();
-    } catch (err) {
+    } catch {
       alert("Failed to grant special");
     } finally {
       setProcessingId(null);
@@ -34,7 +47,7 @@ export default function RawMarksTable({ marks, studentName, onEdit, onAddNew, on
   const handleUndoSpecial = async (markId: string, unitCode: string) => {
     if (
       !confirm(
-        `Reverse Special status for ${unitCode}? This will return it to a regular attempt.`,
+        `Reverse Special status for ${unitCode}? This will return it to a regular attempt.`
       )
     )
       return;
@@ -43,7 +56,7 @@ export default function RawMarksTable({ marks, studentName, onEdit, onAddNew, on
     try {
       const response = await approveSpecialExam(markId, undefined, true);
       if (response.success) onRefresh();
-    } catch (err) {
+    } catch {
       alert("Failed to reverse special status");
     } finally {
       setProcessingId(null);
@@ -88,15 +101,31 @@ export default function RawMarksTable({ marks, studentName, onEdit, onAddNew, on
           <table className="w-full border-collapse">
             <thead className="bg-green-darkest text-[10px] text-lime-bright uppercase tracking-[0.15em]">
               <tr>
-                <th className="p-4 text-left font-black border-b border-white/10">Year</th>
-                <th className="p-4 text-left font-black border-b border-white/10">Unit</th>
-                <th className="p-4 text-center font-black border-b border-white/10">Prac</th>
-                <th className="p-4 text-center font-black border-b border-white/10">CA /30</th>
-                <th className="p-4 text-center font-black border-b border-white/10">Exam /70</th>
-                <th className="p-4 text-center font-black border-b border-white/10">Agreed</th>
-                <th className="p-4 text-center font-black border-b border-white/10">Status</th>
+                <th className="p-4 text-left font-black border-b border-white/10">
+                  Year
+                </th>
+                <th className="p-4 text-left font-black border-b border-white/10">
+                  Unit
+                </th>
+                <th className="p-4 text-center font-black border-b border-white/10">
+                  Prac
+                </th>
+                <th className="p-4 text-center font-black border-b border-white/10">
+                  CA /30
+                </th>
+                <th className="p-4 text-center font-black border-b border-white/10">
+                  Exam /70
+                </th>
+                <th className="p-4 text-center font-black border-b border-white/10">
+                  Agreed
+                </th>
+                <th className="p-4 text-center font-black border-b border-white/10">
+                  Status
+                </th>
                 {!isReadOnly && (
-                  <th className="p-4 text-center font-black border-b border-white/10">Actions</th>
+                  <th className="p-4 text-center font-black border-b border-white/10">
+                    Actions
+                  </th>
                 )}
               </tr>
             </thead>
@@ -104,7 +133,9 @@ export default function RawMarksTable({ marks, studentName, onEdit, onAddNew, on
               {marks.map((m) => {
                 const unitCode = m.programUnit?.unit?.code || "N/A";
                 const isEligibleForSpecial =
-                  (m.caTotal30 || 0) > 0 && (m.examTotal70 || 0) === 0 && !m.isSpecial;
+                  (m.caTotal30 || 0) > 0 &&
+                  (m.examTotal70 || 0) === 0 &&
+                  !m.isSpecial;
 
                 return (
                   <tr
@@ -144,12 +175,12 @@ export default function RawMarksTable({ marks, studentName, onEdit, onAddNew, on
 
                     {!isReadOnly && (
                       <td className="p-4 text-center">
-                        <div className="flex flex-col gap-1">
+                        <div className="flex flex-col gap-1 items-center">
                           <button
                             onClick={() => onEdit(m)}
                             className="text-[10px] font-bold uppercase text-green-dark hover:underline"
                           >
-                            Edit Marks
+                            Edit
                           </button>
                           {isEligibleForSpecial && (
                             <button
@@ -161,22 +192,21 @@ export default function RawMarksTable({ marks, studentName, onEdit, onAddNew, on
                             >
                               {processingId === m._id
                                 ? "Processing..."
-                                : "Grant Special"}
+                                : "Special"}
                             </button>
                           )}
                           {m.isSpecial && (
                             <button
                               disabled={processingId === m._id}
-                              onClick={() =>
-                                handleUndoSpecial(m._id, unitCode)
-                              }
+                              onClick={() => handleUndoSpecial(m._id, unitCode)}
                               className="text-[10px] font-bold uppercase text-red-600 hover:text-red-800 hover:underline disabled:opacity-50"
                             >
                               {processingId === m._id
                                 ? "Processing..."
-                                : "Reverse Special"}
+                                : "Reverse"}
                             </button>
                           )}
+                        
                         </div>
                       </td>
                     )}

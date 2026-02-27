@@ -37,7 +37,6 @@ export interface Invite {
   name: string;
 }
 
-
 export interface UnitAssignment {
   _id: string;
   lecturer: string | Lecturer;
@@ -202,7 +201,6 @@ export interface AcademicSummary {
 }
 
 export interface AcademicStatus {
-  // failedList: any;
   status: string;
   variant: "success" | "warning" | "error" | "info";
   details: string;
@@ -222,6 +220,7 @@ export interface GradeRecord {
   totalMark: number;
   grade: string;
   academicYear: { year: string };
+  deletedAt?: Date;
 }
 
 export interface StudentFullRecord {
@@ -236,9 +235,8 @@ export interface StudentFullRecord {
   };
   grades: GradeRecord[];
   currentStatus: string;
-  academicStatus: AcademicStatus; // Add this line
-  summary: {
-    // Update summary to match the backend
+  academicStatus: AcademicStatus; 
+  summary: {    
     totalUnits: number;
     passed: number;
     supplementary: number;
@@ -248,10 +246,16 @@ export interface StudentFullRecord {
 
 export interface RawMark {
   _id: string;
+  student: {
+    _id: string;
+    // name: string;
+    // regNumber: string;
+  };
   academicYear: {
     _id: string;
     year: string;
   };
+  examMode?: "standard" | "mandatory_q1";
   // Matches the backend population logic: mark.programUnit.unit
   programUnit: {
     _id: string;
@@ -295,6 +299,7 @@ export interface SaveMarksPayload {
   regNo: string;
   unitCode: string;
   academicYear: string;
+  examMode?: "standard" | "mandatory_q1";
   // Coursework
   cat1?: number;
   cat2?: number;
@@ -310,4 +315,23 @@ export interface SaveMarksPayload {
   examQ5?: number;
   isSpecial: boolean;
   attempt: "1st" | "re-take" | "supplementary" | "special";
+}
+
+export interface TrashedMark {
+  _id: string;
+  deletedAt: string;
+  student: {
+    _id: string;
+    regNo: string;
+    name: string;
+  };
+  programUnit: {
+    unit: {
+      code: string;
+      name: string;
+    };
+  };
+  academicYear: {
+    year: string;
+  };
 }

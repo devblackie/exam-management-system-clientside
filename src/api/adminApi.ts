@@ -2,10 +2,6 @@
 import api from "@/config/axiosInstance";
 import type { User, Invite, Role, Status } from "./types";
 
-
-
-
-
 // --- User management ---
 export async function getUsers() {
   return api.get<User[]>("/admin/users");
