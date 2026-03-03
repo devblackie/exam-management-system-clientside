@@ -2,7 +2,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { searchStudents, getStudentRecord, getRawMarks, saveRawMarks } from "@/api/studentsApi";
+import { searchStudents, getStudentRecord, getRawMarks, saveRawMarks, getStudentJourney } from "@/api/studentsApi";
 import type {
   StudentSearchResult,
   StudentFullRecord,
@@ -10,6 +10,7 @@ import type {
   SaveMarksPayload,
   InstitutionSettings, 
   AcademicYear,
+  StudentJourneyResponse,
 } from "@/api/types";
 import { getAcademicYears } from "@/api/marksApi"; 
 import { useToast } from "@/context/ToastContext";
@@ -26,6 +27,9 @@ import PageHeader from "@/components/ui/PageHeader";
 import { LoadingState } from "@/components/ui/LoadingState";
 import { getProgramUnitLookup } from "@/api/programUnitsApi";
 import { getInstitutionSettings } from "@/api/institutionSettingsApi";
+import JourneyTimeline from "@/components/coordinator/StudentSearch/JourneyTimeline";
+
+type TabType = "grades" | "raw" | "journey";
 
 export default function StudentSearchPage() {
   const [query, setQuery] = useState("");
@@ -34,10 +38,11 @@ export default function StudentSearchPage() {
   const [rawMarks, setRawMarks] = useState<RawMark[]>([]);
   const [loading, setLoading] = useState(false);
   const [searching, setSearching] = useState(false);
-  const [activeTab, setActiveTab] = useState<"grades" | "raw">("grades");
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingMark, setEditingMark] = useState<RawMark | null>(null);
   const [selectedYearOfStudy, setSelectedYearOfStudy] = useState<number>(1);
+  const [activeTab, setActiveTab] = useState<TabType>("grades");  
+  const [journeyData, setJourneyData] = useState<StudentJourneyResponse | null>(null);
 
   // States for metadata
   const [availableUnits, setAvailableUnits] = useState<Array<{ code: string; name: string }>>([]);
@@ -112,13 +117,23 @@ export default function StudentSearchPage() {
     }
   };
 
+  const studentJourney = async (regNo: string) => {
+    try {
+      const data = await getStudentJourney(regNo);
+      setJourneyData(data);
+    } catch (err) { 
+      addToast("Failed to load academic journey", "error");
+      console.error(err); 
+    }
+  };
+
   const viewStudent = async (regNo: string) => {
     setLoading(true);
     try {
       const record = await getStudentRecord(encodeURIComponent(regNo), selectedYearOfStudy);
       setSelectedStudent(record);
       setActiveTab("grades");
-    } catch (err) {
+    } catch {
       addToast(`Failed to load Year ${selectedYearOfStudy} records.`, "error");
     } finally {
       setLoading(false);
@@ -144,15 +159,26 @@ export default function StudentSearchPage() {
   return (
     <div className="max-w-8xl ml-48 my-10">
       <div className="bg-[#F8F9FA] rounded-lg shadow-2xl p-10 min-h-screen">
-        
-        <PageHeader title="Student Academic" highlightedTitle="Records" systemLabel=" " />
-
-        <SearchBar
-          query={query} setQuery={setQuery} onSearch={handleSearch} searching={searching}
-          selectedYearOfStudy={selectedYearOfStudy} setSelectedYearOfStudy={setSelectedYearOfStudy} 
+        <PageHeader
+          title="Student Academic"
+          highlightedTitle="Records"
+          systemLabel=" "
         />
 
-        <ResultsTable results={searchResults} onSelect={viewStudent} visible={!selectedStudent && !loading} />
+        <SearchBar
+          query={query}
+          setQuery={setQuery}
+          onSearch={handleSearch}
+          searching={searching}
+          selectedYearOfStudy={selectedYearOfStudy}
+          setSelectedYearOfStudy={setSelectedYearOfStudy}
+        />
+
+        <ResultsTable
+          results={searchResults}
+          onSelect={viewStudent}
+          visible={!selectedStudent && !loading}
+        />
 
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20">
@@ -163,7 +189,7 @@ export default function StudentSearchPage() {
             <div className="animate-in fade-in slide-in-from-bottom-6 duration-700">
               <div className="flex flex-col lg:flex-row gap-6 mb-8">
                 <div className="flex-1">
-                  <StudentProfileHeader student={selectedStudent.student} />
+                  <StudentProfileHeader student={selectedStudent.student} onRefresh={() => viewStudent(selectedStudent.student.regNo)} />
                 </div>
                 <div className="lg:w-1/2">
                   <AcademicStatusBox
@@ -171,23 +197,34 @@ export default function StudentSearchPage() {
                     currentYearOfStudy={selectedStudent.student.currentYear}
                     viewingYear={selectedYearOfStudy}
                     studentId={selectedStudent.student._id}
-                    academicYearName={selectedStudent.academicStatus.academicYearName}
-                    onPromoteSuccess={() => viewStudent(selectedStudent.student.regNo)}
+                    academicYearName={
+                      selectedStudent.academicStatus.academicYearName
+                    }
+                    onPromoteSuccess={() =>
+                      viewStudent(selectedStudent.student.regNo)
+                    }
                   />
                 </div>
               </div>
 
               {/* TABS */}
               <div className="flex gap-12 border-b border-green-darkest/10 mb-5 px-4">
-                {(["grades", "raw"] as const).map((tab) => (
+                {(["grades", "raw", "journey"] as const).map((tab) => (
                   <button
                     key={tab}
-                    onClick={() => setActiveTab(tab)}
+                    onClick={() => {
+                      setActiveTab(tab);
+                      if (tab === "journey") {
+                        studentJourney(selectedStudent.student.regNo);
+                      }
+                    }}
                     className={`pb-5 text-[10px] font-black uppercase tracking-[0.3em] transition-all relative ${
-                      activeTab === tab ? "text-green-darkest" : "text-slate-400 hover:text-green-darkest/60"
+                      activeTab === tab
+                        ? "text-green-darkest"
+                        : "text-slate-400 hover:text-green-darkest/60"
                     }`}
                   >
-                    {tab === "grades" ? "Official Grades" : "Raw Assessment Data"}
+                    {tab === "grades" ? "Official Grades" : tab === "raw" ? "Raw Data" : "Student Journey"}
                     {activeTab === tab && (
                       <div className="absolute bottom-0 left-0 w-full h-1 bg-yellow-gold rounded-t-full" />
                     )}
@@ -196,9 +233,10 @@ export default function StudentSearchPage() {
               </div>
 
               <div className="bg-white rounded-lg border border-green-darkest/5 shadow-sm overflow-hidden">
-                {activeTab === "grades" ? (
+                {activeTab === "grades" && (
                   <GradesTable grades={selectedStudent.grades} />
-                ) : (
+                )}
+                {activeTab === "raw" && (
                   <RawMarksTable
                     marks={rawMarks}
                     studentName={selectedStudent.student.name}
@@ -207,6 +245,10 @@ export default function StudentSearchPage() {
                     onAddNew={() => { setEditingMark(null); setShowEditModal(true); }}
                     isReadOnly={isReadOnly}
                   />
+                )}
+                {/* FIX 4: Types now overlap correctly */}
+                {activeTab === "journey" && journeyData && (
+                  <JourneyTimeline data={journeyData} />
                 )}
               </div>
             </div>
@@ -223,7 +265,7 @@ export default function StudentSearchPage() {
             onSave={handleSaveMarks}
             availableUnits={availableUnits}
             availableYears={availableYears}
-            settings={settings} 
+            settings={settings}
           />
         )}
       </div>

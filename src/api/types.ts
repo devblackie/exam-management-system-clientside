@@ -204,9 +204,11 @@ export interface AcademicStatus {
   status: string;
   variant: "success" | "warning" | "error" | "info";
   details: string;
+  weightedMean: string; // Add this
   summary: AcademicSummary;
   missingList: string[];
   failedList: { displayName: string; attempt: number }[];
+  // Fix: SpecialList needs to match backend: { displayName: string; grounds: string }[]
   specialList: { displayName: string; grounds: string }[];
   incompleteList: string[];
   academicYearName: string;
@@ -232,6 +234,7 @@ export interface StudentFullRecord {
     programId?: string;
     currentYear: number;
     currentSemester: number;
+    status: string;
   };
   grades: GradeRecord[];
   currentStatus: string;
@@ -334,4 +337,27 @@ export interface TrashedMark {
   academicYear: {
     year: string;
   };
+}
+
+export interface StudentJourneyTimeline {
+  academicYear: string;
+  yearOfStudy: number;
+  totalUnits: number;
+  challenges: {
+    supplementary: string[];
+    retakes: string[];
+    specials: string[];
+  };
+  isRepeat: boolean;
+  leaveInfo?: {
+    type: "ACADEMIC LEAVE" | "DEFERMENT";
+    reason: string;
+    duration: string;
+  };
+}
+
+export interface StudentJourneyResponse {
+  admissionYear: string;
+  currentStatus: string;
+  timeline: StudentJourneyTimeline[];
 }

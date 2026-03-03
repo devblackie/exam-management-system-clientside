@@ -1,6 +1,6 @@
 // clientside/src/api/studentsApi.ts
 import api from "@/config/axiosInstance";
-import type { StudentFromAPI, StudentFormRow,  StudentSearchResult, StudentFullRecord, StudentStats, RawMark, SaveMarksPayload } from "./types";
+import type { StudentFromAPI, StudentFormRow,  StudentSearchResult, StudentFullRecord, StudentStats, RawMark, SaveMarksPayload, StudentJourneyResponse } from "./types";
 
 // const API_BASE_URL = api.defaults.baseURL;
 const API_BASE_URL = api.defaults.baseURL?.replace(/\/$/, '') || "http://localhost:8000";
@@ -39,6 +39,26 @@ export const getStudentRecord = async (regNo: string, yearOfStudy: string | numb
   // Update the param key from 'academicYear' to 'yearOfStudy'
   const res = await api.get<StudentFullRecord>("/student/record", { 
     params: { regNo, yearOfStudy } 
+  });
+  return res.data;
+};
+
+export const grantAcademicLeave = async (studentId: string, startDate: Date, endDate: Date, reason: string, leaveType: string) => {
+  // return api.post("/student/leave", { studentId, startDate, endDate, reason, leaveType });
+  const res = await api.post("/student/leave", {studentId, startDate, endDate, reason, leaveType});
+  return res.data;
+};
+
+export const deferAdmission = async (studentId: string, years: number) => {
+  return api.post("/student/defer", { studentId, years });
+};
+
+export const revertStatusToActive = async (id: string) =>
+  api.post("/student/revert-active", { studentId: id });
+
+export const getStudentJourney = async (regNo: string): Promise<StudentJourneyResponse> => {
+  const res = await api.get<StudentJourneyResponse>("/student/journey", {
+    params: { regNo }
   });
   return res.data;
 };
