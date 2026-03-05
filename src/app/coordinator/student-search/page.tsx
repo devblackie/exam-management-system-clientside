@@ -100,7 +100,7 @@ export default function StudentSearchPage() {
   }, [selectedStudent?.student?._id]); 
 
   const isReadOnly =
-    selectedStudent?.academicStatus?.status === "IN GOOD STANDING" &&
+    selectedStudent?.academicStatus?.status === "PASS" &&
     selectedYearOfStudy < selectedStudent.student.currentYear;
 
   const handleSearch = async () => {
