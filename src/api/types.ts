@@ -339,25 +339,31 @@ export interface TrashedMark {
   };
 }
 
-export interface StudentJourneyTimeline {
+export interface StudentJourneyTimeline { 
+  type: "ACADEMIC" | "STATUS_CHANGE";
   academicYear: string;
-  yearOfStudy: number;
-  totalUnits: number;
-  challenges: {
+  yearOfStudy?: number;
+  status?: string;
+  weight?: number;
+  totalUnits?: number;
+  challenges?: {
     supplementary: string[];
     retakes: string[];
     specials: string[];
+    incomplete: string[]; // Added this
   };
-  isRepeat: boolean;
-  leaveInfo?: {
-    type: "ACADEMIC LEAVE" | "DEFERMENT";
-    reason: string;
-    duration: string;
-  };
+  isRepeat?: boolean;
+  isCurrent?: boolean;
+  leaveInfo?: { type: "ACADEMIC LEAVE" | "DEFERMENT"; reason: string; duration: string; };
+  fromStatus?: string;
+  toStatus?: string;
+  reason?: string;
+  date?: string;
 }
 
 export interface StudentJourneyResponse {
   admissionYear: string;
   currentStatus: string;
+  cumulativeMean: string;
   timeline: StudentJourneyTimeline[];
 }
