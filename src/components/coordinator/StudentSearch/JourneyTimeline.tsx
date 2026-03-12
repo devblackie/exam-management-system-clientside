@@ -71,7 +71,7 @@ export default function JourneyTimeline({ data }: JourneyProps) {
               <span className="text-lg font-light text-[#002B1B] tracking-tighter">
                 {data.currentStatus}
               </span>
-             
+              
             </div>
           </div>
         </div>
