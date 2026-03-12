@@ -14,14 +14,7 @@ interface RawMarksTableProps {
   isReadOnly: boolean;
 }
 
-export default function RawMarksTable({
-  marks,
-  studentName,
-  onEdit,
-  onAddNew,
-  onRefresh,
-  isReadOnly,
-}: RawMarksTableProps) {
+export default function RawMarksTable({ marks, studentName, onEdit, onAddNew, onRefresh, isReadOnly }: RawMarksTableProps) {
   const [processingId, setProcessingId] = useState<string | null>(null);
 
   const handleGrantSpecial = async (markId: string, unitCode: string) => {
@@ -220,3 +213,6 @@ export default function RawMarksTable({
     </div>
   );
 }
+
+
+

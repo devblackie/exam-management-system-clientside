@@ -174,11 +174,7 @@ export default function StudentSearchPage() {
           setSelectedYearOfStudy={setSelectedYearOfStudy}
         />
 
-        <ResultsTable
-          results={searchResults}
-          onSelect={viewStudent}
-          visible={!selectedStudent && !loading}
-        />
+        <ResultsTable results={searchResults} onSelect={viewStudent} visible={!selectedStudent && !loading} />
 
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20">

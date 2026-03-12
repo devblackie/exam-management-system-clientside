@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { createAcademicYear, getAcademicYears } from "@/api/academicYearsApi";
+import { createAcademicYear, getAcademicYears, updateAcademicYear } from "@/api/academicYearsApi";
 import { useToast } from "@/context/ToastContext";
 import { AcademicYear } from "@/api/types";
 import { YearFormModal } from "@/components/coordinator/AcademicYears/YearFormModal";
@@ -37,7 +37,7 @@ export default function AcademicYearsPage() {
     }
   };
 
-  useEffect(() => {
+  useEffect(() => { 
     loadYears();
   }, []);
 
@@ -45,16 +45,27 @@ export default function AcademicYearsPage() {
     const today = new Date();
     const currentYear = today.getFullYear();
     const nextYear = currentYear + 1;
-    const academicYear =
-      today.getMonth() >= 7
-        ? `${currentYear}/${nextYear}`
-        : `${currentYear - 1}/${currentYear}`;
+    const academicYear = today.getMonth() >= 7 ? `${currentYear}/${nextYear}` : `${currentYear - 1}/${currentYear}`;
 
     setYear(academicYear);
     setStartDate(`${academicYear.split("/")[0]}-08-01`);
     setEndDate(`${academicYear.split("/")[1]}-07-31`);
     addToast("Auto-filled current academic year", "success");
   };
+
+  // Replace your handleUpdateSession with this:
+const handleUpdateSession = async (id: string, data: Partial<AcademicYear>) => {
+  if (!id) return; // Guard against undefined IDs
+  
+  try {
+    setYears((prev) => prev.map((y) => (y._id === id ? { ...y, ...data } : y)));
+    await updateAcademicYear(id, data);
+    addToast("Calendar updated", "success");
+    await loadYears(); // Ensure this is awaited
+  } catch (error) {
+    addToast("Update failed", "error");
+  }
+};
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -114,7 +125,7 @@ export default function AcademicYearsPage() {
             </div>
           </div>
 
-          <YearTable years={years} />
+          <YearTable years={years} onUpdate={handleUpdateSession} />
         </div>
 
         {/* Add/Edit Modal */}

@@ -56,29 +56,38 @@ export default function JourneyTimeline({ data }: JourneyProps) {
             <GraduationCap size={22} className="text-[#EAB308]" />
           </div>
           <div>
+            <div className="flex items-center gap-3">
+
             <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em] mb-1">
-              Mission Profile: {data.admissionYear} Intake
+              {data.admissionYear} 
             </h4>
+            <div className="h-3 w-[1px] bg-slate-300" />
+            <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em] mb-1">
+              {data.intake} Intake
+            </h4>
+            </div>
+
             <div className="flex items-center gap-3">
               <span className="text-lg font-light text-[#002B1B] tracking-tighter">
                 {data.currentStatus}
               </span>
-              <div className="h-3 w-[1px] bg-slate-300" />
-              <span className="text-[9px] font-mono text-slate-400 uppercase">
-                Auth: System/Coordinator
-              </span>
+              {/* <div className="h-3 w-[1px] bg-slate-300" /> */}
+              {/* <span className="text-[9px] font-mono text-slate-400 uppercase">
+                Cohort Identifier: {data.admissionYear.slice(-2)}
+                {data.intake.slice(0, 1)}
+              </span> */}
             </div>
           </div>
         </div>
 
         {/* Cumulative Tracker */}
         <div className="flex flex-col items-center justify-between  relative overflow-hidden">
-            <div className="flex items-center gap-6 relative z-10">
-              <div>
-                <h5 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-1">
-                  Projected Degree Aggregate
-                </h5>
-                <div className="flex flex-col items-baseline">
+          <div className="flex items-center gap-6 relative z-10">
+            <div>
+              <h5 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-1">
+                Projected Degree Aggregate
+              </h5>
+              <div className="flex flex-col items-baseline">
                 <div className="flex items-baseline gap-2">
                   <span className="text-[11px] font-light text-[#002B1B] tracking-tighter">
                     {data.cumulativeMean || "0.00"}
@@ -86,20 +95,21 @@ export default function JourneyTimeline({ data }: JourneyProps) {
                   <span className="text-[10px] font-mono text-slate-400 font-bold">
                     WAA / 100.00
                   </span>
-                  </div>
+                </div>
                 <div className="flex items-baseline gap-2">
                   <span className="text-[9px] font-black text-slate-400 uppercase  tracking-tight">
-                    Current Standing: 
-                 </span>
-              <span 
-                className={`text-[9px] font-black uppercase tracking-tight ${projected.color}`}
-              >
-                {projected.label}
-              </span></div>
+                    Current Standing:
+                  </span>
+                  <span
+                    className={`text-[9px] font-black uppercase tracking-tight ${projected.color}`}
+                  >
+                    {projected.label}
+                  </span>
                 </div>
               </div>
             </div>
           </div>
+        </div>
       </div>
 
       <div className="p-10 relative bg-white">

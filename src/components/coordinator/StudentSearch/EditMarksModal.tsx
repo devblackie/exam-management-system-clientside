@@ -3,7 +3,7 @@
 
 import { X, ShieldCheck, FileSignature, Fingerprint, Lock } from "lucide-react";
 import { RawMark, StudentFullRecord, SaveMarksPayload, InstitutionSettings } from "@/api/types";
-import { useState, useMemo, useRef, useEffect } from "react";
+import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { useToast } from "@/context/ToastContext";
 import { calculateFinalResult } from "@/components/utils/gradingCore";
 
@@ -31,6 +31,7 @@ export default function EditMarksModal({ isOpen, onClose, student, editingMark, 
   const [selectedUnitCode, setSelectedUnitCode] = useState<string>(editingMark?.programUnit?.unit?.code || "");
   const [examMode, setExamMode] = useState<"standard" | "mandatory_q1">(editingMark?.examMode || "standard");
   
+  const [isDirect, setIsDirect] = useState(true);
   const [preview, setPreview] = useState({
     ca: 0, exam: 0, total: 0, grade: '—', mode: 'theory'
   });
@@ -44,35 +45,45 @@ export default function EditMarksModal({ isOpen, onClose, student, editingMark, 
 
 
   // Inside your component:
-  const handleFormChange = () => {
+  // const handleFormChange = () => {
+  //   if (!formRef.current || !settings) return;
+
+  const handleFormChange = useCallback(() => {
     if (!formRef.current || !settings) return;
 
     const formData = new FormData(formRef.current);
     const attempt = isSpecial ? "special" : editingMark?.attempt || "1st";
 
-    const result = calculateFinalResult({
-      cat1: Number(formData.get("cat1")) || 0,
-      cat2: Number(formData.get("cat2")) || 0,
-      cat3: Number(formData.get("cat3")) || 0,
-      ass1: Number(formData.get("assignment1")) || 0,
-      practical: Number(formData.get("practicalRaw")) || 0,
-      examQ1: Number(formData.get("examQ1")) || 0,
-      examQ2: Number(formData.get("examQ2")) || 0,
-      examQ3: Number(formData.get("examQ3")) || 0,
-      examQ4: Number(formData.get("examQ4")) || 0,
-      examQ5: Number(formData.get("examQ5")) || 0,
-      unitType: currentUnitType,
-      examMode: examMode,
-      attempt: attempt,
-      settings: {
-        catMax: settings.cat1Max,
-        assMax: settings.assignmentMax,
-        practicalMax: settings.practicalMax,
-        passMark: settings.passMark,
-      },
-    });
+    let result = { caTotal: 0, examTotal: 0, finalMark: 0 };
 
-    // Find grade based on total from settings scale
+    if (isDirect) {
+      const ca = Number(formData.get("caDirect")) || 0;
+      const exam = Number(formData.get("examDirect")) || 0;
+      result = { caTotal: ca, examTotal: exam, finalMark: ca + exam };
+    } else {
+      result = calculateFinalResult({
+        cat1: Number(formData.get("cat1")) || 0,
+        cat2: Number(formData.get("cat2")) || 0,
+        cat3: Number(formData.get("cat3")) || 0,
+        ass1: Number(formData.get("assignment1")) || 0,
+        practical: Number(formData.get("practicalRaw")) || 0,
+        examQ1: Number(formData.get("examQ1")) || 0,
+        examQ2: Number(formData.get("examQ2")) || 0,
+        examQ3: Number(formData.get("examQ3")) || 0,
+        examQ4: Number(formData.get("examQ4")) || 0,
+        examQ5: Number(formData.get("examQ5")) || 0,
+        unitType: currentUnitType,
+        examMode: examMode,
+        attempt: attempt,
+        settings: {
+          catMax: settings.cat1Max,
+          assMax: settings.assignmentMax,
+          practicalMax: settings.practicalMax,
+          passMark: settings.passMark,
+        },
+      });
+    }
+
     const matchedGrade = [...(settings.gradingScale || [])]
       .sort((a, b) => b.min - a.min)
       .find((s) => result.finalMark >= s.min);
@@ -84,55 +95,131 @@ export default function EditMarksModal({ isOpen, onClose, student, editingMark, 
       grade: matchedGrade ? matchedGrade.grade : "E",
       mode: currentUnitType,
     });
-  };
+  }, [isDirect, isSpecial, editingMark, settings, currentUnitType, examMode]);
 
-  // Recalculate preview whenever inputs that aren't in the form change (like examMode state)
-  useEffect(() => {
-    handleFormChange();
-  }, [examMode, isSpecial, selectedUnitCode]);
+  useEffect(() => { 
+    handleFormChange(); 
+  }, [handleFormChange]);
 
-  if (!isOpen || !settings) return null;
 
+  // const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  //   e.preventDefault();
+  //   setIsSaving(true);
+  //   const formData = new FormData(e.currentTarget);
+
+  //   const payload: SaveMarksPayload = {
+  //     regNo: student.student.regNo,
+  //     unitCode: editingMark ? editingMark.programUnit.unit.code : selectedUnitCode.toUpperCase().trim(),
+  //     academicYear: editingMark ? editingMark.academicYear.year : (formData.get("academicYear") as string),
+  //     cat1: Number(formData.get("cat1")) || 0,
+  //     cat2: Number(formData.get("cat2")) || 0,
+  //     cat3: Number(formData.get("cat3")) || 0,
+  //     assignment1: Number(formData.get("assignment1")) || 0,
+  //     practicalRaw: Number(formData.get("practicalRaw")) || 0,
+  //     examQ1: Number(formData.get("examQ1")) || 0,
+  //     examQ2: Number(formData.get("examQ2")) || 0,
+  //     examQ3: Number(formData.get("examQ3")) || 0,
+  //     examQ4: Number(formData.get("examQ4")) || 0,
+  //     examQ5: Number(formData.get("examQ5")) || 0,
+  //     examMode: examMode,
+  //     isSpecial: isSpecial,
+  //     attempt: isSpecial ? "special" : editingMark?.attempt || "1st",
+  //   };
+
+  //   if (!payload.unitCode || !payload.academicYear) {
+  //     addToast("Missing Unit or Year configuration", "error");
+  //     setIsSaving(false);
+  //     return;
+  //   }
+
+  //   try {
+  //     await onSave(payload);
+  //     onClose();
+  //   } catch (err) {
+  //     addToast("Failed to save marks", "error");
+  //   } finally {
+  //     setIsSaving(false);
+  //   }
+  // };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSaving(true);
     const formData = new FormData(e.currentTarget);
 
-    const payload: SaveMarksPayload = {
+    // 1. Shared Base Data
+    const baseData = {
       regNo: student.student.regNo,
-      unitCode: editingMark ? editingMark.programUnit.unit.code : selectedUnitCode.toUpperCase().trim(),
-      academicYear: editingMark ? editingMark.academicYear.year : (formData.get("academicYear") as string),
-      cat1: Number(formData.get("cat1")) || 0,
-      cat2: Number(formData.get("cat2")) || 0,
-      cat3: Number(formData.get("cat3")) || 0,
-      assignment1: Number(formData.get("assignment1")) || 0,
-      practicalRaw: Number(formData.get("practicalRaw")) || 0,
-      examQ1: Number(formData.get("examQ1")) || 0,
-      examQ2: Number(formData.get("examQ2")) || 0,
-      examQ3: Number(formData.get("examQ3")) || 0,
-      examQ4: Number(formData.get("examQ4")) || 0,
-      examQ5: Number(formData.get("examQ5")) || 0,
-      examMode: examMode,
+      unitCode: editingMark
+        ? editingMark.programUnit.unit.code
+        : selectedUnitCode.toUpperCase().trim(),
+      academicYear: editingMark
+        ? editingMark.academicYear.year
+        : (formData.get("academicYear") as string),
       isSpecial: isSpecial,
-      attempt: isSpecial ? "special" : editingMark?.attempt || "1st",
+      attempt: (isSpecial ? "special" : editingMark?.attempt || "1st") as
+        | "1st"
+        | "re-take"
+        | "supplementary"
+        | "special",
     };
 
-    if (!payload.unitCode || !payload.academicYear) {
+    if (!baseData.unitCode || !baseData.academicYear) {
       addToast("Missing Unit or Year configuration", "error");
       setIsSaving(false);
       return;
     }
 
     try {
-      await onSave(payload);
+      if (isDirect) {
+        // 2a. Direct Entry Path
+        const ca = Number(formData.get("caDirect")) || 0;
+        const exam = Number(formData.get("examDirect")) || 0;
+
+        const directPayload: SaveMarksPayload = {
+          ...baseData,
+          caDirect: ca,
+          examDirect: exam,
+          caTotal30: ca,
+          examTotal70: exam,
+          agreedMark: ca + exam,
+        };
+
+        await onSave(directPayload);
+      } else {
+        // 2b. Detailed Entry Path
+        const detailedPayload: SaveMarksPayload = {
+          ...baseData,
+          cat1: Number(formData.get("cat1")) || 0,
+          cat2: Number(formData.get("cat2")) || 0,
+          cat3: Number(formData.get("cat3")) || 0,
+          assignment1: Number(formData.get("assignment1")) || 0,
+          practicalRaw: Number(formData.get("practicalRaw")) || 0,
+          examQ1: Number(formData.get("examQ1")) || 0,
+          examQ2: Number(formData.get("examQ2")) || 0,
+          examQ3: Number(formData.get("examQ3")) || 0,
+          examQ4: Number(formData.get("examQ4")) || 0,
+          examQ5: Number(formData.get("examQ5")) || 0,
+          examMode: examMode,
+        };
+
+        await onSave(detailedPayload);
+      }
+
+      addToast(
+        `Marks ${editingMark ? "updated" : "archived"} successfully`,
+        "success",
+      );
       onClose();
     } catch (err) {
-      addToast("Failed to save marks", "error");
+      addToast("Submission failed: Check connection and values", "error");
     } finally {
       setIsSaving(false);
     }
   };
+
+  if (!isOpen || !settings) return null;
+
 
   return (
     <div className="fixed inset-0 bg-green-darkest/40 backdrop-blur-md z-[100] flex items-center justify-center p-4">
@@ -150,9 +237,25 @@ export default function EditMarksModal({ isOpen, onClose, student, editingMark, 
               <h2 className="text-white text-xl font-black uppercase tracking-tighter leading-none mb-1">
                 {editingMark ? "Edit Marks" : "Add Missing Record"}
               </h2>
-              <p className="text-yellow-gold text-[10px] font-bold uppercase tracking-[0.2em] opacity-80">
+              {/* <p className="text-yellow-gold text-[10px] font-bold uppercase tracking-[0.2em] opacity-80">
                 Unit Mode: {currentUnitType.toUpperCase()}
-              </p>
+              </p> */}
+              <div className="flex gap-4 mt-1">
+                <button 
+                  type="button" 
+                  onClick={() => setIsDirect(true)}
+                  className={`text-[9px] font-bold uppercase flex items-center gap-1 transition-colors ${!isDirect ? 'text-yellow-gold' : 'text-white/40'}`}
+                >
+                  Detailed Mode
+                </button>
+                <button 
+                  type="button" 
+                  onClick={() => setIsDirect(false)}
+                  className={`text-[9px] font-bold uppercase flex items-center gap-1 transition-colors ${isDirect ? 'text-yellow-gold' : 'text-white/40'}`}
+                >
+                  Direct Entry
+                </button>
+              </div>
             </div>
           </div>
           <button
@@ -164,18 +267,28 @@ export default function EditMarksModal({ isOpen, onClose, student, editingMark, 
         </div>
 
         <div className="flex-1 overflow-y-auto p-8 bg-slate-50/50">
-          <form
-            ref={formRef}
-            onSubmit={handleSubmit}
-            id="marksForm"
-            onChange={handleFormChange}
-          >
+          <form ref={formRef} onSubmit={handleSubmit} onChange={handleFormChange} id="marksForm">
+
             {!editingMark && (
               <div className="grid grid-cols-2 gap-6 mb-8">
               <SelectField name="unitCode" label="Authorized Unit" placeholder="-- Select Unit --" options={availableUnits} onChange={setSelectedUnitCode} />
               <SelectField name="academicYear" label="Academic Year" placeholder="-- Select Session --" options={availableYears} />
             </div>
             )}
+
+            {isDirect ? (
+              /* SIMPLE MODE UI */
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8 animate-in fade-in slide-in-from-bottom-2">
+                <div className="space-y-4">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Section A: CA Total</span>
+                  <MarkInput name="caDirect" label="Continuous Assessment" max={30} defaultValue={editingMark?.caTotal30} />
+                </div>
+                <div className="space-y-4">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Section B: Exam Total</span>
+                  <MarkInput name="examDirect" label="Examination Score" max={70} defaultValue={editingMark?.examTotal70} />
+                </div>
+              </div>
+            ) : (
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
               {/* COURSEWORK SECTION */}
@@ -248,6 +361,9 @@ export default function EditMarksModal({ isOpen, onClose, student, editingMark, 
                 </div>
               </div>
             </div>
+          )}
+
+
 
             {/* PREVIEW SCOREBOARD */}
             <div className="grid grid-cols-4 gap-4 p-4 bg-green-darkest rounded-2xl border border-yellow-gold/20 shadow-inner">
@@ -270,7 +386,7 @@ export default function EditMarksModal({ isOpen, onClose, student, editingMark, 
             </div>
 
             {/* SPECIAL OVERRIDE */}
-            <div className="mt-6 border-t border-slate-200 pt-6 flex items-center gap-4">
+            {/* <div className="mt-6 border-t border-slate-200 pt-6 flex items-center gap-4">
               <input
                 type="checkbox"
                 checked={isSpecial}
@@ -281,7 +397,7 @@ export default function EditMarksModal({ isOpen, onClose, student, editingMark, 
                 <p className="text-[10px] font-black text-slate-700 uppercase">Special Exam Protocol</p>
                 <p className="text-[9px] text-slate-400 uppercase">Marks attempt as Special (ignores CA if applicable)</p>
               </div>
-            </div>
+            </div> */}
           </form>
         </div>
 

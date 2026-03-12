@@ -2,95 +2,48 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import {
-  bulkRegisterStudents,
-  downloadStudentRegistrationTemplate,
-} from "@/api/studentsApi";
-import type { StudentFormRow, Program, AcademicYear } from "@/api/types";
+import { bulkRegisterStudents, downloadStudentRegistrationTemplate } from "@/api/studentsApi";
+import type { StudentFormRow, Program, AcademicYear, IntakeType } from "@/api/types";
 import { useToast } from "@/context/ToastContext";
 import { getAcademicYears, getPrograms } from "@/api/marksApi";
 import PageHeader from "@/components/ui/PageHeader";
-import {
-  FileDown,
-  Trash2,
-  AlertCircle,
-  ClipboardCheck,
-  Zap,
-} from "lucide-react";
+import { FileDown, Trash2, AlertCircle, ClipboardCheck, Zap} from "lucide-react";
 
 const PREFERRED_PROGRAM = "Bachelor of Science in Civil Engineering";
 
 export default function RegisterStudents() {
   const [students, setStudents] = useState<StudentFormRow[]>([
-    { regNo: "", name: "", program: "", currentYearOfStudy: 1 },
+    { regNo: "", name: "", program: "", currentYearOfStudy: 1, intake: "JAN" },
   ]);
   const [loading, setLoading] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [programs, setPrograms] = useState<Program[]>([]);
   const [academicYears, setAcademicYears] = useState<AcademicYear[]>([]);
   const [selectedProgramId, setSelectedProgramId] = useState<string>("");
-  const [selectedAcademicYearId, setSelectedAcademicYearId] =
-    useState<string>("");
+  const [selectedAcademicYearId, setSelectedAcademicYearId] = useState<string>("");
   const [loadingData, setLoadingData] = useState(false);
   const { addToast } = useToast();
   const tableRef = useRef<HTMLDivElement>(null);
-
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     setLoadingData(true);
-  //     try {
-  //       const [progData, yearData] = await Promise.all([ getPrograms(), getAcademicYears()]);
-  //       setPrograms(progData);
-  //       setAcademicYears(yearData);
-  //       const current = yearData.find((y: AcademicYear) => y.isCurrent || y.isActive);
-  //       if (current) setSelectedAcademicYearId(current._id);
-  //       const preferred = progData.find((p: Program) => p.name.trim() === PREFERRED_PROGRAM);
-  //       if (preferred) setSelectedProgramId(preferred._id);
-  //       else if (yearData.length > 0) setSelectedAcademicYearId(yearData[0]._id);
-  //     } catch (error) {
-  //       console.error("Fetch error:", error);
-  //       addToast("Failed to load programs and years", "error");
-  //     } finally {
-  //       setLoadingData(false);
-  //     }
-  //   };
-  //   fetchData();
-  // }, [addToast]);
 
   useEffect(() => {
     const fetchData = async () => {
       setLoadingData(true);
       try {
-        const [progData, yearData] = await Promise.all([
-          getPrograms(),
-          getAcademicYears(),
-        ]);
+        const [progData, yearData] = await Promise.all([ getPrograms(), getAcademicYears() ]);
 
         // 1. Set Lists
         setPrograms(progData);
         setAcademicYears(yearData);
 
         // 2. Resolve Academic Year (Logic Fix)
-        const currentYear = yearData.find(
-          (y: AcademicYear) => y.isCurrent || y.isActive,
-        );
-        if (currentYear) {
-          setSelectedAcademicYearId(currentYear._id);
-        } else if (yearData.length > 0) {
-          setSelectedAcademicYearId(yearData[0]._id);
-        }
+        const currentYear = yearData.find((y: AcademicYear) => y.isCurrent || y.isActive);
+        if (currentYear) setSelectedAcademicYearId(currentYear._id);
+        else if (yearData.length > 0) setSelectedAcademicYearId(yearData[0]._id);
 
         // 3. Resolve Program (Logic Fix)
-        const preferred = progData.find(
-          (p: Program) =>
-            p.name.trim().toLowerCase() === PREFERRED_PROGRAM.toLowerCase(),
-        );
-        if (preferred) {
-          setSelectedProgramId(preferred._id);
-        } else if (progData.length > 0) {
-          // Fallback to first program if preferred doesn't exist
-          setSelectedProgramId(progData[0]._id);
-        }
+        const preferred = progData.find((p: Program) => p.name.trim().toLowerCase() === PREFERRED_PROGRAM.toLowerCase());
+        if (preferred) setSelectedProgramId(preferred._id);
+        else if (progData.length > 0) setSelectedProgramId(progData[0]._id);   
       } catch (error) {
         console.error("Fetch error:", error);
         addToast("Failed to load setup data", "error");
@@ -115,17 +68,7 @@ export default function RegisterStudents() {
   };
 
   // Add a new empty row
-  const addRow = () => {
-    setStudents([
-      ...students,
-      {
-        regNo: "",
-        name: "",
-        program: selectedProgramId,
-        currentYearOfStudy: 1,
-      },
-    ]);
-  };
+  const addRow = () => { setStudents([ ...students, { regNo: "", name: "", program: selectedProgramId, currentYearOfStudy: 1, intake: "JAN" }]);};
 
   const updateStudent = (
     index: number,
@@ -194,6 +137,12 @@ export default function RegisterStudents() {
       const name = r[1] || "";
       const program = r[2] || "";
       const yearText = r[3] || "";
+      // 1. Get raw string
+      const rawIntake = (r[4] || "SEPT").toUpperCase();
+
+      // 2. Cast and Validate to prevent "string not assignable to 'JAN' | 'MAY' | 'SEPT'"
+      let intake: IntakeType = "SEPT";
+      if (["JAN", "MAY", "SEPT"].includes(rawIntake)) intake = rawIntake as IntakeType;      
 
       if (!regNo || !name || !program) continue;
 
@@ -201,13 +150,11 @@ export default function RegisterStudents() {
       const y = parseInt(yearText);
       if (!isNaN(y) && y >= 1 && y <= 5) currentYearOfStudy = y;
 
-      result.push({ regNo, name, program, currentYearOfStudy });
+      result.push({ regNo, name, program, currentYearOfStudy, intake });
     }
 
-    if (result.length === 0) {
-      addToast("No valid rows found.", "warning");
-      return;
-    }
+    if (result.length === 0) {addToast("No valid rows found.", "warning");
+      return; }
 
     setStudents(result);
     addToast(`Successfully pasted ${result.length} students`, "success");
@@ -225,10 +172,7 @@ export default function RegisterStudents() {
     setIsDownloading(true);
     try {
       // Pass both IDs to your API utility
-      await downloadStudentRegistrationTemplate(
-        selectedProgramId,
-        selectedAcademicYearId,
-      );
+      await downloadStudentRegistrationTemplate( selectedProgramId, selectedAcademicYearId );
       addToast("Template downloaded successfully!", "success");
     } catch {
       addToast("Could not download template", "error");
@@ -267,6 +211,7 @@ export default function RegisterStudents() {
           name: s.name.trim(),
           program: finalProgramId,
           currentYearOfStudy: Number(s.currentYearOfStudy) || 1,
+          intake: s.intake,
           academicYearId: selectedAcademicYearId,
           rawProgram: progObj?.name || "",
         };
@@ -280,15 +225,10 @@ export default function RegisterStudents() {
     // Client-side duplicate check
     const regNos = filled.map((s) => s.regNo.trim().toUpperCase());
     const seen = new Set<string>();
-    const clientDuplicates = regNos.filter(
-      (reg) => seen.size === seen.add(reg).size,
-    );
+    const clientDuplicates = regNos.filter((reg) => seen.size === seen.add(reg).size);
 
     if (clientDuplicates.length > 0) {
-      addToast(
-        `Duplicate reg numbers found in list: ${clientDuplicates.join(", ")}`,
-        "error",
-      );
+      addToast(`Duplicate reg numbers found in list: ${clientDuplicates.join(", ")}`, "error");
       return;
     }
     setLoading(true);
@@ -296,38 +236,21 @@ export default function RegisterStudents() {
     try {
       const response = await bulkRegisterStudents({ students: filled });
       const registeredCount = response.registered?.length || 0;
-      addToast(
-        `${registeredCount} students registered successfully!`,
-        "success",
-      );
       const alreadyCount = response.alreadyRegistered?.length || 0;
       let toastMessage = "";
-      if (registeredCount > 0)
-        toastMessage = `${registeredCount} student(s) registered successfully.`;
-      else if (alreadyCount > 0)
-        toastMessage = "All students in the list are already registered.";
+      if (registeredCount > 0) toastMessage = `${registeredCount} student(s) registered successfully.`;
+      else if (alreadyCount > 0) toastMessage = "All students in the list are already registered.";
       addToast(toastMessage, "success");
-      setStudents([
-        { regNo: "", name: "", program: "", currentYearOfStudy: 1 },
-      ]);
+      setStudents([{ regNo: "", name: "", program: "", currentYearOfStudy: 1, intake: "JAN" }]);
     } catch (err: unknown) {
       const error = err as {
-        response?: {
-          data?: {
-            message?: string;
-            alreadyRegistered?: string[];
-            duplicates?: string[];
-            registered?: string[];
-          };
-        };
+        response?: { data?: { message?: string; alreadyRegistered?: string[]; duplicates?: string[]; registered?: string[]; };};
       };
       const responseData = error.response?.data;
       const registeredCount = responseData?.registered?.length || 0;
       const already = responseData?.alreadyRegistered?.join(", ") || "";
       const dups = responseData?.duplicates?.join(", ") || "";
-      const msg =
-        responseData?.message ||
-        "Failed to register students (Network or Server Error)";
+      const msg = responseData?.message || "Failed to register students (Network or Server Error)";
       let errorDetail = "";
       if (already) errorDetail += ` Already Exist: ${already}`;
       if (dups) errorDetail += ` Duplicates: ${dups}`;
@@ -337,10 +260,8 @@ export default function RegisterStudents() {
     }
   };
 
-  const inputBase =
-    "w-full p-3 bg-white border border-slate-200 text-green-darkest font-semibold text-xs rounded-xl transition-all outline-none appearance-none";
-  const labelStyle =
-    "text-[9px] font-black uppercase text-slate-400 tracking-widest ml-1 mb-2 block";
+  const inputBase = "w-full p-3 bg-white border border-slate-200 text-green-darkest font-semibold text-xs rounded-xl transition-all outline-none appearance-none";
+  const labelStyle = "text-[9px] font-black uppercase text-slate-400 tracking-widest ml-1 mb-2 block";
 
   return (
     <div className="max-w-8xl ml-48 my-10 ">
@@ -455,6 +376,7 @@ export default function RegisterStudents() {
                 <th className="px-4 py-2 text-left font-bold ">Full Name</th>
                 <th className="px-4 py-2 text-left font-bold ">Program</th>
                 <th className="px-4 py-2 text-left font-bold ">Year</th>
+                <th className="px-4 py-2 text-left font-bold ">Intake</th>
                 <th className="px-4 py-2 text-center font-bold ">Action</th>
               </tr>
             </thead>
@@ -465,7 +387,8 @@ export default function RegisterStudents() {
                 const safeProgram = String(student.program || "");
                 const currentReg = safeReg.trim().toUpperCase();
                 const isDuplicate = currentReg && duplicates.has(currentReg);
-                const isIncomplete = !safeReg.trim() || !safeName.trim() || !safeProgram.trim();
+                const isIncomplete =
+                  !safeReg.trim() || !safeName.trim() || !safeProgram.trim();
 
                 return (
                   <tr
@@ -490,8 +413,13 @@ export default function RegisterStudents() {
                           placeholder="E024-01-0001/2024"
                           className={`
                             w-full p-2.5 text-green-darkest rounded-mono font-bold transition-all outline-none 
-                            ${isDuplicate ? "bg-white border-red-500 text-red-700 placeholder-red-400 shadow-md"
-                            : !student.regNo.trim() ? "bg-orange-100  " : "bg-gray-50 hover:bg-yellow-gold/70 focus:ring-0" }`}
+                            ${
+                              isDuplicate
+                                ? "bg-white border-red-500 text-red-700 placeholder-red-400 shadow-md"
+                                : !student.regNo.trim()
+                                  ? "bg-orange-100  "
+                                  : "bg-gray-50 hover:bg-yellow-gold/70 focus:ring-0"
+                            }`}
                         />
                       </div>
                     </td>
@@ -499,7 +427,9 @@ export default function RegisterStudents() {
                       <input
                         type="text"
                         value={safeName}
-                        onChange={(e) => updateStudent(i, "name", e.target.value)}
+                        onChange={(e) =>
+                          updateStudent(i, "name", e.target.value)
+                        }
                         placeholder="Patrick Kimani"
                         className="text-green-darkest  w-full px-2 rounded focus:ring-0 outline-0  "
                       />
@@ -507,13 +437,19 @@ export default function RegisterStudents() {
                     <td className="px-4 py-2">
                       <select
                         value={student.program || selectedProgramId} // Fallback to the globally selected program ID
-                        onChange={(e) => updateStudent(i, "program", e.target.value)}
+                        onChange={(e) =>
+                          updateStudent(i, "program", e.target.value)
+                        }
                         className="text-green-darkest w-full px-2 py-1 rounded bg-transparent border-0 focus:ring-2 focus:ring-green-dark/20 outline-none cursor-pointer font-semibold text-xs"
                       >
                         <option value="" disabled>
                           Select Program
                         </option>
-                        {programs.map((p) => ( <option key={p._id} value={p._id}>{p.name}</option> ))}
+                        {programs.map((p) => (
+                          <option key={p._id} value={p._id}>
+                            {p.name}
+                          </option>
+                        ))}
                       </select>
                     </td>
 
@@ -532,6 +468,19 @@ export default function RegisterStudents() {
                         min="1"
                         max="6"
                       />
+                    </td>
+                    <td className="px-4 py-2">
+                      <select
+                        value={student.intake || "JAN"}
+                        onChange={(e) =>
+                          updateStudent(i, "intake", e.target.value)
+                        }
+                        className="text-green-darkest w-full px-2 py-1 rounded bg-slate-50 border-0 font-bold text-[10px]"
+                      >
+                        <option value="JAN">JAN</option>
+                        <option value="MAY">MAY</option>
+                        <option value="SEPT">SEPT</option>
+                      </select>
                     </td>
                     <td className="px-4 py-2 text-right">
                       <button
@@ -576,3 +525,4 @@ export default function RegisterStudents() {
     </div>
   );
 }
+

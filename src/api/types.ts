@@ -105,11 +105,14 @@ export interface StudentFromAPI {
 
 export interface AcademicYear {
   _id: string;
-  year: string;           // e.g. "2024/2025"
+  year: string;    
+  intakes: string[];
   startDate?: string;      // ISO string "2024-08-01"
   endDate?: string;        // ISO string "2025-07-31"
- isActive: boolean;
+  isActive: boolean;
   isCurrent?: boolean;
+  session: "ORDINARY" | "SUPPLEMENTARY" | "CLOSED"; // Added for ENG 13/18
+  isRegistrationOpen: boolean; // Added for Unit Registration period
   createdAt?: string;
   updatedAt?: string;
 }
@@ -162,12 +165,14 @@ export interface InstitutionSettingsInput {
   gradingScale?: GradingScale[];
 }
 
+export type IntakeType = "JAN" | "MAY" | "SEPT";
 export interface StudentFormRow {
   regNo: string;
   name: string;
   program: string; // The ID from selectedProgramId or the Name from Paste
   currentYearOfStudy: number;
   academicYearId?: string;
+  intake: IntakeType;
   admissionAcademicYearString?: string;
 }
 
@@ -220,6 +225,7 @@ export interface GradeRecord {
   semester: string | number;
   status: string;
   totalMark: number;
+  agreedMark: number;
   grade: string;
   academicYear: { year: string };
   deletedAt?: Date;
@@ -316,6 +322,11 @@ export interface SaveMarksPayload {
   examQ3?: number;
   examQ4?: number;
   examQ5?: number;
+  caDirect?: number; 
+  examDirect?: number;
+  caTotal30?: number;    // Added for backend compatibility
+  examTotal70?: number;  // Added for backend compatibility
+  agreedMark?: number;
   isSpecial: boolean;
   attempt: "1st" | "re-take" | "supplementary" | "special";
 }
@@ -363,6 +374,7 @@ export interface StudentJourneyTimeline {
 
 export interface StudentJourneyResponse {
   admissionYear: string;
+  intake: string;
   currentStatus: string;
   cumulativeMean: string;
   timeline: StudentJourneyTimeline[];

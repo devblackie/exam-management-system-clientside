@@ -30,7 +30,7 @@ export const MENU_ITEMS: MenuItem[] = [
   { name: "Manage Invites", icon: Users, href: "/admin/invites", roles: ["admin"] },
   { name: "Manage Users", icon: Users, href: "/admin/users", roles: ["admin"] },
   { name: "Academic Year", icon: CalendarDays, href: "/coordinator/academic-years", roles: ["coordinator"] },
-  { name: "Programs", icon: BookOpen, href: "/admin/programs", roles: ["admin", "coordinator"] },
+  // { name: "Programs", icon: BookOpen, href: "/admin/programs", roles: ["admin", "coordinator"] },
   { name: "Curriculum", icon: BookOpenCheck, href: "/coordinator/curriculum", roles: ["admin", "coordinator"] },
   { name: "Units", icon: GraduationCap, href: "/coordinator/unit-templates", roles: ["admin", "coordinator"] },
   { name: "Register Students", icon: Users, href: "/coordinator/students", roles: ["coordinator"] },

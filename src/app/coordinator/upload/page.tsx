@@ -17,6 +17,8 @@ import {
   AlertTriangle,
   Cpu,
   Database,
+  LayoutGrid,
+  ListChecks,
 } from "lucide-react";
 import PageHeader from "@/components/ui/PageHeader";
 
@@ -50,6 +52,7 @@ export default function UploadMarks() {
   const [uploading, setUploading] = useState(false);
   const [result, setResult] = useState<UploadResult | null>(null);
   const [dragActive, setDragActive] = useState(false);
+  const [templateMode, setTemplateMode] = useState<"detailed" | "direct">("direct");
 
   useEffect(() => {
     getPrograms().then(setPrograms).catch(() => addToast("Failed to load programs.", "error"));
@@ -105,8 +108,10 @@ export default function UploadMarks() {
         selectedSemester!,
         examMode,
         unitType,
+        templateMode
       );
-      addToast("Scoresheet template generated.", "success");
+      addToast(`${templateMode === 'direct' ? 'Direct Entry' : 'Detailed'} template generated.`, "success");
+      // addToast("Scoresheet template generated.", "success");
     } catch {
       addToast("Template generation failed.", "error");
     }
@@ -144,7 +149,7 @@ export default function UploadMarks() {
     }
   };
 
-  const inputClass =
+  const inputClass = 
     "w-full p-3 bg-white border border-slate-200 text-green-darkest font-semibold text-xs rounded-lg transition-all outline-none appearance-none";
   const disabledStyles =
     "bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed opacity-60";
@@ -247,6 +252,37 @@ export default function UploadMarks() {
               </select>
             </div>
 
+            {/* Template Mode Selection */}
+            <div className="space-y-3">
+              <label className="text-[9px] font-black uppercase text-slate-400 tracking-widest ml-1">
+                Complexity
+              </label>
+              <div className="flex bg-white rounded-lg p-1 border border-slate-200">
+                <button
+                  onClick={() => setTemplateMode("detailed")}
+                  className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-md text-[10px] font-black transition-all ${
+                    templateMode === "detailed" 
+                    ? "bg-green-darkest text-yellow-gold shadow-md" 
+                    : "text-slate-400 hover:text-green-darkest"
+                  }`}
+                >
+                  
+                  DETAILED
+                </button>
+                <button
+                  onClick={() => setTemplateMode("direct")}
+                  className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-md text-[10px] font-black transition-all ${
+                    templateMode === "direct" 
+                    ? "bg-green-darkest text-yellow-gold shadow-md" 
+                    : "text-slate-400 hover:text-green-darkest"
+                  }`}
+                >
+                 
+                  DIRECT
+                </button>
+              </div>
+            </div>
+
             {/* Unit - ENFORCED LOCKING LOGIC */}
             <div className="space-y-2 relative">
               <label className="text-[9px] font-black uppercase text-slate-400 tracking-widest ml-1">
@@ -270,40 +306,56 @@ export default function UploadMarks() {
                 ))}
               </select>
             </div>
-            <div className="space-y-2">
-              <label className="text-[9px] font-black uppercase text-slate-400 tracking-widest ml-1">
-                Unit Type
-              </label>
 
-              <select
-                className={inputClass}
-                onChange={(e) =>
-                  setUnitType(e.target.value as "theory" | "lab" | "workshop")
-                }
-                value={unitType}
-              >
-                <option value="theory">Theory (20/10)</option>
-                <option value="lab">Lab (15/5/10)</option>
-                <option value="workshop">Workshop (40/60)</option>
-              </select>
-            </div>
+            {templateMode === "detailed" && (
+              <>
+                <div className="space-y-2">
+                  <label className="text-[9px] font-black uppercase text-slate-400 tracking-widest ml-1">
+                    Unit Type
+                  </label>
 
-            {/* Exam Mode Selection */}
-            <div className="space-y-2">
-              <label className="text-[9px] font-black uppercase text-slate-400 tracking-widest ml-1">
-                Exam Format
-              </label>
-              <select
-                className={inputClass}
-                value={examMode}
-                onChange={(e) =>
-                  setExamMode(e.target.value as "standard" | "mandatory_q1")
-                }
-              >
-                <option value="standard">Standard Grading</option>
-                <option value="mandatory_q1">Compulsory Q1 Strategy</option>
-              </select>
-            </div>
+                  <select
+                    className={inputClass}
+                    onChange={(e) =>
+                      setUnitType(
+                        e.target.value as "theory" | "lab" | "workshop",
+                      )
+                    }
+                    value={unitType}
+                  >
+                    <option value="theory">Theory (20/10)</option>
+                    <option value="lab">Lab (15/5/10)</option>
+                    <option value="workshop">Workshop (40/60)</option>
+                  </select>
+                </div>
+
+                {/* Exam Mode Selection */}
+                <div className="space-y-2">
+                  <label className="text-[9px] font-black uppercase text-slate-400 tracking-widest ml-1">
+                    Exam Format
+                  </label>
+                  <select
+                    className={inputClass}
+                    value={examMode}
+                    onChange={(e) =>
+                      setExamMode(e.target.value as "standard" | "mandatory_q1")
+                    }
+                  >
+                    <option value="standard">Standard Grading</option>
+                    <option value="mandatory_q1">Compulsory Q1 Strategy</option>
+                  </select>
+                </div>
+              </>
+            )}
+
+            {templateMode === "direct" && (
+              <div className="col-span-2 flex items-center px-4">
+                <p className="text-[10px] text-slate-400 italic">
+                  * Direct mode skips question-by-question analysis and imports
+                  final CA (30) and Exam (70) scores directly.
+                </p>
+              </div>
+            )}
           </div>
         </div>
 

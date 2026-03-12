@@ -10,14 +10,19 @@ export interface UploadResult {
   errors: string[];
 }
 
-/**
- * Upload marks via CSV/Excel file
- */
-export async function uploadMarks(file: File): Promise<UploadResult> {
+// Upload marks via CSV/Excel file 
+export async function uploadMarks(file: File, 
+  templateMode: "detailed" | "direct" = "detailed"): Promise<UploadResult> {
   const formData = new FormData();
   formData.append("file", file);
 
-  const res = await api.post<UploadResult>("/marks/upload", formData, {
+  const endpoint = templateMode === "direct" ? "/marks/upload-direct" : "/marks/upload";
+
+  // const res = await api.post<UploadResult>("/marks/upload", formData, {
+  //   headers: { "Content-Type": "multipart/form-data" },
+  // });
+
+  const res = await api.post<UploadResult>(endpoint, formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
 
@@ -25,7 +30,7 @@ export async function uploadMarks(file: File): Promise<UploadResult> {
 }
 
 export const downloadTemplate = async (
-programId: string, unitId: string, academicYearId: string, yearOfStudy: number, semester: number, examMode: string, unitType: string) => {
+programId: string, unitId: string, academicYearId: string, yearOfStudy: number, semester: number, examMode: string, unitType: string, templateMode: "detailed" | "direct" = "detailed") => {
   // --- Defensive Check ADDED HERE ---
   if (!programId || !unitId || !academicYearId || !yearOfStudy || !semester) {
     console.error(
@@ -36,8 +41,12 @@ programId: string, unitId: string, academicYearId: string, yearOfStudy: number, 
       "Please select the Program, Unit, Academic Year, Year of Study, and Semester before downloading the template."
     );
   }
-  // ----------------------------------
   try {
+    // 2. Determine the Route based on templateMode
+    // Assuming your backend has:
+    // GET /marks/template (Detailed)
+    // GET /marks/template-direct (New Direct Entry)
+    const endpoint = templateMode === "direct" ? "/marks/direct-template" : "/marks/template";
     // Construct the query string with the required parameters
     const params = new URLSearchParams({
       programId,
@@ -45,16 +54,20 @@ programId: string, unitId: string, academicYearId: string, yearOfStudy: number, 
       academicYearId,
       yearOfStudy: yearOfStudy.toString(),
       semester: semester.toString(),
-      examMode, unitType
+      examMode, unitType,
+      ...(templateMode === "detailed" && { examMode, unitType }),
     }).toString();
 
     // Make the GET request with the parameters
-    const response = await axiosInstance.get(`/marks/template?${params}`, {
+    // const response = await axiosInstance.get(`/marks/template?${params}`, {
+    // const response = await axiosInstance.get(`/marks/direct-template?${params}`, {
+    const response = await axiosInstance.get(`${endpoint}?${params}`, {
       responseType: "blob", // Important for downloading files
     });
 
     // --- EXTRACT FILENAME FROM HEADER ---
-    let fileName = "scoresheet-template.xlsx";
+    // let fileName = "scoresheet-template.xlsx";
+    let fileName = templateMode === "direct" ? "Scoresheet.xlsx" : "Scoresheet.xlsx";
     const contentDisposition = response.headers["content-disposition"];
 
     if (contentDisposition) {
@@ -103,9 +116,7 @@ export async function approveSpecialExam(
   }
 }
 
-/**
- * Get student transcript (JSON data)
- */
+// Get student transcript (JSON data) 
 export async function getStudentTranscript(regNo: string) {
   const res = await api.get<{
     student: {
@@ -128,27 +139,6 @@ export async function getStudentTranscript(regNo: string) {
 
   return res.data;
 }
-
-/**
- * Generate Senate Reports (PDF) – Opens in new tab
- */
-export const generatePassList = (academicYearId: string) => {
-  window.open(
-    `${
-      process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-    }/reports/pass-list/${academicYearId}`,
-    "_blank"
-  );
-};
-
-export const generateConsolidatedMarksheet = (academicYearId: string) => {
-  window.open(
-    `${
-      process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-    }/reports/consolidated/${academicYearId}`,
-    "_blank"
-  );
-};
 
 export const generateStudentTranscript = (regNo: string) => {
   window.open(

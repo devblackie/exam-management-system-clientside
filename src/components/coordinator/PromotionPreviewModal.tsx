@@ -188,7 +188,7 @@ export default function PromotionPreviewModal({
                       className={`inline-flex items-center gap-2 px-3 py-2 rounded-full text-[9.5px] font-bold uppercase tracking-wider border ${
                         student.status === "graduand"
                           ? "bg-amber-50 text-amber-700 border-amber-200 shadow-sm"
-                          : student.status === "IN GOOD STANDING"
+                          : student.status === "PASS"
                             ? "bg-emerald-50 text-emerald-700 border-emerald-100"
                             : student.status === "ALREADY PROMOTED"
                               ? "bg-green-darkest text-yellow-gold border-green-darkest shadow-md"
@@ -208,52 +208,21 @@ export default function PromotionPreviewModal({
                       {student.status}
                     </span>
                   </td>
-                  {/* {activeTab === "blocked" && (
+                  {activeTab === "blocked" && (
                     <td className="py-4 px-4">
-                      <div className="flex flex-wrap gap-1 justify-end">
+                      <ol>
                         {student.reasons.map((r, i) => (
-                          <span
+                          <li
                             key={i}
-                            className="text-[9px] px-2 py-1 bg-white border border-slate-200 text-slate-500 font-bold rounded shadow-sm"
+                            className="text-[9px] px-2 py-1  text-slate-500 font-bold "
                           >
                             {r.toUpperCase()}
-                          </span>
+                          </li>
                         ))}
-                      </div>
+                      </ol>
                     </td>
-                  )} */}
-                  {/* Inside the mapping of currentList in PromotionPreviewModal.tsx */}
-                  {activeTab === "blocked" && (
-                    <tr
-                      key={student.id}
-                      className="border-l-4 border-red-500 bg-red-50/30"
-                    >
-                      <td className="py-4 px-4 font-mono font-bold text-red-900">
-                        {student.regNo}
-                      </td>
-                      <td className="py-4 px-4 font-semibold text-slate-700">
-                        {student.name}
-                      </td>
-                      <td className="py-4 px-4">
-                        <span className="bg-red-600 text-white px-3 py-1 rounded text-[10px] font-black">
-                          {student.status}
-                        </span>
-                      </td>
-                      <td className="py-4 px-4 text-right">
-                        <div className="flex flex-col items-end gap-1">
-                          {student.reasons.map((reason, idx) => (
-                            <span
-                              key={idx}
-                              className="flex items-center gap-2 text-[10px] text-red-600 font-bold bg-white border border-red-100 px-2 py-1 rounded"
-                            >
-                              <FileWarning size={12} />
-                              {reason.toUpperCase()}
-                            </span>
-                          ))}
-                        </div>
-                      </td>
-                    </tr>
                   )}
+                  
                 </tr>
               ))}
             </tbody>
