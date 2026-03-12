@@ -71,11 +71,7 @@ export default function JourneyTimeline({ data }: JourneyProps) {
               <span className="text-lg font-light text-[#002B1B] tracking-tighter">
                 {data.currentStatus}
               </span>
-              {/* <div className="h-3 w-[1px] bg-slate-300" /> */}
-              {/* <span className="text-[9px] font-mono text-slate-400 uppercase">
-                Cohort Identifier: {data.admissionYear.slice(-2)}
-                {data.intake.slice(0, 1)}
-              </span> */}
+             
             </div>
           </div>
         </div>
