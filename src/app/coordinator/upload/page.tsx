@@ -9,25 +9,10 @@ import { getPrograms } from "@/api/programsApi";
 import { getAcademicYears } from "@/api/academicYearsApi";
 import { getProgramUnits } from "@/api/programUnitsApi";
 import type { Program, AcademicYear, ProgramUnit } from "@/api/types";
-import {
-  CloudCheck,
-  FileDown,
-  UploadCloud,
-  CheckCircle2,
-  AlertTriangle,
-  Cpu,
-  Database,
-  LayoutGrid,
-  ListChecks,
-} from "lucide-react";
+import { CloudCheck, FileDown, UploadCloud, CheckCircle2, AlertTriangle, Cpu, Database } from "lucide-react";
 import PageHeader from "@/components/ui/PageHeader";
 
-interface UploadResult {
-  message: string;
-  total: number;
-  success: number;
-  errors: string[];
-}
+interface UploadResult { message: string; total: number; success: number; errors: string[]; }
 
 const YEARS_OF_STUDY = [1, 2, 3, 4, 5];
 const SEMESTERS = [1, 2];
@@ -60,55 +45,29 @@ export default function UploadMarks() {
   }, [addToast]);
 
   useEffect(() => {
-    if (selectedProgramId) {
-      getProgramUnits(selectedProgramId).then(setProgramUnits).catch(() => addToast("Failed to load units.", "error"));
-    } else {
-      setProgramUnits([]);
-    }
+    if (selectedProgramId) getProgramUnits(selectedProgramId).then(setProgramUnits).catch(() => addToast("Failed to load units.", "error"));
+    else setProgramUnits([]);
     setSelectedUnitId("");
   }, [selectedProgramId, addToast]);
 
   const filteredProgramUnits = useMemo(() => {
     if (!selectedYearOfStudy || !selectedSemester) return programUnits;
-    return programUnits.filter(
-      (pu) =>
-        pu.requiredYear === selectedYearOfStudy &&
-        pu.requiredSemester === selectedSemester,
-    );
+    return programUnits.filter((pu) => pu.requiredYear === selectedYearOfStudy && pu.requiredSemester === selectedSemester );
   }, [programUnits, selectedYearOfStudy, selectedSemester]);
 
   // Logic to determine if Unit Selection should be unlocked
-  const isUnitUnlocked =
-    !!selectedProgramId && !!selectedYearOfStudy && !!selectedSemester;
+  const isUnitUnlocked = !!selectedProgramId && !!selectedYearOfStudy && !!selectedSemester;
 
   const isDownloadEnabled = useMemo(() => {
-    return (
-      !!selectedProgramId &&
-      !!selectedUnitId &&
-      !!selectedAcademicYearId &&
-      !!selectedYearOfStudy &&
-      !!selectedSemester
-    );
-  }, [
-    selectedProgramId,
-    selectedUnitId,
-    selectedAcademicYearId,
-    selectedYearOfStudy,
-    selectedSemester,
-  ]);
+    return ( !!selectedProgramId && !!selectedUnitId && !!selectedAcademicYearId && !!selectedYearOfStudy && !!selectedSemester );
+  }, [ selectedProgramId, selectedUnitId, selectedAcademicYearId, selectedYearOfStudy, selectedSemester ]);
 
   const handleDownloadTemplate = async () => {
     if (!isDownloadEnabled) return;
     try {
       await downloadTemplate(
-        selectedProgramId,
-        selectedUnitId,
-        selectedAcademicYearId,
-        selectedYearOfStudy!,
-        selectedSemester!,
-        examMode,
-        unitType,
-        templateMode
+        selectedProgramId, selectedUnitId, selectedAcademicYearId, selectedYearOfStudy!,
+        selectedSemester!, examMode, unitType, templateMode
       );
       addToast(`${templateMode === 'direct' ? 'Direct Entry' : 'Detailed'} template generated.`, "success");
       // addToast("Scoresheet template generated.", "success");
@@ -136,12 +95,7 @@ export default function UploadMarks() {
     try {
       const data = await uploadMarks(file);
       setResult(data);
-      addToast(
-        data.success === data.total
-          ? "All records synced."
-          : "Upload processed with remarks.",
-        "success",
-      );
+      addToast( data.success === data.total ? "All records synced." : "Upload processed with remarks.", "success");
     } catch {
       addToast("Server failed to process file.", "error");
     } finally {
@@ -204,11 +158,7 @@ export default function UploadMarks() {
                 onChange={(e) => setSelectedAcademicYearId(e.target.value)}
               >
                 <option value="">Academic Year...</option>
-                {academicYears.map((y: AcademicYear) => (
-                  <option key={y._id} value={y._id}>
-                    {y.year} {y.isActive ? "(Current)" : ""}
-                  </option>
-                ))}
+                {academicYears.map((y: AcademicYear) => ( <option key={y._id} value={y._id}>{y.year} {y.isActive ? "(Current)" : ""}</option> ))}
               </select>
             </div>
 
@@ -220,16 +170,10 @@ export default function UploadMarks() {
               <select
                 className={inputClass}
                 value={selectedYearOfStudy || ""}
-                onChange={(e) =>
-                  setSelectedYearOfStudy(parseInt(e.target.value))
-                }
+                onChange={(e) => setSelectedYearOfStudy(parseInt(e.target.value))}
               >
                 <option value="">Year of Study...</option>
-                {YEARS_OF_STUDY.map((y) => (
-                  <option key={y} value={y}>
-                    Year {y}
-                  </option>
-                ))}
+                {YEARS_OF_STUDY.map((y) => (<option key={y} value={y}>Year {y}</option> ))}
               </select>
             </div>
 
@@ -244,11 +188,7 @@ export default function UploadMarks() {
                 onChange={(e) => setSelectedSemester(parseInt(e.target.value))}
               >
                 <option value="">Semester...</option>
-                {SEMESTERS.map((s) => (
-                  <option key={s} value={s}>
-                    Semester {s}
-                  </option>
-                ))}
+                {SEMESTERS.map((s) => ( <option key={s} value={s}>Semester {s}</option> ))}
               </select>
             </div>
 
@@ -261,23 +201,15 @@ export default function UploadMarks() {
                 <button
                   onClick={() => setTemplateMode("detailed")}
                   className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-md text-[10px] font-black transition-all ${
-                    templateMode === "detailed" 
-                    ? "bg-green-darkest text-yellow-gold shadow-md" 
-                    : "text-slate-400 hover:text-green-darkest"
-                  }`}
+                    templateMode === "detailed" ? "bg-green-darkest text-yellow-gold shadow-md" : "text-slate-400 hover:text-green-darkest"}`}
                 >
-                  
                   DETAILED
                 </button>
                 <button
                   onClick={() => setTemplateMode("direct")}
                   className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-md text-[10px] font-black transition-all ${
-                    templateMode === "direct" 
-                    ? "bg-green-darkest text-yellow-gold shadow-md" 
-                    : "text-slate-400 hover:text-green-darkest"
-                  }`}
+                    templateMode === "direct" ? "bg-green-darkest text-yellow-gold shadow-md" : "text-slate-400 hover:text-green-darkest"}`}
                 >
-                 
                   DIRECT
                 </button>
               </div>
@@ -295,9 +227,7 @@ export default function UploadMarks() {
                 disabled={!isUnitUnlocked}
               >
                 <option value="">
-                  {isUnitUnlocked
-                    ? "Choose Unit..."
-                    : "Select Context First..."}
+                  {isUnitUnlocked ? "Choose Unit..." : "Select Context First..."}
                 </option>
                 {filteredProgramUnits.map((pu) => (
                   <option key={pu._id} value={pu.unit._id}>
@@ -387,16 +317,12 @@ export default function UploadMarks() {
           {/* Drag & Drop Zone */}
           <div className="col-span-12 lg:col-span-8">
             <div
-              onDragOver={(e) => {
-                e.preventDefault();
-                setDragActive(true);
-              }}
+              onDragOver={(e) => { e.preventDefault(); setDragActive(true); }}
               onDragLeave={() => setDragActive(false)}
               onDrop={(e) => {
                 e.preventDefault();
                 setDragActive(false);
-                if (e.dataTransfer.files[0])
-                  handleFile(e.dataTransfer.files[0]);
+                if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
               }}
               className={`relative border-2 border-dashed rounded-lg p-12 transition-all duration-500 flex flex-col items-center justify-center min-h-[300px] ${
                 dragActive

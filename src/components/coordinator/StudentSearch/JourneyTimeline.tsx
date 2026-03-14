@@ -23,16 +23,17 @@ const getOutcomeDetails = (milestone: StudentJourneyTimeline) => {
   }
 
   const status = milestone.status?.toUpperCase() || "";
+  const isPromoted = status.includes("PROMOTED");
   const isCritical = status.includes("REPEAT") || status.includes("DEREGISTERED");
   const isWarning = status.includes("SUPP") || status.includes("SPEC") || status.includes("STAYOUT");
 
   return {
     text: status || "SUCCESSFULLY PROCEEDED",
-    color: isCritical ? "text-red-600" : isWarning ? "text-amber-600" : "text-green-700",
+    color: isPromoted ? "text-[#002B1B]" : isCritical ? "text-red-600" : isWarning ? "text-amber-600" : "text-green-700",
     bg: "bg-white",
     border: "border-slate-100",
-    icon: isCritical ? <AlertCircle size={14} /> : isWarning ? <AlertTriangle size={14} /> : <CheckCircle2 size={14} />,
-    nodeBg: isCritical ? "bg-red-600" : isWarning ? "bg-yellow-600" : "bg-[#002B1B]", 
+    icon: isPromoted ? <Zap size={14} className="fill-current" /> : isCritical ? <AlertCircle size={14} /> : isWarning ? <AlertTriangle size={14} /> : <CheckCircle2 size={14} />,
+    nodeBg: isPromoted ? "bg-[#002B1B]" : isCritical ? "bg-red-600" : isWarning ? "bg-yellow-600" : "bg-[#002B1B]", 
   };
 };
 
@@ -144,19 +145,32 @@ export default function JourneyTimeline({ data }: JourneyProps) {
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-3">
                           <span className="text-[10px] font-black text-[#002B1B] uppercase tracking-[0.3em]">
-                            {isStatusChange
-                              ? "Admin Log"
-                              : `Year ${milestone.yearOfStudy}`}
+                            {isStatusChange ? "Admin Log" : `Year ${milestone.yearOfStudy}`}
                           </span>
+                      
                           <span className="text-[10px] font-mono text-slate-300">
-                            [{milestone.academicYear}]
+                            [{milestone.academicYear || 'N/A'}]
                           </span>
+                      
                           {milestone.isCurrent && (
                             <span className="text-[8px] font-black px-2 py-0.5 bg-[#EAB308] text-[#002B1B] rounded-none uppercase tracking-tighter">
-                              Live Session
+                              Current Active Phase
                             </span>
                           )}
                         </div>
+
+                        {/* Permanent Stamp Badge */}
+                        {!isStatusChange && (
+                          <div
+                            className={`px-3 py-1 border-l-4 ${outcome.border} ${outcome.bg} shadow-sm`}
+                          >
+                            <p
+                              className={`text-[10px] font-black uppercase tracking-widest ${outcome.color}`}
+                            >
+                              {outcome.text}
+                            </p>
+                          </div>
+                        )}
                       </div>
 
                       <div className="grid grid-cols-12 gap-4">
