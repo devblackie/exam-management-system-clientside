@@ -57,9 +57,7 @@ export default function GradesTable({ grades }: GradesTableProps) {
               </td>
               <td className="p-4">
                 <span className="bg-gray-100 px-2 py-1 rounded text-[10px] font-bold text-gray-600">
-                  {grade.semester && grade.semester !== "N/A"
-                    ? `SEM ${grade.semester}`
-                    : "N/A"}
+                  {grade.semester && grade.semester !== "N/A" ? `SEM ${grade.semester}` : "N/A"}
                 </span>
               </td>
               <td className="p-4 font-mono font-bold text-blue-700">

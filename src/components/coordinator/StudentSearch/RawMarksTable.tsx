@@ -6,22 +6,14 @@ import { RawMark } from "@/api/types";
 import { useState } from "react";
 
 interface RawMarksTableProps {
-  marks: RawMark[];
-  studentName: string;
-  onEdit: (mark: RawMark) => void;
-  onAddNew: () => void;
-  onRefresh: () => void;
-  isReadOnly: boolean;
+  marks: RawMark[]; studentName: string; onEdit: (mark: RawMark) => void; onAddNew: () => void; onRefresh: () => void; isReadOnly: boolean;
 }
 
 export default function RawMarksTable({ marks, studentName, onEdit, onAddNew, onRefresh, isReadOnly }: RawMarksTableProps) {
   const [processingId, setProcessingId] = useState<string | null>(null);
 
   const handleGrantSpecial = async (markId: string, unitCode: string) => {
-    const reasonInput = window.prompt(
-      `Grant ${studentName} a Special Exam for ${unitCode}?\nType '1' for Financial\nType '2' for Compassionate`,
-      "1"
-    );
+    const reasonInput = window.prompt(`Grant ${studentName} a Special Exam for ${unitCode}?\nType '1' for Financial\nType '2' for Compassionate`, "1");
 
     if (reasonInput === null) return;
     const reason = reasonInput === "2" ? "Compassionate" : "Financial";
@@ -38,11 +30,7 @@ export default function RawMarksTable({ marks, studentName, onEdit, onAddNew, on
   };
 
   const handleUndoSpecial = async (markId: string, unitCode: string) => {
-    if (
-      !confirm(
-        `Reverse Special status for ${unitCode}? This will return it to a regular attempt.`
-      )
-    )
+    if (!confirm(`Reverse Special status for ${unitCode}? This will return it to a regular attempt.`))
       return;
 
     setProcessingId(markId);
@@ -125,10 +113,7 @@ export default function RawMarksTable({ marks, studentName, onEdit, onAddNew, on
             <tbody className="bg-white">
               {marks.map((m) => {
                 const unitCode = m.programUnit?.unit?.code || "N/A";
-                const isEligibleForSpecial =
-                  (m.caTotal30 || 0) > 0 &&
-                  (m.examTotal70 || 0) === 0 &&
-                  !m.isSpecial;
+                const isEligibleForSpecial = (m.caTotal30 || 0) > 0 && (m.examTotal70 || 0) === 0 && !m.isSpecial;
 
                 return (
                   <tr
@@ -178,14 +163,10 @@ export default function RawMarksTable({ marks, studentName, onEdit, onAddNew, on
                           {isEligibleForSpecial && (
                             <button
                               disabled={processingId === m._id}
-                              onClick={() =>
-                                handleGrantSpecial(m._id, unitCode)
-                              }
+                              onClick={() => handleGrantSpecial(m._id, unitCode)}
                               className="text-[10px] font-bold uppercase text-blue-600 hover:text-blue-800 hover:underline disabled:opacity-50"
                             >
-                              {processingId === m._id
-                                ? "Processing..."
-                                : "Special"}
+                              {processingId === m._id ? "Processing..." : "Special"}
                             </button>
                           )}
                           {m.isSpecial && (

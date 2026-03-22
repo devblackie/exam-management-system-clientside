@@ -2,25 +2,23 @@
 "use client";
 
 import { StudentFullRecord } from "@/api/types";
-import { GraduationCap, AlertTriangle, CalendarClock } from "lucide-react";
+import { GraduationCap } from "lucide-react";
 import { useState } from "react";
-import { deferAdmission, grantAcademicLeave, revertStatusToActive } from "@/api/studentsApi";
+import { deferAdmission, grantAcademicLeave, readmitStudent, revertStatusToActive } from "@/api/studentsApi";
 
+interface StudentProfileHeaderProps { student: StudentFullRecord["student"];  calculatedStatus?: string; onRefresh: () => void; }
 
-interface StudentProfileHeaderProps {
-  student: StudentFullRecord["student"];
-  onRefresh: () => void; 
-}
-
-export default function StudentProfileHeader({
-  student,
-  onRefresh,
-}: StudentProfileHeaderProps) {
+export default function StudentProfileHeader({ student, calculatedStatus, onRefresh }: StudentProfileHeaderProps) {
   const [loading, setLoading] = useState(false);
+
+  const displayStatus = (student.status === 'active' && calculatedStatus) 
+    ? calculatedStatus.toLowerCase() 
+    : student.status ?? "unknown";
 
   // --- SAFE DATA HANDLING ---
   // Ensure status exists, otherwise default to "unknown"
-  const safeStatus = student.status ?? "unknown";
+  // const safeStatus = student.status ?? "unknown";
+  const safeStatus = displayStatus;
   const formattedStatus = safeStatus.replace("_", " ").toUpperCase();
 
   // Mapping status to colors
@@ -29,6 +27,7 @@ export default function StudentProfileHeader({
     on_leave: "bg-yellow-100 text-yellow-700 border-yellow-200",
     deferred: "bg-blue-100 text-blue-700 border-blue-200",
     discontinued: "bg-red-100 text-red-700 border-red-200",
+    deregistered: "bg-orange-100 text-orange-700 border-orange-200",
     graduated: "bg-purple-100 text-purple-700 border-purple-200",
     unknown: "bg-gray-100 text-gray-700 border-gray-200",
   };
@@ -42,10 +41,7 @@ export default function StudentProfileHeader({
     const startDate = new Date(sDateInput);
 
     // 2. Ask for Duration (Auto-calculate end date)
-    const durationInput = prompt(
-      `Leave for ${student.name}?\nType '1' for One Year\nType '2' for Two Years`,
-      "1"
-    );
+    const durationInput = prompt( `Leave for ${student.name}?\nType '1' for One Year\nType '2' for Two Years`, "1" );
     if (durationInput === null || !["1", "2"].includes(durationInput)) return;
     
     const years = parseInt(durationInput);
@@ -53,10 +49,7 @@ export default function StudentProfileHeader({
     endDate.setFullYear(startDate.getFullYear() + years);
 
     // 3. Ask for Reason
-    const reasonInput = prompt(
-      `Reason for leave?\nType '1' for Financial\nType '2' for Compassionate\nType '3' for Other`,
-      "1"
-    );
+    const reasonInput = prompt( `Reason for leave?\nType '1' for Financial\nType '2' for Compassionate\nType '3' for Other`, "1" );
     if (reasonInput === null) return;
     const reason = reasonInput === "2" ? "Compassionate" : reasonInput === "3" ? "Other" : "Financial";
 
@@ -66,21 +59,13 @@ export default function StudentProfileHeader({
       await grantAcademicLeave(student._id, startDate, endDate, reason, reason.toLowerCase());
       onRefresh();
     } catch (e: unknown) {
-      if (e instanceof Error) {
-        alert(e.message);
-      } else {
-        alert("An unknown error occurred");
-      }
-    } finally {
-      setLoading(false);
-    }
+      if (e instanceof Error) alert(e.message);
+      else alert("An unknown error occurred");      
+    } finally {setLoading(false); }    
   };
 
-    const handleDefer = async () => {
-    const years = prompt(
-      `Defer Admission for ${student.name}?\nType '1' for One Year\nType '2' for Two Years`,
-      "1",
-    );
+  const handleDefer = async () => {
+    const years = prompt(`Defer Admission for ${student.name}?\nType '1' for One Year\nType '2' for Two Years`, "1" );
     if (!years || !["1", "2"].includes(years)) return;
 
     setLoading(true);
@@ -88,13 +73,29 @@ export default function StudentProfileHeader({
       await deferAdmission(student._id, parseInt(years));
       onRefresh();
     } catch (e: unknown) { // FIX: Changed 'any' to 'unknown'
-      if (e instanceof Error) {
-        alert(e.message);
-      } else {
-        alert("An unknown error occurred");
-      }
+      if (e instanceof Error) alert(e.message);
+      else alert("An unknown error occurred");      
     } 
-    finally { setLoading(false); }
+    finally {setLoading(false); }
+  };
+
+  const handleReadmit = async () => {
+    const remarks = prompt(
+      `Formal Readmission for ${student.name}.\nThis student was ${formattedStatus}.\nPlease enter the readmission reason (e.g., Senate Minute #, Medical Clearance):`,
+      "Approved by Department Board" );
+    
+    if (!remarks) return;
+  
+    setLoading(true);
+    try {
+      await readmitStudent(student._id, remarks);
+      onRefresh();
+    } catch (e: unknown) {
+      if (e instanceof Error) alert(e.message);
+      else alert("Readmission failed");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleRevert = async () => {
@@ -104,13 +105,10 @@ export default function StudentProfileHeader({
       await revertStatusToActive(student._id);
       onRefresh();
     } catch (e: unknown) { // FIX: Changed 'any' to 'unknown'
-      if (e instanceof Error) {
-        alert(e.message);
-      } else {
-        alert("An unknown error occurred");
-      }
+      if (e instanceof Error) alert(e.message);
+      else alert("An unknown error occurred");      
     } 
-    finally { setLoading(false); }
+    finally {setLoading(false); }
   };
 
   return (
@@ -159,29 +157,22 @@ export default function StudentProfileHeader({
             <div className="flex  g mt-1">
               {student.status === "active" ? (
                 <>
-                  <button
-                    onClick={handleGrantLeave}
-                    disabled={loading}
-                    className="text-xs  py-1  text-green-darkest hover:underline rounded font-light"
-                  >
+                  <button onClick={handleGrantLeave} disabled={loading} className="text-xs  py-1  text-green-darkest hover:underline rounded font-light">
                     {loading ? "Processing..." : "Leave"}
                   </button>
                   {student.currentYear === 1 && (
-                    <button
-                      onClick={handleDefer}
-                      disabled={loading}
-                      className="text-xs px-1 py- text-green-darkest hover:underline font-light"
-                    >
+                    <button onClick={handleDefer} disabled={loading} className="text-xs px-1 py- text-green-darkest hover:underline font-light">
                       {loading ? "Processing..." : " | Defer"}
                     </button>
                   )}
                 </>
+              ) : ["deregistered", "discontinued"].includes(safeStatus) ? (
+              /* --- READMISSION BUTTON FOR TERMINAL STATUSES --- */
+                <button onClick={handleReadmit} disabled={loading} className="text-[10px] px-3 py-1 bg-orange-600 text-white rounded font-black shadow-sm hover:bg-orange-700 transition-colors uppercase tracking-wider">
+                  {loading ? "Processing..." : "Formal Readmission"}
+                </button>
               ) : (
-                <button
-                  onClick={handleRevert}
-                  disabled={loading}
-                  className="text-xs px-3 py-1 bg-green-darkest text-white rounded font-bold"
-                >
+                <button onClick={handleRevert} disabled={loading} className="text-xs px-3 py-1 bg-green-darkest text-white rounded font-bold">
                   {loading ? "Processing..." : "Undo / Activate"}
                 </button>
               )}

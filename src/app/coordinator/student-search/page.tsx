@@ -12,7 +12,7 @@ import type {
   AcademicYear,
   StudentJourneyResponse,
 } from "@/api/types";
-import { getAcademicYears } from "@/api/marksApi"; 
+// import { getAcademicYears } from "@/api/marksApi"; 
 import { useToast } from "@/context/ToastContext";
 
 // Components
@@ -28,6 +28,7 @@ import { LoadingState } from "@/components/ui/LoadingState";
 import { getProgramUnitLookup } from "@/api/programUnitsApi";
 import { getInstitutionSettings } from "@/api/institutionSettingsApi";
 import JourneyTimeline from "@/components/coordinator/StudentSearch/JourneyTimeline";
+import { getAcademicYears } from "@/api/academicYearsApi";
 
 type TabType = "grades" | "raw" | "journey";
 
@@ -80,15 +81,8 @@ export default function StudentSearchPage() {
     const fetchMetadata = async () => {
       try {
         // We fetch Academic Years, Program Units, AND Institution Settings
-        const [years, units, instSettings] = await Promise.all([
-          getAcademicYears(),
-          getProgramUnitLookup(programId!),
-          getInstitutionSettings(), // Ensure this API helper exists
-        ]);
-
-        setAvailableYears(years);
-        setAvailableUnits(units);
-        setSettings(instSettings); // Store settings for the modal
+        const [years, units, instSettings] = await Promise.all([ getAcademicYears(), getProgramUnitLookup(programId!), getInstitutionSettings() ]);
+        setAvailableYears(years); setAvailableUnits(units); setSettings(instSettings); // Store settings for the modal
         console.log("✅ Metadata & Policy Settings Loaded");
       } catch (err) {
         console.error("❌ Metadata fetch failed:", err);
@@ -132,6 +126,7 @@ export default function StudentSearchPage() {
     try {
       const record = await getStudentRecord(encodeURIComponent(regNo), selectedYearOfStudy);
       setSelectedStudent(record);
+      console.log("Status Engine Results:", record.academicStatus);
       setActiveTab("grades");
     } catch {
       addToast(`Failed to load Year ${selectedYearOfStudy} records.`, "error");
@@ -158,6 +153,7 @@ export default function StudentSearchPage() {
 
   return (
     <div className="max-w-8xl ml-48 my-10">
+      
       <div className="bg-[#F8F9FA] rounded-lg shadow-2xl p-10 min-h-screen">
         <PageHeader
           title="Student Academic"
@@ -166,12 +162,8 @@ export default function StudentSearchPage() {
         />
 
         <SearchBar
-          query={query}
-          setQuery={setQuery}
-          onSearch={handleSearch}
-          searching={searching}
-          selectedYearOfStudy={selectedYearOfStudy}
-          setSelectedYearOfStudy={setSelectedYearOfStudy}
+          query={query} setQuery={setQuery} onSearch={handleSearch} searching={searching}
+          selectedYearOfStudy={selectedYearOfStudy} setSelectedYearOfStudy={setSelectedYearOfStudy}
         />
 
         <ResultsTable results={searchResults} onSelect={viewStudent} visible={!selectedStudent && !loading} />
@@ -189,16 +181,9 @@ export default function StudentSearchPage() {
                 </div>
                 <div className="lg:w-1/2">
                   <AcademicStatusBox
-                    status={selectedStudent.academicStatus}
-                    currentYearOfStudy={selectedStudent.student.currentYear}
-                    viewingYear={selectedYearOfStudy}
-                    studentId={selectedStudent.student._id}
-                    academicYearName={
-                      selectedStudent.academicStatus.academicYearName
-                    }
-                    onPromoteSuccess={() =>
-                      viewStudent(selectedStudent.student.regNo)
-                    }
+                    status={selectedStudent.academicStatus} currentYearOfStudy={selectedStudent.student.currentYear}
+                    viewingYear={selectedYearOfStudy} studentId={selectedStudent.student._id}
+                    academicYearName={ selectedStudent.academicStatus.academicYearName } onPromoteSuccess={() => viewStudent(selectedStudent.student.regNo)}
                   />
                 </div>
               </div>
@@ -210,15 +195,10 @@ export default function StudentSearchPage() {
                     key={tab}
                     onClick={() => {
                       setActiveTab(tab);
-                      if (tab === "journey") {
-                        studentJourney(selectedStudent.student.regNo);
-                      }
+                      if (tab === "journey") studentJourney(selectedStudent.student.regNo);                      
                     }}
                     className={`pb-5 text-[10px] font-black uppercase tracking-[0.3em] transition-all relative ${
-                      activeTab === tab
-                        ? "text-green-darkest"
-                        : "text-slate-400 hover:text-green-darkest/60"
-                    }`}
+                      activeTab === tab ? "text-green-darkest" : "text-slate-400 hover:text-green-darkest/60" }`}
                   >
                     {tab === "grades" ? "Official Grades" : tab === "raw" ? "Raw Data" : "Student Journey"}
                     {activeTab === tab && (
@@ -254,14 +234,9 @@ export default function StudentSearchPage() {
         {/* MODAL FIX: settings prop is now passed */}
         {selectedStudent && (
           <EditMarksModal
-            isOpen={showEditModal}
-            onClose={() => setShowEditModal(false)}
-            student={selectedStudent}
-            editingMark={editingMark}
-            onSave={handleSaveMarks}
-            availableUnits={availableUnits}
-            availableYears={availableYears}
-            settings={settings}
+            isOpen={showEditModal} onClose={() => setShowEditModal(false)}
+            student={selectedStudent} editingMark={editingMark} onSave={handleSaveMarks}
+            availableUnits={availableUnits} availableYears={availableYears} settings={settings}
           />
         )}
       </div>

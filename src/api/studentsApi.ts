@@ -63,6 +63,11 @@ export const getStudentJourney = async (regNo: string): Promise<StudentJourneyRe
   return res.data;
 };
 
+export const readmitStudent = async (studentId: string, remarks: string) => {
+  const res = await api.post("/student/readmit", { studentId, remarks });
+  return res.data;
+};
+
 export const getRawMarks = async (regNo: string, yearOfStudy: number): Promise<RawMark[]> => {
   const res = await api.get<RawMark[]>("/student/raw-marks", { params: { regNo, yearOfStudy } });
   return res.data;

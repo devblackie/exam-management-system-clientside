@@ -100,12 +100,7 @@ programId: string, unitId: string, academicYearId: string, yearOfStudy: number, 
   }
 };
 
-
-export async function approveSpecialExam(
-  markId: string,
-  reason?: string,
-  undo: boolean = false,
-) {
+export async function approveSpecialExam( markId: string, reason?: string, undo: boolean = false ) {
   try {
     const res = await api.post("/student/approve-special", { markId, reason, undo });
     return res.data;
