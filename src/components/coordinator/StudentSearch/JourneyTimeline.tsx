@@ -79,30 +79,49 @@ export default function JourneyTimeline({ data }: JourneyProps) {
 
         {/* Cumulative Tracker */}
         <div className="flex flex-col items-center justify-between  relative overflow-hidden">
-          <div className="flex items-center gap-6 relative z-10">
+          <div className="flex items-center gap-6 relative">
             <div>
               <h5 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-1">
                 Projected Degree Aggregate
               </h5>
               <div className="flex flex-col items-baseline">
-                <div className="flex items-baseline gap-2">
-                  <span className="text-[11px] font-light text-[#002B1B] tracking-tighter">
-                    {data.cumulativeMean || "0.00"}
-                  </span>
-                  <span className="text-[10px] font-mono text-slate-400 font-bold">
-                    WAA / 100.00
-                  </span>
-                </div>
-                <div className="flex items-baseline gap-2">
-                  <span className="text-[9px] font-black text-slate-400 uppercase  tracking-tight">
-                    Current Standing:
-                  </span>
-                  <span
-                    className={`text-[9px] font-black uppercase tracking-tight ${projected.color}`}
-                  >
-                    {projected.label}
-                  </span>
-                </div>
+              {/* AFTER */}
+{/* 
+  Locked statuses have no meaningful graduation projection.
+  Showing a WAA for a deregistered student implies degree progress
+  that doesn't exist.
+*/}
+{["DEREGISTERED", "DISCONTINUED", "ON_LEAVE", "DEFERRED"].includes(
+  data.currentStatus.toUpperCase()
+) ? (
+  <div className="flex flex-col">
+    <span className="text-[10px] font-mono text-slate-400 font-bold">
+      WAA / 100.00
+    </span>
+    <span className="text-[9px] font-black text-slate-400 uppercase tracking-tight mt-1">
+      Not applicable — {data.currentStatus.replace("_", " ").toLowerCase()}
+    </span>
+  </div>
+) : (
+  <>
+    <div className="flex items-baseline gap-2">
+      <span className="text-[11px] font-light text-[#002B1B] tracking-tighter">
+        {data.cumulativeMean || "0.00"}
+      </span>
+      <span className="text-[10px] font-mono text-slate-400 font-bold">
+        WAA / 100.00
+      </span>
+    </div>
+    <div className="flex items-baseline gap-2">
+      <span className="text-[9px] font-black text-slate-400 uppercase tracking-tight">
+        Current Standing:
+      </span>
+      <span className={`text-[9px] font-black uppercase tracking-tight ${projected.color}`}>
+        {projected.label}
+      </span>
+    </div>
+  </>
+)}
               </div>
             </div>
           </div>
@@ -127,7 +146,7 @@ export default function JourneyTimeline({ data }: JourneyProps) {
                     key={idx}
                     className="relative flex gap-12 items-start group"
                   >
-                    <div className="relative z-10 flex-shrink-0 mt-1">
+                    <div className="relative flex-shrink-0 mt-1">
                       <div
                         className={`w-6 h-6 rounded-sm rotate-45 border-2 border-white shadow-sm flex items-center justify-center text-white transition-transform group-hover:scale-110 ${outcome.nodeBg}`}
                       >

@@ -11,13 +11,7 @@ interface StudentProfileHeaderProps { student: StudentFullRecord["student"];  ca
 export default function StudentProfileHeader({ student, calculatedStatus, onRefresh }: StudentProfileHeaderProps) {
   const [loading, setLoading] = useState(false);
 
-  const displayStatus = (student.status === 'active' && calculatedStatus) 
-    ? calculatedStatus.toLowerCase() 
-    : student.status ?? "unknown";
-
-  // --- SAFE DATA HANDLING ---
-  // Ensure status exists, otherwise default to "unknown"
-  // const safeStatus = student.status ?? "unknown";
+  const displayStatus = (student.status === 'active' && calculatedStatus) ? calculatedStatus.toLowerCase() : student.status ?? "unknown";
   const safeStatus = displayStatus;
   const formattedStatus = safeStatus.replace("_", " ").toUpperCase();
 
