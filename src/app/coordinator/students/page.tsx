@@ -260,7 +260,7 @@ export default function RegisterStudents() {
     }
   };
 
-  const inputBase = "w-full p-3 bg-white border border-slate-200 text-green-darkest font-semibold text-xs rounded-xl transition-all outline-none appearance-none";
+  const inputBase = "w-full p-3 bg-white border border-slate-200 text-green-darkest font-semibold text-xs rounded transition-all outline-none appearance-none";
   const labelStyle = "text-[9px] font-black uppercase text-slate-400 tracking-widest ml-1 mb-2 block";
 
   return (

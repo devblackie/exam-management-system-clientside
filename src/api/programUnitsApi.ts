@@ -1,6 +1,6 @@
 // clientside/src/api/programUnitsApi.ts (NEW FILE for Curriculum Links)
 import api from "@/config/axiosInstance";
-import type { ProgramUnit } from "./types";
+import type { ProgramUnit, UnitStats } from "./types";
 
 // Data for creating a curriculum link
 export interface ProgramUnitLinkFormData {
@@ -18,6 +18,10 @@ export interface ProgramUnitUpdateData {
   isElective?: boolean;
 }
 
+export const getProgramUnitStats = async (): Promise<UnitStats> => {
+  const res = await api.get<UnitStats>("/program-units/stats");
+  return res.data;
+};
 
 // 1. CREATE Program Unit Link
 export const createProgramUnitLink = async (data: ProgramUnitLinkFormData) => {

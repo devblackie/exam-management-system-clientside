@@ -1,48 +1,4 @@
 // src/components/ProtectedRoute.tsx
-// "use client";
-
-// import { useEffect, useState } from "react";
-// import { useRouter } from "next/navigation";
-// import { me } from "@/lib/api"; 
-
-// type Role = "admin" | "lecturer" | "coordinator";
-
-// interface Props {
-//   children: React.ReactNode;
-//   allowed: Role[];
-// }
-
-// export default function ProtectedRoute({ children, allowed }: Props) {
-//   const [loading, setLoading] = useState(true);
-//   const [authorized, setAuthorized] = useState(false);
-//   const router = useRouter();
-
-//   useEffect(() => {
-//     async function checkAuth() {
-//       try {
-//         const res = await me(); 
-//         const userRole = res.data.role;
-
-//         if (allowed.includes(userRole as Role)) {
-//           setAuthorized(true);
-//         } else {
-//           router.replace("/login"); // redirect if wrong role
-//         }
-//       } catch {
-//         router.replace("/login"); // not logged in
-//       } finally {
-//         setLoading(false);
-//       }
-//     }
-//     checkAuth();
-//   }, [allowed, router]);
-
-//   if (loading) return <p>Loading...</p>;
-//   if (!authorized) return null;
-
-//   return <>{children}</>;
-// }
-
 "use client";
 
 import { useEffect, useState } from "react";

@@ -85,21 +85,26 @@ export default function GradesTable({ grades }: GradesTableProps) {
 }
 
 function StatusBadge({ status }: { status: string }) {
-  // Map statuses to visual styles
+  // Normalise legacy "FAIL" → "SUPPLEMENTARY"
+  // The system never stores FAIL as an intended final status — a failed
+  // first attempt is always eligible for supplementary (ENG.13)
+  const normalised = status === "FAIL" || status === "F" ? "SUPPLEMENTARY" : status;
+
   const styles: Record<string, string> = {
-    PASS: "bg-green-100 text-green-800 border-green-200",
-    INCOMPLETE: "bg-amber-100 text-amber-800 border-amber-200",
-    FAIL: "bg-red-100 text-red-800 border-red-200",
-    RETAKE: "bg-orange-100 text-orange-800 border-orange-200",
-    SUPPLEMENTARY: "bg-purple-100 text-purple-800 border-purple-200",
-    SPECIAL: "bg-blue-100 text-blue-800 border-blue-300 font-black", // Highlight special exams
+    PASS:          " text-green-800 ",
+    INCOMPLETE:    "text-amber-800 ",
+    SUPPLEMENTARY: "text-purple-800 ",
+    RETAKE:        "text-orange-800 ",
+    SPECIAL:       " text-blue-800 font-black",
   };
 
   return (
     <span
-      className={`py-1 px-3 rounded-md text-[10px] font-bold uppercase border ${styles[status] || "bg-gray-100 text-gray-700"}`}
+      className={`py-1 px-3 text-[10px] font-bold uppercase  ${
+        styles[normalised] ?? "bg-gray-100 text-gray-700 border-gray-200"
+      }`}
     >
-      {status}
+      {normalised}
     </span>
   );
 }

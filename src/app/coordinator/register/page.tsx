@@ -1,3 +1,4 @@
+// clientside/src/app/coordinator/register/page.tsx
 "use client";
 
 import { useState } from "react";

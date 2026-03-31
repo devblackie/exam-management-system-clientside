@@ -4,7 +4,8 @@ import type { NextRequest } from 'next/server';
 import { jwtVerify } from 'jose';
 
 const SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET || 'your-fallback-secret-for-dev-only'
+  // process.env.JWT_SECRET || 'your-fallback-secret-for-dev-only'
+  process.env.JWT_SECRET 
 );
 
 export async function middleware(request: NextRequest) {
@@ -12,25 +13,17 @@ export async function middleware(request: NextRequest) {
   const token = request.cookies.get('token')?.value;
 
   // 1. Skip middleware for internal assets, images, and the unauthorized page
-  if (
-    pathname === '/unauthorized' || 
-    pathname.startsWith('/_next') || 
-    pathname.includes('.')
+  if (  pathname === '/unauthorized' || pathname.startsWith('/_next') || pathname.includes('.')
   ) {
     return NextResponse.next();
   }
 
-  const isPublicRoute = 
-    pathname === '/login' || 
-    pathname === '/' || 
-    pathname.startsWith('/reset-password');
+  const isPublicRoute = pathname === '/login' || pathname === '/' || pathname.startsWith('/reset-password');
 
   // 2. Handle missing token
   if (!token) {
     // If not logged in and trying to hit a protected route -> redirect to login
-    if (!isPublicRoute) {
-      return NextResponse.redirect(new URL('/login', request.url));
-    }
+    if (!isPublicRoute) return NextResponse.redirect(new URL('/login', request.url));    
     // If on / or /login without a token, just let them stay
     return NextResponse.next();
   }

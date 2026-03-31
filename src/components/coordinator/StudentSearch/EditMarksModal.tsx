@@ -32,9 +32,7 @@ export default function EditMarksModal({ isOpen, onClose, student, editingMark, 
   const [examMode, setExamMode] = useState<"standard" | "mandatory_q1">(editingMark?.examMode || "standard");
   
   const [isDirect, setIsDirect] = useState(true);
-  const [preview, setPreview] = useState({
-    ca: 0, exam: 0, total: 0, grade: '—', mode: 'theory'
-  });
+  const [preview, setPreview] = useState({  ca: 0, exam: 0, total: 0, grade: '—', mode: 'theory'});
 
   // Determine current unit type to handle UI locking
   const currentUnitType = useMemo(() => {
@@ -42,11 +40,6 @@ export default function EditMarksModal({ isOpen, onClose, student, editingMark, 
     return unit?.type || "theory";
   }, [selectedUnitCode, availableUnits]);
   const { addToast } = useToast();  
-
-
-  // Inside your component:
-  // const handleFormChange = () => {
-  //   if (!formRef.current || !settings) return;
 
   const handleFormChange = useCallback(() => {
     if (!formRef.current || !settings) return;
@@ -430,17 +423,87 @@ export default function EditMarksModal({ isOpen, onClose, student, editingMark, 
   );
 }
 
-function MarkInput({ name, label, defaultValue, max, disabled }: MarkInputProps) {
+// function MarkInput({ name, label, defaultValue, max, disabled }: MarkInputProps) {
+//   return (
+//     <div className={`p-2 rounded-xl border transition-all ${disabled ? 'bg-slate-100 border-slate-100 opacity-50' : 'bg-white border-slate-200 focus-within:border-green-500'}`}>
+//       <label className="text-[9px] font-black text-slate-400 block mb-1 px-1 uppercase">
+//         {label} (/{max})
+//       </label>
+//       <input
+//         name={name} type="number" step="0.1" min="0" max={max} required={!disabled} disabled={disabled}
+//         className="w-full p-1 text-center bg-transparent text-green-900 font-mono font-black text-sm outline-none disabled:cursor-not-allowed"
+//         defaultValue={defaultValue ?? (disabled ? 0 : "")}
+//       />
+//     </div>
+//   );
+// }
+
+// ─── Replace MarkInput component ──────────────────────────────────────
+function MarkInput({
+  name, label, defaultValue, max, disabled,
+}: MarkInputProps) {
+  const [value, setValue] = useState<string>(() => {
+    if (disabled)              return "0";
+    if (defaultValue != null)  return String(defaultValue);
+    return "";
+  });
+  const [clamped, setClamped] = useState(false);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value;
+
+    // Allow typing intermediate states
+    if (raw === "" || raw === ".") { setValue(raw); setClamped(false); return; }
+
+    const num = parseFloat(raw);
+    if (isNaN(num)) return;
+
+    if (num > max) {
+      setValue(String(max));
+      setClamped(true);
+      setTimeout(() => setClamped(false), 1500);
+      return;
+    }
+    if (num < 0) { setValue("0"); return; }
+    setValue(raw);
+    setClamped(false);
+  };
+
   return (
-    <div className={`p-2 rounded-xl border transition-all ${disabled ? 'bg-slate-100 border-slate-100 opacity-50' : 'bg-white border-slate-200 focus-within:border-green-500'}`}>
-      <label className="text-[9px] font-black text-slate-400 block mb-1 px-1 uppercase">
-        {label} (/{max})
+    <div
+      className={`p-2 rounded-xl border transition-all ${
+        disabled
+          ? "bg-slate-100 border-slate-100 opacity-40"
+          : clamped
+          ? "bg-red-50 border-red-400 ring-1 ring-red-300"
+          : "bg-white border-slate-200 focus-within:border-green-500"
+      }`}
+    >
+      <label className="text-[9px] font-black text-slate-400 block mb-1 px-1 uppercase flex justify-between">
+        <span>{label}</span>
+        <span className={clamped ? "text-red-500" : "text-slate-300"}>
+          /{max}
+        </span>
       </label>
       <input
-        name={name} type="number" step="0.1" min="0" max={max} required={!disabled} disabled={disabled}
-        className="w-full p-1 text-center bg-transparent text-green-900 font-mono font-black text-sm outline-none disabled:cursor-not-allowed"
-        defaultValue={defaultValue ?? (disabled ? 0 : "")}
+        name={name}
+        type="number"
+        step="0.1"
+        min="0"
+        max={max}
+        value={value}
+        onChange={handleChange}
+        required={!disabled}
+        disabled={disabled}
+        className="w-full p-1 text-center bg-transparent text-green-900
+                   font-mono font-black text-sm outline-none
+                   disabled:cursor-not-allowed"
       />
+      {clamped && (
+        <p className="text-[8px] text-red-500 text-center font-black mt-0.5 animate-pulse">
+          Max: {max}
+        </p>
+      )}
     </div>
   );
 }

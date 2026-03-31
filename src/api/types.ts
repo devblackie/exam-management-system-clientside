@@ -27,6 +27,10 @@ export interface User {
   createdAt: string;
 }
 
+export interface UnitStats {
+  totalUnits: number; 
+}
+
 export interface Invite {
   _id: string;
   email: string;
@@ -95,7 +99,7 @@ export interface StudentFromAPI {
   _id?: string;
   regNo: string;
   name: string;
-  program: string;           // Populated name
+  program: { _id: string; name: string; code: string; } | string;       
   programId: string;
   currentYearOfStudy: number; // Corrected field name
   currentSemester: number;    // Added field
@@ -209,7 +213,8 @@ export interface AcademicStatus {
   status: string;
   variant: "success" | "warning" | "error" | "info";
   details: string;
-  weightedMean: string; // Add this
+  weightedMean: string; 
+  sessionState?: "ORDINARY" | "SUPPLEMENTARY" | "CLOSED";
   summary: AcademicSummary;
   missingList: string[];
   failedList: { displayName: string; attempt: number }[];

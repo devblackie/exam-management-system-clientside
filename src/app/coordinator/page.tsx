@@ -1,32 +1,28 @@
 // src/app/coordinator/page.tsx
 "use client";
 
-import { Upload, FileText, User, UserCheck, Users, UserX } from "lucide-react";
+import { Upload, FileText, FilePenLine, User, UserCheck, Users, UserX } from "lucide-react";
 import { useState, useEffect } from "react";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { getStudentStats } from "@/api/studentsApi";
-import { StudentStats } from "@/api/types";
+import { StudentStats, UnitStats } from "@/api/types";
 import { bulkPromoteClass, previewPromotion, PromotionParams, PromotionPreviewResponse } from "@/api/promoteApi";
 import PromotionControlCard from "@/components/coordinator/PromotionControlCard";
 import PromotionPreviewModal from "@/components/coordinator/PromotionPreviewModal";
 import Image from "next/image";
 import { branding } from "@/config/branding";
-import { useServerHealth } from "@/hooks/useServerHealth";
 import PageHeader from "@/components/ui/PageHeader";
+import { getProgramUnitStats } from "@/api/programUnitsApi";
 
 export default function CoordinatorPage() {
-  const [stats, setStats] = useState<StudentStats>({
-    active: 0,
-    inactive: 0,
-    total: 0,
-  });
+  const [stats, setStats] = useState<StudentStats>({ active: 0, inactive: 0, total: 0 });
+  const [unitCount, setUnitCount]= useState<UnitStats>({ totalUnits:0 });
   const [loadingStats, setLoadingStats] = useState(true);
   const [isPreviewLoading, setIsPreviewLoading] = useState(false);
   const [previewData, setPreviewData] = useState<PromotionPreviewResponse | null>(null);
   const [showPreview, setShowPreview] = useState(false);
   const [currentParams, setCurrentParams] = useState<PromotionParams | null>(null);
-  const [currentTime, setCurrentTime] = useState(new Date());
-  const isOnline = useServerHealth();
+ 
 
   useEffect(() => {
     const loadStats = async () => {
@@ -43,17 +39,24 @@ export default function CoordinatorPage() {
   }, []);
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 60000); // Update every minute
-    return () => clearInterval(timer);
+    const loadUnitCount = async () => {
+      try {
+        const data = await getProgramUnitStats();
+        setUnitCount(data);
+      } catch (e) {
+        console.error("Failed to fetch unit stats:", e);
+      } finally {
+        setLoadingStats(false);
+      }
+    };
+    loadUnitCount();
   }, []);
 
   const dashboardStats = [
     { title: "Active Students", value: loadingStats ? "..." : stats.active.toLocaleString(), icon: <UserCheck className="w-6 h-6 " /> },
     { title: "Inactive/Other", value: loadingStats ? "..." : stats.inactive.toLocaleString(), icon: <UserX className="w-6 h-6 " /> },
     { title: "Total Students", value: loadingStats ? "..." : stats.total.toLocaleString(), icon: <Users className="w-6 h-6 " /> },
-    { title: "Units Offered", value: "184", icon: <FileText className="w-6 h-6 " /> },
+    { title: "Units Offered", value: loadingStats ? "..." : unitCount.totalUnits.toLocaleString(), icon: <FilePenLine className="w-6 h-6 " /> },
     { title: "Marks Uploaded", value: "98.2%", icon: <Upload className="w-6 h-6 " /> },
     { title: "Reports Generated", value: "47", icon: <FileText className="w-6 h-6 " /> },
   ];
@@ -73,7 +76,7 @@ export default function CoordinatorPage() {
   };
 
   const handleFinalPromote = async () => {
-    // FIX: Check if data exists before accessing eligibleCount
+    //  Check if data exists before accessing eligibleCount
     if (!previewData || !currentParams) {
       alert("No data to process.");
       return;
@@ -187,7 +190,7 @@ export default function CoordinatorPage() {
               {[
                 { label: "Grade Ledger", icon: <Upload size={18} />, href: "/marks", desc: "Sync academic scores" },
                 { label: "Transcript Gen", icon: <FileText size={18} />, href: "/reports", desc: "Batch export PDFs" },
-                { label: "Student Registry", icon: <User size={18} />, href: "/coordinator/students", desc: "Manual & Bulk entry" }
+                { label: "Student Registry", icon: <User size={18} />, href: "/coordinator/allStudents", desc: "Student Details Editing" }
               ].map((action) => (
                 <a
                   key={action.label}

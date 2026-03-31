@@ -4,7 +4,7 @@
 import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
 import { branding } from "@/config/branding";
-import { LogOut, ShieldCheck, WifiOff } from "lucide-react";
+import { LogOut, Server, ServerOff } from "lucide-react";
 import Breadcrumbs from "../ui/Breadcrumbs";
 import { useServerHealth } from "@/hooks/useServerHealth";
 
@@ -41,14 +41,14 @@ export default function Navbar() {
 
       <div className="flex items-center gap-6">
           {/* 2. SYSTEM STATUS BADGE */}
-          <div className={`hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all duration-500 ${
+          <div className={`hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all duration-500 ${
             isOnline 
               ? "border-emerald-500/20 bg-emerald-500/5 text-emerald-500" 
               : "border-red-500/20 bg-red-500/5 text-red-500 animate-pulse"
           }`}>
-            {isOnline ? <ShieldCheck size={14} /> : <WifiOff size={14} />}
+            {isOnline ? <Server size={14} /> : <ServerOff size={14} />}
             <span className="text-[10px] font-black uppercase tracking-widest">
-              {isOnline ? "Encrypted & Live" : "Offline"}
+              {isOnline ? "Live Server" : "Server Offline"}
             </span>
           </div>
 

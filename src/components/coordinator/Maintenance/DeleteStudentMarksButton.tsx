@@ -1,3 +1,4 @@
+// clientside/src/components/coordinator/maintenance/DeleteStudentMarks
 "use client";
 import { useState } from "react";
 import { Trash2, Loader2, AlertTriangle } from "lucide-react";

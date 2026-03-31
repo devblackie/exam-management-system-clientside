@@ -12,7 +12,8 @@ import {
   FileCog,
   Cog,
   FileText,
-  DatabaseZap
+  DatabaseZap,
+  Archive
 } from "lucide-react";
 import { SVGProps } from "react";
 
@@ -41,6 +42,6 @@ export const MENU_ITEMS: MenuItem[] = [
 //    { name: "Lecturers",icon: DocumentArrowUpIcon,href: "/coordinator/lecturers",roles: ["coordinator"]},
 //    { name: "Reports", icon: FileText, href: "/coordinator/reports",roles: ["coordinator"] },
    { name: "Settings", icon: FileCog, href: "/coordinator/institution-settings", roles: ["coordinator"] },
-   { name: "Bin", icon: DatabaseZap, href: "/coordinator/maintenance", roles: ["coordinator"] },
+   { name: "Bin", icon: Archive, href: "/coordinator/maintenance", roles: ["coordinator"] },
   //  { name: "System Health", icon: Cog, href: "/admin/health", roles: ["coordinator"] },
 ];

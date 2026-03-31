@@ -1,3 +1,4 @@
+// clientside/src/app/layout.tsx
 import type { Metadata } from "next";
 import "./globals.css";
 
@@ -23,7 +24,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-    <body className="min-h-screen bg-yellow-gold dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+    <body className="min-h-screen bg-[#F8F9FA] text-gray-900 transition-colors duration-300">
         <AuthProvider>
           <div className="flex ">
             {/* Sidebar on the left */}
@@ -43,26 +44,3 @@ export default function RootLayout({
     </html>
   );
 }
-// export default function RootLayout({ children }: { children: React.ReactNode }) {
-//   return (
-//     <html lang="en" suppressHydrationWarning>
-//       <body className="min-h-screen bg-yellow-gold dark:bg-gray-900 text-gray-900 dark:text-gray-100 antialiased">
-//         <AuthProvider>
-//           <ToastProvider>
-//             <div className="flex">
-//               {/* FIXED WIDTH SIDEBAR SPACE */}
-//               <Sidebar />
-
-//               <div className="flex flex-1 flex-col min-w-0">
-//                 <Navbar />
-//                 <main className="flex-1 p-4 md:p-8 mt-16 md:ml-64 transition-all duration-300">
-//                   {children}
-//                 </main>
-//               </div>
-//             </div>
-//           </ToastProvider>
-//         </AuthProvider>
-//       </body>
-//     </html>
-//   );
-// }

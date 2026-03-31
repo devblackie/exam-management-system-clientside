@@ -85,12 +85,7 @@ export default function JourneyTimeline({ data }: JourneyProps) {
                 Projected Degree Aggregate
               </h5>
               <div className="flex flex-col items-baseline">
-              {/* AFTER */}
-{/* 
-  Locked statuses have no meaningful graduation projection.
-  Showing a WAA for a deregistered student implies degree progress
-  that doesn't exist.
-*/}
+           
 {["DEREGISTERED", "DISCONTINUED", "ON_LEAVE", "DEFERRED"].includes(
   data.currentStatus.toUpperCase()
 ) ? (

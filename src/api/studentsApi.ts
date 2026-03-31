@@ -2,9 +2,6 @@
 import api from "@/config/axiosInstance";
 import type { StudentFromAPI, StudentFormRow,  StudentSearchResult, StudentFullRecord, StudentStats, RawMark, SaveMarksPayload, StudentJourneyResponse } from "./types";
 
-// const API_BASE_URL = api.defaults.baseURL;
-const API_BASE_URL = api.defaults.baseURL?.replace(/\/$/, '') || "http://localhost:8000";
-
 export interface BulkRegisterResponse {
   message: string;
   alreadyRegistered?: string[];
@@ -17,14 +14,21 @@ export const getStudents = async (): Promise<StudentFromAPI[]> => {
   return res.data;
 };
 
+export const deleteStudent = async (id: string) => {
+  await api.delete(`/students/${id}`);
+};
+
+export const updateStudentName = async (id: string, name: string): Promise<StudentFromAPI> => {
+  const res = await api.patch<StudentFromAPI>(`/students/${id}`, { name });
+  return res.data;
+};
+
 export const bulkRegisterStudents = async (data: { students: StudentFormRow[] }): Promise<BulkRegisterResponse> => {
-  // Now we pass 'data' directly, which is { students: [...] }
   const res = await api.post<BulkRegisterResponse>("/students/bulk", data);
   return res.data;
 };
 
 export const getStudentStats = async (): Promise<StudentStats> => {
-  // Use your existing axios instance
   const res = await api.get<StudentStats>("/students/stats");
   return res.data;
 };
@@ -36,7 +40,6 @@ export const searchStudents = async (query: string): Promise<StudentSearchResult
 };
 
 export const getStudentRecord = async (regNo: string, yearOfStudy: string | number): Promise<StudentFullRecord> => {
-  // Update the param key from 'academicYear' to 'yearOfStudy'
   const res = await api.get<StudentFullRecord>("/student/record", { 
     params: { regNo, yearOfStudy } 
   });
