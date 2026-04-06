@@ -2,7 +2,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import Image from "next/image";
 import { branding } from "@/config/branding";
@@ -11,31 +11,38 @@ import { motion } from "framer-motion";
 type Role = "admin" | "lecturer" | "coordinator";
 
 interface Props {
-  children: React.ReactNode;
-  allowed: Role[];
+  children:  React.ReactNode;
+  allowed:   Role[];
+}
+
+// Mirrors middleware.ts PUBLIC_PREFIXES
+const PUBLIC_PREFIXES = [
+  "/login",
+  "/coordinator-secret",
+  "/secret-register",
+  "/reset-password",
+  "/register",
+  "/unauthorized",
+];
+
+function isPublicRoute(pathname: string): boolean {
+  if (pathname === "/") return true;
+  return PUBLIC_PREFIXES.some((p) => pathname.startsWith(p));
 }
 
 export default function ProtectedRoute({ children, allowed }: Props) {
   const { user, loading } = useAuth();
   const [showContent, setShowContent] = useState(false);
-  const router = useRouter();
-
-  // useEffect(() => {
-  //   if (loading) return;
-
-
-
-  //   if (!user || !allowed.includes(user.role as Role)) {
-  //     router.replace("/login");
-  //     return;
-  //   }
-
-  //   // Small delay for smooth transitions
-  //   const timer = setTimeout(() => setShowContent(true), 300);
-  //   return () => clearTimeout(timer);
-  // }, [user, loading, allowed, router]);
+  const router   = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
+    // Never redirect on public routes — they are always accessible
+    if (isPublicRoute(pathname)) {
+      setShowContent(true);
+      return;
+    }
+
     if (loading) return;
 
     if (!user || !allowed.includes(user.role as Role)) {
@@ -43,16 +50,19 @@ export default function ProtectedRoute({ children, allowed }: Props) {
       return;
     }
 
-    // Small delay for smooth transition
     const timer = setTimeout(() => setShowContent(true), 300);
     return () => clearTimeout(timer);
-  }, [user, loading, allowed, router]);
+  }, [user, loading, allowed, router, pathname]);
 
+  // On public routes: render immediately, no splash screen
+  if (isPublicRoute(pathname)) {
+    return <>{children}</>;
+  }
 
+  // On protected routes: show splash while resolving auth
   if (loading || !showContent) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-green-darkest">
-        {/* Animated Spinning Logo */}
         <motion.div
           initial={{ rotateY: 0, opacity: 0 }}
           animate={{ rotateY: 360, opacity: 1 }}
@@ -65,12 +75,11 @@ export default function ProtectedRoute({ children, allowed }: Props) {
             width={140}
             height={140}
             priority
-            style={{ height: 'auto'}}
+            style={{ height: "auto" }}
             className="object-contain"
           />
         </motion.div>
 
-        {/* Animated Slogan */}
         <motion.p
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -94,4 +103,3 @@ export default function ProtectedRoute({ children, allowed }: Props) {
     </motion.div>
   );
 }
-

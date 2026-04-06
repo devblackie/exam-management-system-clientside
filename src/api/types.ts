@@ -1,7 +1,6 @@
 // src/api/types.ts
 export type Role = "admin" | "lecturer" | "coordinator";
 export type Status = "active" | "suspended";
-export type Lecturer = User & { role: "lecturer" };
 
 export interface BackendErrorResponse {
   message?: string;
@@ -19,12 +18,27 @@ export interface AxiosExpectedError {
 }
 
 export interface User {
-  _id: string;
-  name: string;
-  email: string;
-  role: Role;
-  status: Status;
-  createdAt: string;
+  _id:         string;
+  name:        string;
+  email:       string;
+  role:        Role;
+  status:      Status;
+  institution: string;
+  createdAt:   string;
+}
+ 
+export type Lecturer    = User & { role: "lecturer" };
+export type Coordinator = User & { role: "coordinator" };
+export type Admin       = User & { role: "admin" };
+
+export interface EmailCheckResult {
+  nextStep:    "password";
+  maskedName?: string;
+}
+ 
+export interface PasswordVerifyResult {
+  requiresOTP: true;
+  maskedEmail: string;
 }
 
 export interface UnitStats {
@@ -32,13 +46,14 @@ export interface UnitStats {
 }
 
 export interface Invite {
-  _id: string;
-  email: string;
-  role: "lecturer" | "coordinator";
-  used: boolean;
-  expiresAt: string;
-  createdAt: string;
-  name: string;
+  _id:         string;
+  name:        string;
+  email:       string;
+  role:        "lecturer" | "coordinator";
+  used:        boolean;
+  expiresAt:   string;
+  createdAt:   string;
+  institution: string;
 }
 
 export interface UnitAssignment {

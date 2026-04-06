@@ -12,9 +12,9 @@ export default function UnauthorizedPage() {
   // Determine where to send them back based on their role
   const getSafePath = () => {
     const role = user?.role?.toLowerCase();
-    if (role === "admin") return "/admin/invite";
+    if (role === "admin") return "/admin";
     if (role === "lecturer") return "/lecturer/upload";
-    if (role === "coordinator") return "/coordinator/students";
+    if (role === "coordinator") return "/coordinator";
     return "/login";
   };
 

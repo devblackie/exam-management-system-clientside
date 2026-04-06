@@ -54,3 +54,29 @@ export const exportAuditLogsExcel = async (params?: GetAuditLogsParams) => {
   });
   return res.data;
 };
+
+// Add these three functions to your existing @/api/auditLogs.ts
+
+// Single delete
+export async function deleteAuditLog(id: string): Promise<{ message: string }> {
+  const res = await api.delete(`/audit-logs/${id}`);
+  return res.data;
+}
+
+// Bulk delete by ID array
+export async function bulkDeleteAuditLogs(
+  ids: string[]
+): Promise<{ message: string; deletedCount: number; notFound: string[] }> {
+  const res = await api.delete("/audit-logs/bulk", { data: { ids } });
+  return res.data;
+}
+
+// Purge everything before a given date
+export async function purgeAuditLogsByDate(
+  before: string
+): Promise<{ message: string; deletedCount: number }> {
+  const res = await api.delete("/audit-logs/purge/by-date", {
+    data: { before },
+  });
+  return res.data;
+}

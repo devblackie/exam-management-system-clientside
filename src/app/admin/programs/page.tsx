@@ -4,8 +4,8 @@
 import { useEffect, useState } from "react";
 import { getPrograms } from "@/api/programsApi";
 import type { Program } from "@/api/types";
-import ProgramTable from "@/components/coordinator/Programs/ProgramTable";
-import ProgramForm from "@/components/coordinator/Programs/ProgramForm";
+import ProgramTable from "@/components/admin/Programs/ProgramTable";
+import ProgramForm from "@/components/admin/Programs/ProgramForm";
 import PageHeader from "@/components/ui/PageHeader";
 import { LayoutGrid } from "lucide-react";
 
@@ -27,9 +27,9 @@ export default function ProgramsPage() {
   };
 
   return (
-    <div className="max-w-8xl ml-48 my-10 ">
+    <div className="max-w-8xl ml-36 my-10  ">
       {/* <div className="bg-white rounded-xl shadow-2xl p-10 min-h-screen"> */}
-      <div className="bg-white rounded-3xl shadow-2xl p-6 md:p-10 min-h-[100vh]">
+      <div className="bg-white rounded-xl shadow-2xl p-6 md:p-10 min-h-[100vh]">
         {/* Header */}
         <PageHeader
           title="Academic Programs"
@@ -69,7 +69,7 @@ export default function ProgramsPage() {
               {programs.length} Records Found
             </span>
           </div>
-          <ProgramTable programs={programs} />
+          <ProgramTable programs={programs} onRefresh={loadPrograms}/>
         </div>
       </div>
     </div>

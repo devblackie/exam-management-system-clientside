@@ -20,7 +20,7 @@ export default function Sidebar() {
 
   const role = user.role?.toLowerCase() as UserRole;
   const dashboardLink = {
-    admin: "/admin/invite",
+    admin: "/admin",
     lecturer: "/lecturer/upload",
     coordinator: "/coordinator",
    }[role] || "/";
