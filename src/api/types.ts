@@ -399,3 +399,21 @@ export interface StudentJourneyResponse {
   cumulativeMean: string;
   timeline: StudentJourneyTimeline[];
 }
+
+  export interface AwardListEntry {
+    studentId: string;
+    regNo: string;
+    name: string;
+    waa: number;
+    classification: string;
+    graduationYear: number;
+  }
+
+  export interface AwardListParams {
+    programId: string;
+    academicYear?: string;
+  }
+
+  export interface AwardDocParams extends AwardListParams {
+    variant: "simple" | "classified";
+  }

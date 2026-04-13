@@ -12,8 +12,23 @@ export type { User, Role, Status, Invite, EmailCheckResult, PasswordVerifyResult
 
 export function getErrorMessage(error: unknown): string {
   if (axios.isAxiosError(error)) {
-    const data   = error.response?.data as BackendErrorResponse | undefined;
-    if (data?.message) return data.message;
+    // const data   = error.response?.data as BackendErrorResponse | undefined;
+    const responseData   = error.response?.data;
+    // if (data?.message) return data.message;
+    // Handle different possible shapes the backend might return
+    if (responseData && typeof responseData === 'object') {
+      // Direct "message" field (what we return now)
+      if (responseData.message) {
+        return typeof responseData.message === 'string' 
+          ? responseData.message : JSON.stringify(responseData.message);
+      }
+      
+      // Fallback to "error" field
+      if (responseData.error) {
+        return typeof responseData.error === 'string' 
+          ? responseData.error : JSON.stringify(responseData.error);
+      }
+    }
     const status = error.response?.status;
     if (status === 401) return "Session expired. Please log in again.";
     if (status === 403) return "You do not have permission for this action.";

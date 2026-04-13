@@ -1,19 +1,6 @@
 import { 
-  Home, 
-  UserPlus, 
-  Users, UsersRound, BrainCog,
-  BookOpen, 
-  BookOpenCheck, 
-  CalendarDays, 
-  Upload, 
-  Search, 
-  LayoutDashboard,
-  GraduationCap,
-  FileCog,
-  Cog,
-  FileText,
-  DatabaseZap,
-  Archive
+  Home, UserPlus, Users, UsersRound, BrainCog, BookOpen, ClipboardList, BookOpenCheck, 
+  CalendarDays, Upload, Search, LayoutDashboard, GraduationCap, FileCog, Cog, FileText, DatabaseZap, Archive
 } from "lucide-react";
 import { SVGProps } from "react";
 
@@ -33,10 +20,11 @@ export const MENU_ITEMS: MenuItem[] = [
   { name: "Academic Year", icon: CalendarDays, href: "/coordinator/academic-years", roles: ["coordinator"] },
   { name: "Programs", icon: BookOpen, href: "/admin/programs", roles: ["admin"] },
   { name: "Curriculum", icon: BookOpenCheck, href: "/coordinator/curriculum", roles: ["admin", "coordinator"] },
-  { name: "Units", icon: GraduationCap, href: "/coordinator/unit-templates", roles: ["admin", "coordinator"] },
+  { name: "Units", icon: ClipboardList, href: "/coordinator/unit-templates", roles: ["admin", "coordinator"] },
   { name: "Register Students", icon: Users, href: "/coordinator/students", roles: ["coordinator"] },
   { name: "Upload Results", icon: Upload, href: "/coordinator/upload", roles: ["coordinator"] },
   { name: "Search", icon: Search, href: "/coordinator/student-search", roles: ["coordinator"] },
+  { name: "Graduation List", icon: GraduationCap, href: "/coordinator/award-list", roles: ["coordinator"] },
   { name: "Lecturers", icon: UsersRound, href: "/admin/lecturers", roles: ["admin"]},
   { name: "Logs", icon: BrainCog, href: "/admin/logs", roles: ["admin"]},
 //    { name: "Lecturers",icon: DocumentArrowUpIcon,href: "/coordinator/lecturers",roles: ["coordinator"]},

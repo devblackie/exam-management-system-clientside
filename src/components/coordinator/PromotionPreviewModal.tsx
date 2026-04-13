@@ -4,17 +4,8 @@
 
 import { useState } from "react";
 import {
-  X,
-  CheckCircle,
-  AlertCircle,
-  ArrowRight,
-  FileText,
-  Loader2,
-  GraduationCap,
-  ArrowUpRight,
-  ShieldCheck,
-  RotateCcw,
-  Table2,
+  X, CheckCircle, AlertCircle, ArrowRight, FileText, Loader2,
+  GraduationCap, ArrowUpRight, ShieldCheck, RotateCcw, Table2,
 } from "lucide-react";
 import {
   PromotionPreviewResponse,
@@ -25,22 +16,10 @@ import {
   PromotionParams,
 } from "@/api/promoteApi";
 
-interface PreviewModalProps {
-  data: PromotionPreviewResponse;
-  params: PromotionParams;
-  onClose: () => void;
-  onConfirm: () => void;
-}
+interface PreviewModalProps { data: PromotionPreviewResponse; params: PromotionParams; onClose: () => void; onConfirm: () => void;}
 
-export default function PromotionPreviewModal({
-  data,
-  params,
-  onClose,
-  onConfirm,
-}: PreviewModalProps) {
-  const [activeTab, setActiveTab] = useState<"eligible" | "blocked">(
-    "eligible",
-  );
+export default function PromotionPreviewModal({ data, params, onClose, onConfirm }: PreviewModalProps) {
+  const [activeTab, setActiveTab] = useState<"eligible" | "blocked">("eligible");
   const [isDownloading, setIsDownloading] = useState(false);
   const [isCmsDownloading, setIsCmsDownloading] = useState(false);
   const [downloadProgress, setDownloadProgress] = useState<number | null>(null);
@@ -56,8 +35,7 @@ export default function PromotionPreviewModal({
   const [isUndoing, setIsUndoing] = useState(false);
   const [undoError, setUndoError] = useState<string | null>(null);
 
-  const currentList: PromotionPreviewRecord[] =
-    activeTab === "eligible" ? data.eligible : data.blocked;
+  const currentList: PromotionPreviewRecord[] = activeTab === "eligible" ? data.eligible : data.blocked;
 
   const formatStudentName = (fullName: string) => {
     if (!fullName) return "";

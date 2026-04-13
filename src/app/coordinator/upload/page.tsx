@@ -15,6 +15,7 @@ import {
   Database, ChevronDown, ChevronRight, BarChart3, FileSpreadsheet, BookOpen, FileText,
 } from "lucide-react";
 import PageHeader from "@/components/ui/PageHeader";
+import { getErrorMessage } from "@/lib/api";
 
 interface UploadResult { message: string; total: number; success: number; errors: string[] }
 
@@ -177,9 +178,13 @@ export default function UploadMarks() {
     try {
       await downloadTemplate( selectedProgramId, selectedUnitId, selectedAcademicYearId, selectedYearOfStudy!, selectedSemester!, examMode, unitType, templateMode );
       addToast(`${templateMode === "direct" ? "Direct Entry" : "Detailed"} template generated.`, "success");
-    } catch (err: unknown) {
-      addToast( err instanceof Error ? err.message : "Template generation failed.", "error");
-    } finally {
+    // } catch (err: unknown) {
+    //   addToast( err instanceof Error ? err.message : "Template generation failed.", "error");
+    // } 
+  } catch (err: unknown) {
+    const errorMsg = getErrorMessage(err);   // ← Use the improved function
+    addToast(errorMsg, "error");
+  }finally {
       setIsTemplateDownloading(false);
     }
   };
@@ -202,9 +207,13 @@ export default function UploadMarks() {
         data.success === data.total ? "success" : "warning",
       );
       await loadStats();
-    } catch (err: unknown) {
-      addToast(err instanceof Error ? err.message : "Upload failed.", "error");
-    } finally {
+    // } catch (err: unknown) {
+    //   addToast(err instanceof Error ? err.message : "Upload failed.", "error");
+    // } 
+  } catch (err: unknown) {
+    const errorMsg = getErrorMessage(err);   // ← Use the improved function
+    addToast(errorMsg, "error");
+  }finally {
       setIsUploading(false);
       setUploading2(false);
       setUploadProgress(null);
