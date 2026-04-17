@@ -70,6 +70,18 @@ export async function downloadCmsWithProgress(data: PromotionParams, programName
   return startStreamingDownload("/promote/download-cms", data, onProgress, xlsxName);
 }
 
+// Download the multi-year Student Journey CMS (Board of Examiners report)
+export async function downloadJourneyCmsWithProgress(
+  data: PromotionParams, 
+  programName: string | undefined,
+  onProgress:  (percent: number, message: string) => void,
+) {
+  const safeName = getSafeFileName(programName);
+  const safeYear = getSafeFileName(data.academicYearName);
+  const xlsxName = `Journey_CMS_${safeName}_${safeYear}.xlsx`;
+  return startStreamingDownload("/promote/download-journey-cms", data, onProgress, xlsxName);
+}
+
 // ── Ineligibility notices ZIP ─────────────────────────────────────────────────
 export async function downloadIneligibilityNoticesWithProgress( data: PromotionParams, programName: string | undefined, onProgress: (percent: number, message: string) => void) {
   const safeName = getSafeFileName(programName);

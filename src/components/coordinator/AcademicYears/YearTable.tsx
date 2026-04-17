@@ -1,3 +1,4 @@
+// clientside/src/components/coordinator/AcademicYears/YearTable.tsx
 "use client";
 
 import {

@@ -44,3 +44,4 @@ export async function downloadAwardListDoc(
   link.remove();
   window.URL.revokeObjectURL(url);
 }
+

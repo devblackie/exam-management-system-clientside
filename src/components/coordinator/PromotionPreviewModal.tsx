@@ -6,6 +6,7 @@ import { useState } from "react";
 import {
   X, CheckCircle, AlertCircle, ArrowRight, FileText, Loader2,
   GraduationCap, ArrowUpRight, ShieldCheck, RotateCcw, Table2,
+  BookOpen,
 } from "lucide-react";
 import {
   PromotionPreviewResponse,
@@ -14,6 +15,7 @@ import {
   downloadCmsWithProgress,
   undoPromotionApi,
   PromotionParams,
+  downloadJourneyCmsWithProgress,
 } from "@/api/promoteApi";
 
 interface PreviewModalProps { data: PromotionPreviewResponse; params: PromotionParams; onClose: () => void; onConfirm: () => void;}
@@ -34,6 +36,10 @@ export default function PromotionPreviewModal({ data, params, onClose, onConfirm
   const [undoStudentName, setUndoStudentName] = useState<string>("");
   const [isUndoing, setIsUndoing] = useState(false);
   const [undoError, setUndoError] = useState<string | null>(null);
+
+  const [isJourneyDownloading, setIsJourneyDownloading] = useState(false);
+  const [journeyProgress, setJourneyProgress] = useState<number | null>(null);
+  const [journeyMsg, setJourneyMsg] = useState("");
 
   const currentList: PromotionPreviewRecord[] = activeTab === "eligible" ? data.eligible : data.blocked;
 
@@ -92,6 +98,28 @@ export default function PromotionPreviewModal({ data, params, onClose, onConfirm
       setIsCmsDownloading(false);
       setTimeout(() => setCmsProgress(null), 1000);
     }
+  };
+
+  const handleDownloadJourneyCms = async () => {
+      setJourneyProgress(0);
+      setJourneyMsg("Initializing...");
+      setIsJourneyDownloading(true);
+      try {
+        await downloadJourneyCmsWithProgress(
+          params,
+          params.programName || "Program",
+          (percent, message) => {
+            setJourneyProgress(percent);
+            setJourneyMsg(message);
+          },
+        );
+      } catch (error) {
+        console.error("Journey CMS download error:", error);
+        alert("Failed to generate Journey CMS.");
+      } finally {
+        setIsJourneyDownloading(false);
+        setTimeout(() => setJourneyProgress(null), 1000);
+      }
   };
 
   // ── Undo promotion ───────────────────────────────────────────────────
@@ -489,6 +517,26 @@ export default function PromotionPreviewModal({ data, params, onClose, onConfirm
                 </>
               )}
             </button>
+            {/* <button
+              disabled={isJourneyDownloading || isDownloading || isCmsDownloading}
+              onClick={handleDownloadJourneyCms}
+              className="group flex items-center gap-3 px-5 py-3 rounded-xl font-black
+                        text-[10px] uppercase tracking-widest text-white/70 border
+                      border-white/10 hover:border-yellow-gold hover:text-yellow-gold
+                        transition-all disabled:opacity-40"
+            >
+              {isJourneyDownloading ? (
+                <>
+                  <Loader2 size={16} className="animate-spin" />
+                  Journey CMS {journeyProgress}%
+                </>
+              ) : (
+               <>
+                  <BookOpen size={16} className="group-hover:scale-110 transition-transform" />
+                  Download Journey CMS
+               </>
+              )}
+            </button> */}
           </div>
 
           <div className="flex items-center gap-6">
