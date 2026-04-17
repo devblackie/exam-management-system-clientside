@@ -353,6 +353,7 @@ export interface SaveMarksPayload {
 
 export interface TrashedMark {
   _id: string;
+  source: "detailed" | "direct";
   deletedAt: string;
   student: {
     _id: string;

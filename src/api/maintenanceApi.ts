@@ -1,10 +1,18 @@
 // clientside/src/api/maintenanceApi.ts
 import api from "@/config/axiosInstance";
-import { Unit, Program, AcademicYear, TrashedMark } from "./types";
+import { TrashedMark } from "./types";
 
 export interface CleanupFilters { unitCode: string; programId: string; academicYear: string; }
 
-export interface TrashActionPayload {markIds: string[]; action: "restore" | "purge";}
+// export interface TrashActionPayload {markIds: string[]; action: "restore" | "purge";}
+
+// clientside/src/api/maintenanceApi.ts
+
+// Update this interface
+export interface TrashActionPayload {
+  markIds: Array<{ id: string; source: "detailed" | "direct" }>;
+  action: "restore" | "purge";
+}
 
 export const maintenanceApi = {
   // Move to trash

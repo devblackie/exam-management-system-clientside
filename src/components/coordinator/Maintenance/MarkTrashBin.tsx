@@ -1,7 +1,7 @@
 // src/components/coordinator/Maintenance/MarkTrashBin.tsx
 "use client";
 import { useEffect, useState } from "react";
-import { RotateCcw, Trash2, Loader2, AlertTriangle } from "lucide-react";
+import { RotateCcw, Trash2, Loader2 } from "lucide-react";
 import { maintenanceApi } from "@/api/maintenanceApi";
 import { TrashedMark } from "@/api/types";
 
@@ -26,9 +26,29 @@ export default function MarkTrashBin() {
     fetchTrash();
   }, []);
 
-  const handleAction = async (ids: string[], action: "restore" | "purge") => {
-    if (action === "purge" && !confirm(`Permanent delete ${ids.length} marks?`)) return;
-    await maintenanceApi.handleTrashAction({ markIds: ids, action });
+  // const handleAction = async (ids: string[], action: "restore" | "purge") => {
+  //   if (action === "purge" && !confirm(`Permanent delete ${ids.length} marks?`)) return;
+  //   await maintenanceApi.handleTrashAction({ markIds: ids, action });
+  //   fetchTrash();
+  // };
+
+  const handleAction = async (
+    marks: TrashedMark[],
+    action: "restore" | "purge",
+  ) => {
+    if (
+      action === "purge" &&
+      !confirm(`Permanent delete ${marks.length} marks?`)
+    )
+      return;
+
+    // Map the TrashedMark objects to the format the server expects
+    const payload = {
+      markIds: marks.map((m) => ({ id: m._id, source: m.source })),
+      action,
+    };
+
+    await maintenanceApi.handleTrashAction(payload);
     fetchTrash();
   };
 
@@ -56,13 +76,15 @@ export default function MarkTrashBin() {
         {selectedIds.size > 0 && (
           <div className="flex gap-2">
             <button
-              onClick={() => handleAction(Array.from(selectedIds), "restore")}
+              // onClick={() => handleAction(Array.from(selectedIds), "restore")}
+              onClick={() => handleAction(trashed.filter(m => selectedIds.has(m._id)), "restore")}
               className="px-4 py-2 text-xs bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors font-bold flex items-center gap-1"
             >
               <RotateCcw size={14} /> Restore ({selectedIds.size})
             </button>
             <button
-              onClick={() => handleAction(Array.from(selectedIds), "purge")}
+              // onClick={() => handleAction(Array.from(selectedIds), "purge")}
+              onClick={() => handleAction(trashed.filter(m => selectedIds.has(m._id)), "purge")}
               className="px-4 py-2 text-xs bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors font-bold flex items-center gap-1"
             >
               <Trash2 size={14} /> Purge ({selectedIds.size})
@@ -133,14 +155,14 @@ export default function MarkTrashBin() {
                   <td className="p-4 text-center">
                     <div className="flex justify-center gap-3">
                       <button
-                        onClick={() => handleAction([m._id], "restore")}
+                        onClick={() => handleAction([m], "restore")}
                         className="p-2 text-blue-600 hover:bg-blue-200 rounded-lg"
                         title="Restore"
                       >
                         <RotateCcw size={16} />
                       </button>
                       <button
-                        onClick={() => handleAction([m._id], "purge")}
+                        onClick={() => handleAction([m], "purge")}
                         className="p-2 text-red-600 hover:bg-red-200 rounded-lg"
                         title="Permanently Delete"
                       >
