@@ -79,17 +79,9 @@ export interface ProgramUnit {
   programId: string;
   requiredYear: number;
   requiredSemester: 1 | 2;
-  isElective: boolean;
-  
-  unit: {
-    _id: string;
-    code: string;
-    name: string;
-  };
-  program: {
-    _id: string;
-    name: string;
-  };
+  isElective: boolean;  
+  unit: { _id: string; code: string; name: string; };
+  program: { _id: string; name: string; };
   createdAt?: string;
   updatedAt?: string;
 }
@@ -224,6 +216,18 @@ export interface AcademicSummary {
   missing: number;
 }
 
+export interface FailedUnit {
+  displayName: string;
+  attempt: number;
+  programUnitId: string; // Add this
+}
+
+export interface SpecialUnit {
+  displayName: string;
+  attempt: number;
+  programUnitId: string; // Add this
+}
+
 export interface AcademicStatus {
   status: string;
   variant: "success" | "warning" | "error" | "info";
@@ -232,9 +236,9 @@ export interface AcademicStatus {
   sessionState?: "ORDINARY" | "SUPPLEMENTARY" | "CLOSED";
   summary: AcademicSummary;
   missingList: string[];
-  failedList: { displayName: string; attempt: number }[];
-  // Fix: SpecialList needs to match backend: { displayName: string; grounds: string }[]
-  specialList: { displayName: string; grounds: string }[];
+  failedList: { displayName: string; attempt: number; programUnitId: string; }[];  
+  specialList: { displayName: string; grounds: string; programUnitId: string; }[];
+  deferredList:  { displayName: string; programUnitId: string; reason: string }[];
   incompleteList: string[];
   academicYearName: string;
 }
