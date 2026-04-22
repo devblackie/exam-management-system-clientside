@@ -1,6 +1,6 @@
 import { 
-  Home, UserPlus, Users, UsersRound, BrainCog, BookOpen, ClipboardList, BookOpenCheck, 
-  CalendarDays, Upload, Search, LayoutDashboard, GraduationCap, FileCog, Cog, FileText, DatabaseZap, Archive
+  UserPlus, Users, UsersRound, BrainCog, BookOpen, ClipboardList, BookOpenCheck, 
+  CalendarDays, Upload, Search, GraduationCap, FileCog, Cog, Archive
 } from "lucide-react";
 import { SVGProps } from "react";
 

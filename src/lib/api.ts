@@ -1,10 +1,8 @@
 // clientside/src/lib/api.ts
-import api  from "@/config/axiosInstance";
 import axios from "axios";
 import type {
   User, Role, Status, Invite,
   EmailCheckResult, PasswordVerifyResult,
-  BackendErrorResponse,
 } from "@/api/types";
  
 export type { User, Role, Status, Invite, EmailCheckResult, PasswordVerifyResult };
