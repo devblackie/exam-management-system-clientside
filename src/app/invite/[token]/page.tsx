@@ -2,19 +2,21 @@
 "use client";
 
 import { useState } from "react";
-import { sendInvite, getErrorMessage } from "@/lib/api";
+import {  getErrorMessage } from "@/lib/api";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import { sendInvite } from "@/api/adminApi";
+import type { Role } from "@/api/types";
 
 export default function InvitePage() {
   const [email, setEmail] = useState("");
-  const [role, setRole] = useState("lecturer");
+  const [role, setRole] = useState<Role>("lecturer");
   const [message, setMessage] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       const res = await sendInvite(email, role);
-      setMessage(res.data.message);
+      setMessage(res.message);
       setEmail("");
     } catch (err: unknown) {
       setMessage(getErrorMessage(err));
@@ -38,7 +40,7 @@ export default function InvitePage() {
           <select
             className="border p-2 rounded"
             value={role}
-            onChange={(e) => setRole(e.target.value)}
+            onChange={(e) => setRole(e.target.value as Role)}
           >
             <option value="lecturer">Lecturer</option>
             <option value="coordinator">Coordinator</option>

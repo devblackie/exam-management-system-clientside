@@ -2,7 +2,7 @@
 import api from "@/config/axiosInstance";
 import type { Program } from "./types";
 
-// ➕ Create program
+//  Create program
 export async function createProgram(data: {
   name: string;
   code: string;
@@ -13,19 +13,19 @@ export async function createProgram(data: {
   return res.data;
 }
 
-// 📄 Get all programs
+//  Get all programs
 export async function getPrograms() {
   const res = await api.get<Program[]>("/programs");
   return res.data;
 }
 
-// 🔎 fetch single program by ID
+//  fetch single program by ID
 export async function getProgramById(id: string) {
   const res = await api.get<Program>(`/programs/${id}`);
   return res.data;
 }
 
-// ✏️ Update program
+//  Update program
 export async function updateProgram(id: string, data: Partial<Program>) {
   const res = await api.put<Program>(`/programs/${id}`, data);
   return res.data;

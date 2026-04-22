@@ -29,12 +29,12 @@ export async function deleteUser(id: string): Promise<void> {
 export async function sendInvite(
   email: string,
   role: Role,
-  name: string,
+  name?: string,
 ): Promise<{ message: string }> {
   const res = await api.post<{ message: string }>("/admin/invite", {
     email: email.toLowerCase().trim(),
     role,
-    name: name.trim(),
+    name: name?.trim(),
   });
   return res.data;
 }

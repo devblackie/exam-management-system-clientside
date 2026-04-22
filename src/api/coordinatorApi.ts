@@ -2,13 +2,13 @@
 import api from "@/config/axiosInstance";
 import type { User } from "./types";
 
-// 🧑‍🏫 Fetch lecturers (accessible by coordinator)
+//  Fetch lecturers (accessible by coordinator)
 export async function getCoordinatorLecturers() {
   const res = await api.get<User[]>("/admin/lecturers");
   return res.data;
 }
 
-// ➕ Create lecturer (no invite flow)
+//  Create lecturer (no invite flow)
 export async function createLecturer(data: {
   name: string;
   email: string;
@@ -17,8 +17,6 @@ export async function createLecturer(data: {
   const res = await api.post("/coordinator/lecturers", data);
   return res.data;
 }
-
-
 
 // --- Data Cleanup ---
 export async function runDatabaseCleanup() {

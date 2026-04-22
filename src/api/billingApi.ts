@@ -1,7 +1,4 @@
-// ═══════════════════════════════════════════════════════════════════════════
-// FILE 1: clientside/src/api/billingApi.ts
-// ═══════════════════════════════════════════════════════════════════════════
-
+// clientside/src/api/billingApi.ts
 import api from "@/config/axiosInstance";
 
 export interface Invoice {

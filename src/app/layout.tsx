@@ -1,6 +1,7 @@
 // clientside/src/app/layout.tsx
 import type { Metadata } from "next";
-import "./globals.css";
+
+import "./global.css";
 
 import { branding } from "../config/branding";
 import { AuthProvider } from "@/context/AuthContext";
