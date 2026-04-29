@@ -1,71 +1,59 @@
-// clientside/src/app/coordinator/allStudents/page.tsx
+
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useCallback } from "react";
 import type { StudentFromAPI } from "@/api/types";
 import { useToast } from "@/context/ToastContext";
-import {
-  X,
-  Trash2,
-  PenLine,
-  ChevronLeft,
-  ChevronRight,
-  Search,
-  Save,
-  Command,
-  User,
-} from "lucide-react";
+import { X, Trash2, PenLine, ChevronLeft, ChevronRight, Search, Save, Command } from "lucide-react";
 import PageHeader from "@/components/ui/PageHeader";
 import { LoadingState } from "@/components/ui/LoadingState";
-import {
-  deleteStudent,
-  getStudents,
-  updateStudentName,
-} from "@/api/studentsApi";
-
-const STUDENTS_PER_PAGE = 10;
+import { deleteStudent, getStudents, updateStudentName } from "@/api/studentsApi";
 
 export default function StudentData() {
   const [studentData, setStudentData] = useState<StudentFromAPI[]>([]);
   const [loading, setLoading] = useState(true);
+  const [totalPages, setTotalPages] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editName, setEditName] = useState(""); // Track only name
+  const [editName, setEditName] = useState("");
   const { addToast } = useToast();
 
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 
-  useEffect(() => {
-    loadStudents();
-  }, []);
-
-  const loadStudents = async () => {
-    setLoading(true);
-    try {
-      const data = await getStudents();
-      setStudentData(data);
-    } catch {
-      addToast("Failed to load students.", "error");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const filteredStudents = useMemo(() => {
-    const term = searchTerm.toLowerCase();
-    return studentData.filter(
-      (s) =>
-        s.regNo.toLowerCase().includes(term) ||
-        s.name.toLowerCase().includes(term),
-    );
-  }, [studentData, searchTerm]);
-
-  const totalPages = Math.ceil(filteredStudents.length / STUDENTS_PER_PAGE);
-  const currentStudents = filteredStudents.slice(
-    (currentPage - 1) * STUDENTS_PER_PAGE,
-    currentPage * STUDENTS_PER_PAGE,
+  // 1. The core fetch function
+  const loadStudents = useCallback(
+    async (query: string, page: number) => {
+      setLoading(true);
+      try {
+        const data = await getStudents(query, page);
+        setStudentData(data.students);
+        setTotalPages(data.totalPages);
+      } catch {
+        addToast("Failed to load students.", "error");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [addToast],
   );
+
+  // 2. The Debounce Effect
+  useEffect(() => {
+    // This timer waits for the user to stop typing for 500ms
+    const handler = setTimeout(() => {
+      loadStudents(searchTerm, currentPage);
+    }, 500);
+
+    // If searchTerm or currentPage changes before 500ms, clear the timer
+    return () => clearTimeout(handler);
+  }, [searchTerm, currentPage, loadStudents]);
+
+  // Handle Search Input Change
+  const handleSearchChange = (val: string) => {
+    setSearchTerm(val);
+    setCurrentPage(1); // Reset to page 1 on every new search
+  };
 
   const startEdit = (student: StudentFromAPI) => {
     setEditingId(student._id!);
@@ -81,7 +69,8 @@ export default function StudentData() {
       await updateStudentName(editingId, editName);
       addToast("Student name updated.", "success");
       setEditingId(null);
-      await loadStudents();
+      // Reload current state
+      loadStudents(searchTerm, currentPage);
     } catch {
       addToast("Update failed.", "error");
     } finally {
@@ -95,7 +84,7 @@ export default function StudentData() {
     try {
       await deleteStudent(id);
       addToast("Student purged.", "success");
-      await loadStudents();
+      loadStudents(searchTerm, currentPage);
     } catch {
       addToast("Purge failed.", "error");
     } finally {
@@ -103,7 +92,9 @@ export default function StudentData() {
     }
   };
 
-  if (loading) return <LoadingState message="Loading Registry..." />;
+  // Only show the big loading screen on initial mount
+  if (loading && studentData.length === 0)
+    return <LoadingState message="Loading Registry..." />;
 
   return (
     <div className="max-w-8xl ml-48 my-10 ">
@@ -123,14 +114,14 @@ export default function StudentData() {
               type="text"
               placeholder="Search by Name or Reg.No..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-14 pr-6 py-4 bg-white border border-slate-200 rounded-xl text-green-darkest font-bold text-sm outline-none shadow-sm"
+              onChange={(e) => handleSearchChange(e.target.value)}
+              className="w-full pl-14 pr-6 py-4 bg-white border border-slate-200 rounded-xl text-green-darkest  text-xs outline-none shadow-sm"
             />
           </div>
           <div className="px-8 py-4 bg-slate-100 rounded-xl flex items-center gap-4">
             <Command size={16} className="text-yellow-gold" />
             <span className="text-[10px] font-black text-green-darkest uppercase tracking-widest">
-              Total: {filteredStudents.length} Records
+              Total: {studentData.length} Records
             </span>
           </div>
         </div>
@@ -141,15 +132,13 @@ export default function StudentData() {
               <tr className="bg-slate-50/50 border-b text-[10px] text-slate-400 uppercase tracking-widest">
                 <th className="px-8 py-5 text-left font-black">Reg No</th>
                 <th className="px-8 py-5 text-left font-black">Full Name</th>
-                <th className="px-8 py-5 text-left font-black">Program</th>
-                <th className="px-8 py-5 text-left font-black text-center">
-                  Year
-                </th>
+                {/* <th className="px-8 py-5 text-left font-black">Program</th> */}
+                <th className="px-8 py-5 font-black text-center">Year</th>
                 <th className="px-8 py-5 text-center font-black">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {currentStudents.map((student) => (
+              {studentData.map((student) => (
                 <tr
                   key={student._id}
                   className="group hover:bg-slate-50/50 transition-all"
@@ -193,12 +182,13 @@ export default function StudentData() {
                       </span>
                     )}
                   </td>
-                  <td className="px-8 py-4">
+                  {/* <td className="px-8 py-4">
                     <span className="text-[10px] text-slate-500 font-medium uppercase truncate block max-w-[200px]">
-                      {/* {(student.program as any)?.name || "N/A"} */}
-                      {typeof student.program === 'object' ? student.program.name : "N/A"}
+                      {typeof student.program === "object"
+                        ? student.program.name
+                        : "N/A"}
                     </span>
-                  </td>
+                  </td> */}
                   <td className="px-8 py-4 text-center">
                     <span className="text-xs font-black text-slate-300">
                       Y{student.currentYearOfStudy}
@@ -228,7 +218,7 @@ export default function StudentData() {
           </table>
         </div>
 
-        {/* Pagination Logic */}
+        {/* Pagination */}
         {totalPages > 1 && (
           <div className="mt-8 flex justify-between items-center">
             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
@@ -258,4 +248,3 @@ export default function StudentData() {
     </div>
   );
 }
-

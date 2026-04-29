@@ -1,7 +1,7 @@
 // // clientside/src/app/coordinator/student-search/page.tsx
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { searchStudents, getStudentRecord, getRawMarks, saveRawMarks, getStudentJourney } from "@/api/studentsApi";
 import type {
   StudentSearchResult,
@@ -12,7 +12,6 @@ import type {
   AcademicYear,
   StudentJourneyResponse,
 } from "@/api/types";
-// import { getAcademicYears } from "@/api/marksApi"; 
 import { useToast } from "@/context/ToastContext";
 
 // Components
@@ -35,41 +34,49 @@ type TabType = "grades" | "raw" | "journey";
 export default function StudentSearchPage() {
   const [query, setQuery] = useState("");
   const [searchResults, setSearchResults] = useState<StudentSearchResult[]>([]);
-  const [selectedStudent, setSelectedStudent] = useState<StudentFullRecord | null>(null);
+  const [selectedStudent, setSelectedStudent] =
+    useState<StudentFullRecord | null>(null);
   const [rawMarks, setRawMarks] = useState<RawMark[]>([]);
   const [loading, setLoading] = useState(false);
   const [searching, setSearching] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingMark, setEditingMark] = useState<RawMark | null>(null);
   const [selectedYearOfStudy, setSelectedYearOfStudy] = useState<number>(1);
-  const [activeTab, setActiveTab] = useState<TabType>("grades");  
-  const [journeyData, setJourneyData] = useState<StudentJourneyResponse | null>(null);
+  const [activeTab, setActiveTab] = useState<TabType>("grades");
+  const [journeyData, setJourneyData] = useState<StudentJourneyResponse | null>(
+    null,
+  );
 
   // States for metadata
-  const [availableUnits, setAvailableUnits] = useState<Array<{ code: string; name: string }>>([]);
+  const [availableUnits, setAvailableUnits] = useState<
+    Array<{ code: string; name: string }>
+  >([]);
   const [availableYears, setAvailableYears] = useState<AcademicYear[]>([]);
   const [settings, setSettings] = useState<InstitutionSettings | null>(null); // Added settings state
 
   const { addToast } = useToast();
 
   // 1. Sync student record when Year of Study changes
-  useEffect(() => {
-    if (selectedStudent?.student.regNo) { viewStudent(selectedStudent.student.regNo); }
-  }, [selectedYearOfStudy]);
+  // useEffect(() => {
+  //   if (selectedStudent?.student.regNo) { viewStudent(selectedStudent.student.regNo); }
+  // }, [selectedYearOfStudy]);
 
   // 2. Fetch Raw Marks when switching tabs
   useEffect(() => {
     const fetchMarks = async () => {
       if (!selectedStudent || activeTab !== "raw") return;
       try {
-        const marks = await getRawMarks(selectedStudent.student.regNo, selectedYearOfStudy);
+        const marks = await getRawMarks(
+          selectedStudent.student.regNo,
+          selectedYearOfStudy,
+        );
         setRawMarks(marks);
       } catch {
         addToast("Failed to fetch assessment results", "error");
       }
     };
     fetchMarks();
-  }, [selectedStudent, activeTab, selectedYearOfStudy]);
+  }, [selectedStudent, activeTab, selectedYearOfStudy, addToast]); // addToast added here
 
   // 3. Fetch Metadata AND Institution Settings
   useEffect(() => {
@@ -80,9 +87,14 @@ export default function StudentSearchPage() {
 
     const fetchMetadata = async () => {
       try {
-        // We fetch Academic Years, Program Units, AND Institution Settings
-        const [years, units, instSettings] = await Promise.all([ getAcademicYears(), getProgramUnitLookup(programId!), getInstitutionSettings() ]);
-        setAvailableYears(years); setAvailableUnits(units); setSettings(instSettings); // Store settings for the modal
+        const [years, units, instSettings] = await Promise.all([
+          getAcademicYears(),
+          getProgramUnitLookup(programId!),
+          getInstitutionSettings(),
+        ]);
+        setAvailableYears(years);
+        setAvailableUnits(units);
+        setSettings(instSettings);
         console.log("✅ Metadata & Policy Settings Loaded");
       } catch (err) {
         console.error("❌ Metadata fetch failed:", err);
@@ -91,7 +103,8 @@ export default function StudentSearchPage() {
     };
 
     fetchMetadata();
-  }, [selectedStudent?.student?._id]); 
+    // Added selectedStudent?.student?.programId here:
+  }, [selectedStudent?.student?.programId, addToast]);
 
   const isReadOnly =
     selectedStudent?.academicStatus?.status === "PASS" &&
@@ -115,25 +128,40 @@ export default function StudentSearchPage() {
     try {
       const data = await getStudentJourney(regNo);
       setJourneyData(data);
-    } catch (err) { 
+    } catch (err) {
       addToast("Failed to load academic journey", "error");
-      console.error(err); 
+      console.error(err);
     }
   };
 
-  const viewStudent = async (regNo: string) => {
-    setLoading(true);
-    try {
-      const record = await getStudentRecord(encodeURIComponent(regNo), selectedYearOfStudy);
-      setSelectedStudent(record);
-      console.log("Status Engine Results:", record.academicStatus);
-      setActiveTab("grades");
-    } catch {
-      addToast(`Failed to load Year ${selectedYearOfStudy} records.`, "error");
-    } finally {
-      setLoading(false);
+  const viewStudent = useCallback(
+    async (regNo: string) => {
+      setLoading(true);
+      try {
+        const record = await getStudentRecord(
+          encodeURIComponent(regNo),
+          selectedYearOfStudy,
+        );
+        setSelectedStudent(record);
+        console.log("Status Engine Results:", record.academicStatus);
+        setActiveTab("grades");
+      } catch {
+        addToast(
+          `Failed to load Year ${selectedYearOfStudy} records.`,
+          "error",
+        );
+      } finally {
+        setLoading(false);
+      }
+    },
+    [selectedYearOfStudy, addToast],
+  );
+
+  useEffect(() => {
+    if (selectedStudent?.student.regNo) {
+      viewStudent(selectedStudent.student.regNo);
     }
-  };
+  }, [selectedYearOfStudy, selectedStudent?.student.regNo, viewStudent]);
 
   const handleSaveMarks = async (payload: SaveMarksPayload) => {
     try {
@@ -142,8 +170,11 @@ export default function StudentSearchPage() {
       addToast("Marks updated successfully!", "success");
       // if (selectedStudent) await viewStudent(selectedStudent.student.regNo);
       if (selectedStudent) {
-        console.log("[UI] Re-fetching record for:", selectedStudent.student.regNo);
-        await viewStudent(selectedStudent.student.regNo); 
+        console.log(
+          "[UI] Re-fetching record for:",
+          selectedStudent.student.regNo,
+        );
+        await viewStudent(selectedStudent.student.regNo);
       }
       setShowEditModal(false);
     } catch {
@@ -153,7 +184,6 @@ export default function StudentSearchPage() {
 
   return (
     <div className="max-w-8xl ml-48 my-10">
-      
       <div className="bg-[#F8F9FA] rounded-lg shadow-2xl p-10 min-h-screen">
         <PageHeader
           title="Student Academic"
@@ -162,11 +192,19 @@ export default function StudentSearchPage() {
         />
 
         <SearchBar
-          query={query} setQuery={setQuery} onSearch={handleSearch} searching={searching}
-          selectedYearOfStudy={selectedYearOfStudy} setSelectedYearOfStudy={setSelectedYearOfStudy}
+          query={query}
+          setQuery={setQuery}
+          onSearch={handleSearch}
+          searching={searching}
+          selectedYearOfStudy={selectedYearOfStudy}
+          setSelectedYearOfStudy={setSelectedYearOfStudy}
         />
 
-        <ResultsTable results={searchResults} onSelect={viewStudent} visible={!selectedStudent && !loading} />
+        <ResultsTable
+          results={searchResults}
+          onSelect={viewStudent}
+          visible={!selectedStudent && !loading}
+        />
 
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20">
@@ -177,13 +215,23 @@ export default function StudentSearchPage() {
             <div className="animate-in fade-in slide-in-from-bottom-6 duration-700">
               <div className="flex flex-col lg:flex-row gap-6 mb-8">
                 <div className="flex-1">
-                  <StudentProfileHeader student={selectedStudent.student} onRefresh={() => viewStudent(selectedStudent.student.regNo)} />
+                  <StudentProfileHeader
+                    student={selectedStudent.student}
+                    onRefresh={() => viewStudent(selectedStudent.student.regNo)}
+                  />
                 </div>
                 <div className="lg:w-1/2">
                   <AcademicStatusBox
-                    status={selectedStudent.academicStatus} currentYearOfStudy={selectedStudent.student.currentYear}
-                    viewingYear={selectedYearOfStudy} studentId={selectedStudent.student._id}
-                    academicYearName={ selectedStudent.academicStatus.academicYearName } onPromoteSuccess={() => viewStudent(selectedStudent.student.regNo)}
+                    status={selectedStudent.academicStatus}
+                    currentYearOfStudy={selectedStudent.student.currentYear}
+                    viewingYear={selectedYearOfStudy}
+                    studentId={selectedStudent.student._id}
+                    academicYearName={
+                      selectedStudent.academicStatus.academicYearName
+                    }
+                    onPromoteSuccess={() =>
+                      viewStudent(selectedStudent.student.regNo)
+                    }
                   />
                 </div>
               </div>
@@ -195,12 +243,20 @@ export default function StudentSearchPage() {
                     key={tab}
                     onClick={() => {
                       setActiveTab(tab);
-                      if (tab === "journey") studentJourney(selectedStudent.student.regNo);                      
+                      if (tab === "journey")
+                        studentJourney(selectedStudent.student.regNo);
                     }}
                     className={`pb-5 text-[10px] font-black uppercase tracking-[0.3em] transition-all relative ${
-                      activeTab === tab ? "text-green-darkest" : "text-slate-400 hover:text-green-darkest/60" }`}
+                      activeTab === tab
+                        ? "text-green-darkest"
+                        : "text-slate-400 hover:text-green-darkest/60"
+                    }`}
                   >
-                    {tab === "grades" ? "Official Grades" : tab === "raw" ? "Raw Data" : "Student Journey"}
+                    {tab === "grades"
+                      ? "Official Grades"
+                      : tab === "raw"
+                        ? "Raw Data"
+                        : "Student Journey"}
                     {activeTab === tab && (
                       <div className="absolute bottom-0 left-0 w-full h-1 bg-yellow-gold rounded-t-full" />
                     )}
@@ -217,8 +273,14 @@ export default function StudentSearchPage() {
                     marks={rawMarks}
                     studentName={selectedStudent.student.name}
                     onRefresh={() => viewStudent(selectedStudent.student.regNo)}
-                    onEdit={(m) => { setEditingMark(m); setShowEditModal(true); }}
-                    onAddNew={() => { setEditingMark(null); setShowEditModal(true); }}
+                    onEdit={(m) => {
+                      setEditingMark(m);
+                      setShowEditModal(true);
+                    }}
+                    onAddNew={() => {
+                      setEditingMark(null);
+                      setShowEditModal(true);
+                    }}
                     isReadOnly={isReadOnly}
                   />
                 )}
@@ -234,9 +296,14 @@ export default function StudentSearchPage() {
         {/* MODAL FIX: settings prop is now passed */}
         {selectedStudent && (
           <EditMarksModal
-            isOpen={showEditModal} onClose={() => setShowEditModal(false)}
-            student={selectedStudent} editingMark={editingMark} onSave={handleSaveMarks}
-            availableUnits={availableUnits} availableYears={availableYears} settings={settings}
+            isOpen={showEditModal}
+            onClose={() => setShowEditModal(false)}
+            student={selectedStudent}
+            editingMark={editingMark}
+            onSave={handleSaveMarks}
+            availableUnits={availableUnits}
+            availableYears={availableYears}
+            settings={settings}
           />
         )}
       </div>

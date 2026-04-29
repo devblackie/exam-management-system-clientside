@@ -609,7 +609,7 @@ export default function LoginPage() {
                           </>
                         ) : (
                           <>
-                            Verify &amp; Send Code <ShieldCheck size={15} />
+                            Send Code <ShieldCheck size={15} />
                           </>
                         )}
                       </button>

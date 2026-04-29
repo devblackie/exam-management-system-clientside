@@ -4,7 +4,6 @@
 
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Link from "next/link";
-import { useAuth } from "@/context/AuthContext";
 import { useEffect, useState } from "react";
 import { getUsers, getInvites } from "@/api/adminApi";
 import { getStudentStats }       from "@/api/studentsApi";
@@ -14,11 +13,10 @@ import { getErrorMessage }       from "@/lib/api";
 import { useToast }              from "@/context/ToastContext";
 import type { User, Invite, StudentStats, InstitutionSettings } from "@/api/types";
 import {
-  Users, Mail, ShieldCheck, Activity,
-  ArrowUpRight, Settings, History, UserCheck,
-  UserX, CheckCircle2, XCircle, BookOpen,
-  GraduationCap, Gauge, FilePenLine,
+  Users, Mail, ShieldCheck, Activity, ArrowUpRight, Settings, UserCheck,
+  UserX, CheckCircle2, XCircle, BookOpen, GraduationCap, Gauge, Wallet,
 } from "lucide-react";
+import PageHeader from "@/components/ui/PageHeader";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -103,7 +101,6 @@ function Metric({ label, value, sub, icon, accent = "neutral" }: MetricProps) {
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function AdminDashboard() {
-  const { user }     = useAuth();
   const { addToast } = useToast();
   const isOnline     = useServerHealth();      // live polling every 10 s
 
@@ -167,18 +164,17 @@ export default function AdminDashboard() {
     <ProtectedRoute allowed={["admin"]}>
       <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}`}</style>
 
-      <div className="max-w-7xl ml-48 my-10">
+      <div className="max-w-7xl ml-40 my-10">
         <div className="bg-[#F8F9FA] min-h-screen rounded-xl shadow-2xl p-10">
 
           {/* ── Header ──────────────────────────────────────────────────── */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-light text-green-darkest tracking-tight">
-              Admin <span className="font-black text-yellow-gold">Dashboard</span>
-            </h1>
-            <p className="text-sm text-slate-400 mt-1">
-              Welcome back, {user?.name ?? "—"} — here is your institution overview.
-            </p>
-          </div>
+         
+
+          <PageHeader
+                    title="Admin"
+                    highlightedTitle="Dashboard"
+                    subtitle="Institution overview"
+                  />
 
           {/* ── Metric ribbon ────────────────────────────────────────────── */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -420,10 +416,8 @@ export default function AdminDashboard() {
                   {[
                     { label: "Send invite",          sub: "Add staff by email",      href: "/admin/invite",     icon: <Mail size={16} />      },
                     { label: "Manage users",         sub: "Roles, status, deletion", href: "/admin/users",      icon: <Users size={16} />     },
-                    { label: "Audit forensics",      sub: "System event log",        href: "/admin/audit-logs", icon: <History size={16} />   },
-                    { label: "Institution settings", sub: "Grading, marks config",   href: "/coordinator/settings", icon: <Settings size={16} /> },
                     { label: "Invite registry",      sub: "View all invitations",    href: "/admin/invitations",icon: <BookOpen size={16} />  },
-                    { label: "Academic marks",       sub: "Upload & review",         href: "/marks",            icon: <FilePenLine size={16} />},
+                    { label: "Billing Info",       sub: "Billing Information",         href: "/admin/billing",            icon: <Wallet size={16} />},
                   ].map(a => (
                     <Link
                       key={a.label}

@@ -1,6 +1,9 @@
 // src/api/types.ts
 export type Role = "admin" | "lecturer" | "coordinator";
-export type Status = "active" | "suspended";
+// export type Status = "active" | "suspended";
+export type Status =  "active" | "inactive" | "graduated" | "suspended" | "deferred" | "disciplinary_suspension" | "discontinued" | "readmitted";
+export type DisciplinaryOutcome = "PENDING" | "WARNING" | "SENT_HOME" | "REINSTATED" | "DISCONTINUED" | "DISMISSED";
+export type HurdleUnit = string | { code: string; attempt?: number };
 
 export interface BackendErrorResponse {
   message?: string;
@@ -8,11 +11,7 @@ export interface BackendErrorResponse {
 
 // Define the shape of the full error object returned by Axios
 export interface AxiosExpectedError {
-  response?: {
-    data?: BackendErrorResponse;
-    status: number;
-    statusText: string;
-  };
+  response?: { data?: BackendErrorResponse; status: number; statusText: string; };
   message: string; // The standard JS/Axios error message
   isAxiosError: boolean;
 }
@@ -379,14 +378,24 @@ export interface StudentJourneyTimeline {
   type: "ACADEMIC" | "STATUS_CHANGE";
   academicYear: string;
   yearOfStudy?: number;
+  annualMean?: number;           
+  qualifierSuffix?: string;
   status?: string;
   weight?: number;
   totalUnits?: number;
+  // challenges?: {
+  //   supplementary: string[];
+  //   retakes: string[];
+  //   specials: string[];
+  //   incomplete: string[]; // Added this
+  // };
   challenges?: {
-    supplementary: string[];
-    retakes: string[];
-    specials: string[];
-    incomplete: string[]; // Added this
+    supplementary: HurdleUnit[];
+    retakes: HurdleUnit[];
+    specials: HurdleUnit[];
+    incomplete: HurdleUnit[];
+    carryForwards?: HurdleUnit[]; // Fixed missing property
+    deferred?: HurdleUnit[];      // Fixed missing property
   };
   isRepeat?: boolean;
   isCurrent?: boolean;
@@ -402,6 +411,7 @@ export interface StudentJourneyResponse {
   intake: string;
   currentStatus: string;
   cumulativeMean: string;
+  totalTimeOutYears?: number;
   timeline: StudentJourneyTimeline[];
 }
 
@@ -421,4 +431,38 @@ export interface StudentJourneyResponse {
 
   export interface AwardDocParams extends AwardListParams {
     variant: "simple" | "classified";
+  }
+
+  export interface DisciplinaryCase {
+    _id: string;
+    student: { _id: string; name: string; regNo: string; currentYearOfStudy: number; status: Status; };
+    raisedBy: { name: string; email: string };
+    resolvedBy?: { name: string; email: string };
+    grounds: string;
+    description: string;
+    outcome: DisciplinaryOutcome;
+    hearingDate?: string;
+    suspensionStart?: string;
+    suspensionEnd?: string;
+    outcomeNotes?: string;
+    appealed?: boolean;
+    appealOutcome?: "UPHELD" | "DISMISSED";
+    appealNotes?: string;
+    createdAt: string;
+    academicYear?: string;
+  }
+  
+  export interface RaiseCasePayload {
+    studentId: string;
+    grounds: string;
+    description: string;
+    hearingDate?: string;
+  }
+  
+  export interface OutcomePayload {
+    outcome: DisciplinaryOutcome;
+    outcomeNotes?: string;
+    hearingDate?: string;
+    suspensionStart?: string;
+    suspensionEnd?: string;
   }

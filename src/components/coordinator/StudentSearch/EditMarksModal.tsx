@@ -27,7 +27,7 @@ interface MarkInputProps {
 export default function EditMarksModal({ isOpen, onClose, student, editingMark, onSave, availableUnits, availableYears, settings }: EditMarksModalProps) {
   const formRef = useRef<HTMLFormElement>(null);
   const [isSaving, setIsSaving] = useState(false);
-  const [isSpecial, setIsSpecial] = useState(editingMark?.isSpecial || false);
+  // const [isSpecial, setIsSpecial] = useState(editingMark?.isSpecial || false);
   const [selectedUnitCode, setSelectedUnitCode] = useState<string>(editingMark?.programUnit?.unit?.code || "");
   const [examMode, setExamMode] = useState<"standard" | "mandatory_q1">(editingMark?.examMode || "standard");
   
@@ -39,6 +39,7 @@ export default function EditMarksModal({ isOpen, onClose, student, editingMark, 
     const unit = availableUnits.find(u => u.code === selectedUnitCode);
     return unit?.type || "theory";
   }, [selectedUnitCode, availableUnits]);
+  const isSpecial = editingMark?.isSpecial || false;
   const { addToast } = useToast();  
 
   const handleFormChange = useCallback(() => {
@@ -93,47 +94,6 @@ export default function EditMarksModal({ isOpen, onClose, student, editingMark, 
   useEffect(() => { 
     handleFormChange(); 
   }, [handleFormChange]);
-
-
-  // const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-  //   e.preventDefault();
-  //   setIsSaving(true);
-  //   const formData = new FormData(e.currentTarget);
-
-  //   const payload: SaveMarksPayload = {
-  //     regNo: student.student.regNo,
-  //     unitCode: editingMark ? editingMark.programUnit.unit.code : selectedUnitCode.toUpperCase().trim(),
-  //     academicYear: editingMark ? editingMark.academicYear.year : (formData.get("academicYear") as string),
-  //     cat1: Number(formData.get("cat1")) || 0,
-  //     cat2: Number(formData.get("cat2")) || 0,
-  //     cat3: Number(formData.get("cat3")) || 0,
-  //     assignment1: Number(formData.get("assignment1")) || 0,
-  //     practicalRaw: Number(formData.get("practicalRaw")) || 0,
-  //     examQ1: Number(formData.get("examQ1")) || 0,
-  //     examQ2: Number(formData.get("examQ2")) || 0,
-  //     examQ3: Number(formData.get("examQ3")) || 0,
-  //     examQ4: Number(formData.get("examQ4")) || 0,
-  //     examQ5: Number(formData.get("examQ5")) || 0,
-  //     examMode: examMode,
-  //     isSpecial: isSpecial,
-  //     attempt: isSpecial ? "special" : editingMark?.attempt || "1st",
-  //   };
-
-  //   if (!payload.unitCode || !payload.academicYear) {
-  //     addToast("Missing Unit or Year configuration", "error");
-  //     setIsSaving(false);
-  //     return;
-  //   }
-
-  //   try {
-  //     await onSave(payload);
-  //     onClose();
-  //   } catch (err) {
-  //     addToast("Failed to save marks", "error");
-  //   } finally {
-  //     setIsSaving(false);
-  //   }
-  // };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -204,9 +164,12 @@ export default function EditMarksModal({ isOpen, onClose, student, editingMark, 
         "success",
       );
       onClose();
-    } catch (err) {
-      addToast("Submission failed: Check connection and values", "error");
-    } finally {
+    
+    } catch (err: unknown) {
+            const axiosErr = err as { response?: { status?: number; data?: { error?: string } } };
+            const message = err instanceof Error ? err.message : axiosErr?.response?.data?.error ?? "Submission failed: check connection and values";
+            addToast(`${axiosErr?.response?.status ?? ""} — ${message}`, "error");
+        } finally {  
       setIsSaving(false);
     }
   };
@@ -423,20 +386,7 @@ export default function EditMarksModal({ isOpen, onClose, student, editingMark, 
   );
 }
 
-// function MarkInput({ name, label, defaultValue, max, disabled }: MarkInputProps) {
-//   return (
-//     <div className={`p-2 rounded-xl border transition-all ${disabled ? 'bg-slate-100 border-slate-100 opacity-50' : 'bg-white border-slate-200 focus-within:border-green-500'}`}>
-//       <label className="text-[9px] font-black text-slate-400 block mb-1 px-1 uppercase">
-//         {label} (/{max})
-//       </label>
-//       <input
-//         name={name} type="number" step="0.1" min="0" max={max} required={!disabled} disabled={disabled}
-//         className="w-full p-1 text-center bg-transparent text-green-900 font-mono font-black text-sm outline-none disabled:cursor-not-allowed"
-//         defaultValue={defaultValue ?? (disabled ? 0 : "")}
-//       />
-//     </div>
-//   );
-// }
+
 
 // ─── Replace MarkInput component ──────────────────────────────────────
 function MarkInput({
@@ -479,7 +429,7 @@ function MarkInput({
           : "bg-white border-slate-200 focus-within:border-green-500"
       }`}
     >
-      <label className="text-[9px] font-black text-slate-400 block mb-1 px-1 uppercase flex justify-between">
+      <label className="text-[9px] font-black text-slate-400 mb-1 px-1 uppercase flex justify-between">
         <span>{label}</span>
         <span className={clamped ? "text-red-500" : "text-slate-300"}>
           /{max}

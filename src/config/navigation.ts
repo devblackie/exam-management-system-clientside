@@ -1,6 +1,6 @@
 import { 
   UserPlus, Users, UsersRound, BrainCog, BookOpen, ClipboardList, BookOpenCheck, 
-  CalendarDays, Upload, Search, GraduationCap, FileCog, Cog, Archive
+  CalendarDays, Upload, Search, GraduationCap, Cog, Archive, 
 } from "lucide-react";
 import { SVGProps } from "react";
 
@@ -15,12 +15,11 @@ export interface MenuItem {
 
 export const MENU_ITEMS: MenuItem[] = [
   { name: "Send Invites", icon: UserPlus, href: "/admin/admit", roles: ["admin"] },
-  { name: "Manage Invites", icon: Users, href: "/admin/invitations", roles: ["admin"] },
   { name: "Manage Users", icon: Users, href: "/admin/users", roles: ["admin"] },
   { name: "Academic Year", icon: CalendarDays, href: "/coordinator/academic-years", roles: ["coordinator"] },
   { name: "Programs", icon: BookOpen, href: "/admin/programs", roles: ["admin"] },
-  { name: "Curriculum", icon: BookOpenCheck, href: "/coordinator/curriculum", roles: ["admin", "coordinator"] },
-  { name: "Units", icon: ClipboardList, href: "/coordinator/unit-templates", roles: ["admin", "coordinator"] },
+  { name: "Curriculum", icon: BookOpenCheck, href: "/coordinator/curriculum", roles: [ "coordinator"] },
+  { name: "Units", icon: ClipboardList, href: "/coordinator/unit-templates", roles: [ "coordinator"] },
   { name: "Register Students", icon: Users, href: "/coordinator/students", roles: ["coordinator"] },
   { name: "Upload Results", icon: Upload, href: "/coordinator/upload", roles: ["coordinator"] },
   { name: "Search", icon: Search, href: "/coordinator/student-search", roles: ["coordinator"] },
@@ -28,8 +27,6 @@ export const MENU_ITEMS: MenuItem[] = [
   { name: "Lecturers", icon: UsersRound, href: "/admin/lecturers", roles: ["admin"]},
   { name: "Logs", icon: BrainCog, href: "/admin/logs", roles: ["admin"]},
 //    { name: "Lecturers",icon: DocumentArrowUpIcon,href: "/coordinator/lecturers",roles: ["coordinator"]},
-//    { name: "Reports", icon: FileText, href: "/coordinator/reports",roles: ["coordinator"] },
-   { name: "Settings", icon: FileCog, href: "/coordinator/institution-settings", roles: ["coordinator"] },
    { name: "Bin", icon: Archive, href: "/coordinator/maintenance", roles: ["coordinator"] },
    { name: "System Health", icon: Cog, href: "/admin/health", roles: ["admin"] },
 ];

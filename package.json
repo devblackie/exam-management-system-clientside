@@ -11,6 +11,8 @@
   "dependencies": {
     "@headlessui/react": "^2.2.9",
     "@heroicons/react": "^2.2.0",
+    "@tanstack/react-query": "^5.100.5",
+    "@tanstack/react-query-devtools": "^5.100.5",
     "axios": "^1.12.2",
     "framer-motion": "^12.23.22",
     "jose": "^6.1.3",

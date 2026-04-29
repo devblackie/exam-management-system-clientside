@@ -65,9 +65,12 @@ export default function CoordinatorSecretRegisterPage() {
         const data = await getPublicInstitutions();
         setInstitutions(data);
         if (data.length === 1) setInstitutionId(data[0]._id);
-      } catch (err) {
-        setMessage("Service unavailable. Please try again later.");
-      } finally {
+     
+      } catch (err: unknown) {
+        const axiosErr = err as { response?: { status?: number; data?: { error?: string } } };
+        const message = err instanceof Error ? err.message : axiosErr?.response?.data?.error ?? "Service unavailble. Please try again later";
+        addToast(`${axiosErr?.response?.status ?? ""} — ${message}`, "error");
+    } finally {
         setFetching(false);
       }
     };

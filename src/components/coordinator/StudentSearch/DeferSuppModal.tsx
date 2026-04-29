@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   X, CalendarClock, AlertTriangle, CheckCircle2,
   Loader2, ChevronRight, RotateCcw, ArrowRight,
@@ -44,7 +44,7 @@ export default function DeferSuppModal({
   const [loadingDeferred, setLoadingDeferred] = useState(false);
 
   // ── Fetch existing deferrals ──────────────────────────────────────────────
-  const fetchDeferred = async () => {
+  const fetchDeferred = useCallback(async () => {
     if (!studentId) return;
     setLoadingDeferred(true);
     try {
@@ -55,11 +55,11 @@ export default function DeferSuppModal({
     } finally {
       setLoadingDeferred(false);
     }
-  };
+  },[studentId]);
 
   useEffect(() => {
     if (isOpen) { fetchDeferred(); setActiveTab("defer"); }
-  }, [isOpen, studentId]);
+  }, [fetchDeferred, isOpen, studentId]);
 
   if (!isOpen) return null;
 
@@ -67,18 +67,8 @@ export default function DeferSuppModal({
   const alreadyDeferredIds = new Set(deferredUnits.map(u => u.programUnitId));
 
   const availableToDefer = [
-    ...failedList.map(u => ({
-      id: u.programUnitId || "",
-      displayName: u.displayName,
-      type: "SUPP" as const,
-      grounds: "",
-    })),
-    ...specialList.map(u => ({
-      id: u.programUnitId || "",
-      displayName: u.displayName,
-      type: "SPECIAL" as const,
-      grounds: u.grounds,
-    })),
+    ...failedList.map(u => ({ id: u.programUnitId || "", displayName: u.displayName, type: "SUPP" as const, grounds: ""})),
+    ...specialList.map(u => ({ id: u.programUnitId || "", displayName: u.displayName, type: "SPECIAL" as const, grounds: u.grounds })),
   ].filter(u => u.id && !alreadyDeferredIds.has(u.id));
 
   const toggleUnit = (id: string) => {
@@ -110,10 +100,7 @@ export default function DeferSuppModal({
       onSuccess(); // ← tells AcademicStatusBox to re-fetch the student record
     } catch (err: unknown) {
         const axiosErr = err as { response?: { status?: number; data?: { error?: string } } };
-        const message =
-          err instanceof Error
-            ? err.message
-            : axiosErr?.response?.data?.error ?? "Failed to defer units";
+        const message = err instanceof Error ? err.message : axiosErr?.response?.data?.error ?? "Failed to defer units";
         addToast(`${axiosErr?.response?.status ?? ""} — ${message}`, "error");
     } finally {
       setIsSaving(false);

@@ -1,7 +1,7 @@
 // src/app/coordinator/page.tsx
 "use client";
 
-import { Upload, FileText, FilePenLine, User, UserCheck, Users, UserX } from "lucide-react";
+import { Upload, FileCog, Scale, FilePenLine, User, UserCheck, Users, UserX } from "lucide-react";
 import { useState, useEffect } from "react";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { getStudentStats } from "@/api/studentsApi";
@@ -58,7 +58,7 @@ export default function CoordinatorPage() {
     { title: "Total Students", value: loadingStats ? "..." : stats.total.toLocaleString(), icon: <Users className="w-6 h-6 " /> },
     { title: "Units Offered", value: loadingStats ? "..." : unitCount.totalUnits.toLocaleString(), icon: <FilePenLine className="w-6 h-6 " /> },
     { title: "Marks Uploaded", value: "98.2%", icon: <Upload className="w-6 h-6 " /> },
-    { title: "Reports Generated", value: "47", icon: <FileText className="w-6 h-6 " /> },
+    { title: "Disciplinary Issues", value: "47", icon: <Scale className="w-6 h-6 " /> },
   ];
 
   const handleRunPreview = async (params: PromotionParams) => {
@@ -171,10 +171,7 @@ export default function CoordinatorPage() {
                 <div className="absolute -inset-1 bg-gradient-to-r from-yellow-gold/20 to-green-darkest/5 rounded-[2.5rem] blur opacity-25 group-hover:opacity-50 transition duration-1000" />
                 <div className="relative bg-white border border-green-darkest/5 rounded-lg p-10 shadow-sm">
 
-                  <PromotionControlCard
-                    onRunPreview={handleRunPreview}
-                    isLoading={isPreviewLoading}
-                  />
+                  <PromotionControlCard onRunPreview={handleRunPreview} isLoading={isPreviewLoading} />
                 </div>
               </div>
             </div>
@@ -188,9 +185,9 @@ export default function CoordinatorPage() {
                 <div className="h-[2px] flex-1 bg-gradient-to-r from-green-darkest/20 to-transparent" />
               </div>
               {[
-                { label: "Grade Ledger", icon: <Upload size={18} />, href: "/marks", desc: "Sync academic scores" },
-                { label: "Transcript Gen", icon: <FileText size={18} />, href: "/reports", desc: "Batch export PDFs" },
-                { label: "Student Registry", icon: <User size={18} />, href: "/coordinator/allStudents", desc: "Student Details Editing" }
+                { label: "Institution Settings", icon: <FileCog size={18} />, href: "/coordinator/institution-settings", desc: "Exam Marks, CAT Marks Threshhold Settings" },
+                { label: "Disciplinary Registry", icon: <Scale size={18} />, href: "/coordinator/disciplinary", desc: "Disciplinary Cases" },
+                { label: "Student Registry", icon: <User size={18} />, href: "/coordinator/allStudents", desc: "Student Details Editing" },
               ].map((action) => (
                 <a
                   key={action.label}

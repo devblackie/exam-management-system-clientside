@@ -29,7 +29,12 @@ export default function InstitutionSettingsPage() {
  
   useEffect(() => {
     getInstitutionSettings()
-      .then((data) => { if (data) setSettings({ ...settings, ...data });})
+      .then((data) => { 
+        if (data) {
+          // Use the functional update pattern (prev => ...)
+          setSettings((prev) => ({ ...prev, ...data }));
+        }
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -38,9 +43,12 @@ export default function InstitutionSettingsPage() {
     try {
       await saveInstitutionSettings(settings);
       addToast("Configuration synchronized successfully", "success");
-    } catch (err) {
-      addToast("Failed to update institution settings", "error");
-    } finally {
+    
+    } catch (err: unknown) {
+      const axiosErr = err as { response?: { status?: number; data?: { error?: string } } };
+      const message = err instanceof Error ? err.message : axiosErr?.response?.data?.error ?? "Failed to update institution settings";
+      addToast(`${axiosErr?.response?.status ?? ""} — ${message}`, "error");
+  } finally {
       setSaving(false);
     }
   };

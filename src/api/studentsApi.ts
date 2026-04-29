@@ -9,10 +9,25 @@ export interface BulkRegisterResponse {
   registered?: string[];
 }
 
-export const getStudents = async (): Promise<StudentFromAPI[]> => {
-  const res = await api.get<StudentFromAPI[]>("/students");
+// Update this in src/api/studentsApi.ts
+export interface PaginatedStudents {
+  students: StudentFromAPI[];
+  total: number;
+  page: number;
+  totalPages: number;
+}
+
+export const getStudents = async (search: string = "", page: number = 1): Promise<PaginatedStudents> => {
+  // Pass search and page as query parameters
+  const res = await api.get<PaginatedStudents>("/students", { 
+    params: { search, page } 
+  });
   return res.data;
 };
+
+
+
+
 
 export const deleteStudent = async (id: string) => {
   await api.delete(`/students/${id}`);

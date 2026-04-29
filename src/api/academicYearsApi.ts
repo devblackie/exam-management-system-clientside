@@ -34,3 +34,10 @@ export const updateAcademicYear = async (
 export const deleteAcademicYear = async (id: string): Promise<void> => {
   await api.delete(`/academic-years/${id}`);
 };
+
+export const setCurrentYear = async (id: string): Promise<AcademicYear> => {
+  const res = await api.patch<AcademicYear>(`/academic-years/${id}`, {
+    isCurrent: true,
+  });
+  return res.data;
+};

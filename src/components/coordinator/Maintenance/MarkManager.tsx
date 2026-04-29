@@ -1,7 +1,7 @@
 // src/components/coordinator/Maintenance/MarkManager.tsx
 "use client";
 import { useState, useEffect } from "react";
-import { AlertCircle, Trash2, Archive, Settings2 } from "lucide-react";
+import { AlertCircle, Trash2, Archive } from "lucide-react";
 import { Unit, Program, AcademicYear } from "@/api/types";
 import { useToast } from "@/context/ToastContext";
 import MarkTrashBin from "./MarkTrashBin";

@@ -21,13 +21,13 @@ export default function RegisterStudents() {
   const [academicYears, setAcademicYears] = useState<AcademicYear[]>([]);
   const [selectedProgramId, setSelectedProgramId] = useState<string>("");
   const [selectedAcademicYearId, setSelectedAcademicYearId] = useState<string>("");
-  const [loadingData, setLoadingData] = useState(false);
+  // const [loadingData, setLoadingData] = useState(false);
   const { addToast } = useToast();
   const tableRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchData = async () => {
-      setLoadingData(true);
+      // setLoadingData(true);
       try {
         const [progData, yearData] = await Promise.all([ getPrograms(), getAcademicYears() ]);
 
@@ -48,7 +48,7 @@ export default function RegisterStudents() {
         console.error("Fetch error:", error);
         addToast("Failed to load setup data", "error");
       } finally {
-        setLoadingData(false);
+        // setLoadingData(false);
       }
     };
     fetchData();
@@ -181,14 +181,14 @@ export default function RegisterStudents() {
     }
   };
 
-  const extractAcademicYear = (regNo: string): string => {
-    const match = regNo.match(/\/(\d{2,4})$/);
-    if (!match) return "2024/2025"; // Global fallback
-    let yearPart = match[1];
-    if (yearPart.length === 2) yearPart = `20${yearPart}`;
-    const startYear = Number(yearPart);
-    return `${startYear}/${startYear + 1}`;
-  };
+  // const extractAcademicYear = (regNo: string): string => {
+  //   const match = regNo.match(/\/(\d{2,4})$/);
+  //   if (!match) return "2024/2025"; // Global fallback
+  //   let yearPart = match[1];
+  //   if (yearPart.length === 2) yearPart = `20${yearPart}`;
+  //   const startYear = Number(yearPart);
+  //   return `${startYear}/${startYear + 1}`;
+  // };
 
   const handleSubmit = async () => {
     if (!selectedProgramId) {
@@ -247,7 +247,7 @@ export default function RegisterStudents() {
         response?: { data?: { message?: string; alreadyRegistered?: string[]; duplicates?: string[]; registered?: string[]; };};
       };
       const responseData = error.response?.data;
-      const registeredCount = responseData?.registered?.length || 0;
+      // const registeredCount = responseData?.registered?.length || 0;
       const already = responseData?.alreadyRegistered?.join(", ") || "";
       const dups = responseData?.duplicates?.join(", ") || "";
       const msg = responseData?.message || "Failed to register students (Network or Server Error)";

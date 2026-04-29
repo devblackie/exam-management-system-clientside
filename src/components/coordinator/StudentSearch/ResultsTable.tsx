@@ -3,8 +3,6 @@
 
 import { StudentSearchResult } from "@/api/types";
 import { 
-  UserX, 
-  ChevronRight, 
   Fingerprint, 
   GraduationCap, 
   SearchCode,

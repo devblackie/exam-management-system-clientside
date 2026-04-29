@@ -1,7 +1,7 @@
 // clientside/src/app/coordinator/academic-years/page.tsx
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { createAcademicYear, getAcademicYears, updateAcademicYear } from "@/api/academicYearsApi";
 import { useToast } from "@/context/ToastContext";
 import { AcademicYear } from "@/api/types";
@@ -24,7 +24,7 @@ export default function AcademicYearsPage() {
 
   const { addToast } = useToast();
 
-  const loadYears = async () => {
+  const loadYears = useCallback(async () => {
     setLoading(true);
     try {
       const data = await getAcademicYears();
@@ -35,11 +35,11 @@ export default function AcademicYearsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [addToast]);
 
   useEffect(() => { 
     loadYears();
-  }, []);
+  }, [loadYears]);
 
   const autoFill = () => {
     const today = new Date();
@@ -62,9 +62,12 @@ const handleUpdateSession = async (id: string, data: Partial<AcademicYear>) => {
     await updateAcademicYear(id, data);
     addToast("Calendar updated", "success");
     await loadYears(); // Ensure this is awaited
-  } catch (error) {
-    addToast("Update failed", "error");
-  }
+ 
+  } catch (err: unknown) {
+          const axiosErr = err as { response?: { status?: number; data?: { error?: string } } };
+          const message = err instanceof Error ? err.message : axiosErr?.response?.data?.error ?? "Update Failed";
+          addToast(`${axiosErr?.response?.status ?? ""} — ${message}`, "error");
+      } 
 };
 
   const handleSubmit = async (e: React.FormEvent) => {

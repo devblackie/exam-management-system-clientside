@@ -30,7 +30,7 @@ export default function StudentProfileHeader({ student, calculatedStatus, onRefr
   };
 
   const statusBadgeStyle = statusColors[safeStatus] || statusColors.unknown;
-  const canUndo = student.status === "active" && student.currentYear > 1;
+  // const canUndo = student.status === "active" && student.currentYear > 1;
  
   // ── Handlers ─────────────────────────────────────────────────────────────
  
@@ -260,7 +260,7 @@ export default function StudentProfileHeader({ student, calculatedStatus, onRefr
                       </button>
                     )}
 
-                    {canUndo && (
+                    {/* {canUndo && (
                       <button
                         onClick={() => {
                           setShowUndoConfirm(true);
@@ -276,7 +276,7 @@ export default function StudentProfileHeader({ student, calculatedStatus, onRefr
                         <RotateCcw size={10} />
                         Undo Y{student.currentYear}
                       </button>
-                    )}
+                    )} */}
                   </>
                 ) : ["deregistered", "discontinued"].includes(safeStatus) ? (
                   <button
