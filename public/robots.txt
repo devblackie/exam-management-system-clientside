@@ -1,0 +1,22 @@
+# robots.txt — SenateDesk
+# Allow public marketing pages. Block all authenticated app routes.
+
+User-agent: *
+Disallow: /coordinator/
+Disallow: /admin/
+Disallow: /login
+Disallow: /register/
+Disallow: /reset-password/
+Disallow: /coordinator-secret/
+Disallow: /secret-register/
+Disallow: /unauthorized/
+Disallow: /api/
+
+Allow: /
+Allow: /blog/
+Allow: /about/
+Allow: /pricing/
+Allow: /og-image.png
+Allow: /Logo.png
+
+Sitemap: https://senatedesk.com/sitemap.xml

@@ -3,7 +3,17 @@ export type Role = "admin" | "lecturer" | "coordinator";
 // export type Status = "active" | "suspended";
 export type Status =  "active" | "inactive" | "graduated" | "suspended" | "deferred" | "disciplinary_suspension" | "discontinued" | "readmitted";
 export type DisciplinaryOutcome = "PENDING" | "WARNING" | "SENT_HOME" | "REINSTATED" | "DISCONTINUED" | "DISMISSED";
-export type HurdleUnit = string | { code: string; attempt?: number };
+export interface UnitHurdle {
+  code:     string;         // unit code, e.g. "ECE 301"
+  name?:    string;         // full unit name
+  attempt?: number;         // 1 = first, 2 = supp, 3 = CF, 4-5 = risk zone
+  grounds?: string;         // specials only: "FINANCIAL" | "COMPASSIONATE" | "MEDICAL"
+  reason?:  string;         // deferred only: "supp_deferred" | "special_deferred"
+  status?:  string;         // CF/deferred: "pending" | "passed" | "failed"
+}
+ 
+// Keep backward compat alias so existing code importing HurdleUnit still compiles
+export type HurdleUnit = UnitHurdle | string;
 
 export interface BackendErrorResponse {
   message?: string;
@@ -374,44 +384,84 @@ export interface TrashedMark {
   };
 }
 
-export interface StudentJourneyTimeline { 
-  type: "ACADEMIC" | "STATUS_CHANGE";
-  academicYear: string;
-  yearOfStudy?: number;
-  annualMean?: number;           
-  qualifierSuffix?: string;
-  status?: string;
-  weight?: number;
-  totalUnits?: number;
-  // challenges?: {
-  //   supplementary: string[];
-  //   retakes: string[];
-  //   specials: string[];
-  //   incomplete: string[]; // Added this
-  // };
-  challenges?: {
-    supplementary: HurdleUnit[];
-    retakes: HurdleUnit[];
-    specials: HurdleUnit[];
-    incomplete: HurdleUnit[];
-    carryForwards?: HurdleUnit[]; // Fixed missing property
-    deferred?: HurdleUnit[];      // Fixed missing property
-  };
-  isRepeat?: boolean;
-  isCurrent?: boolean;
-  leaveInfo?: { type: "ACADEMIC LEAVE" | "DEFERMENT"; reason: string; duration: string; };
-  fromStatus?: string;
-  toStatus?: string;
-  reason?: string;
-  date?: string;
+export interface JourneyChallenges {
+  supplementary: HurdleUnit[]; // ENG.13 — fail ≤ ⅓ units → supp eligible
+  retakes: HurdleUnit[]; // ENG.15a/b — retake units
+  stayouts: HurdleUnit[]; // ENG.15h — fail >⅓ <½ → sit next ordinary
+  specials: HurdleUnit[]; // ENG.18 — special exams (grounds included)
+  carryForwards: HurdleUnit[]; // ENG.14 — units carried to next year
+  deferred: HurdleUnit[]; // ENG.13b/18c — deferred to next ordinary
+  incomplete: HurdleUnit[]; // Missing CA or exam
+  discontinuationRisk: HurdleUnit[]; // ENG.22 — attempt ≥ 4 on any unit
 }
 
+// ── Leave info (attached to STATUS_CHANGE nodes for leave/deferral events) ──
+export interface JourneyLeaveInfo {
+  type: "ACADEMIC LEAVE" | "DEFERMENT";
+  reason: string; // "FINANCIAL" | "COMPASSIONATE" | "OTHER"
+  duration: string; // e.g. "14 months"
+  endDate?: string; // ISO date string if known
+}
+
+// ── Single timeline node ───────────────────────────────────────────────────
+export interface StudentJourneyTimeline {
+  // ── Present on ALL node types ────────────────────────────────────────────
+  type:
+    | "ACADEMIC"
+    | "STATUS_CHANGE"
+    | "CARRY_FORWARD" // ENG.14 — explicit CF grant event
+    | "DEFERRED_SUPP" // ENG.13b / ENG.18c — deferred to next ordinary
+    | "DISCIPLINARY" // DisciplinaryCase document surfaced
+    | "GRADUATION"; // Final year completed → degree awarded
+  academicYear: string; // e.g. "2019/2020"
+  date?: string; // ISO timestamp for sorting
+  isCurrent?: boolean; // true on the current active ACADEMIC node
+
+  // ── ACADEMIC nodes ───────────────────────────────────────────────────────
+  yearOfStudy?: number; // 1–5
+  status?: string; // "PASS (PROMOTED)" | "REPEAT YEAR" | "STAYOUT" | "SUPP 2" | etc.
+  weight?: number; // degree contribution in % (e.g. 15, 20, 25)
+  totalUnits?: number; // prescribed units this year
+  annualMean?: number; // year weighted mean — drives sparkline bars
+  qualifierSuffix?: string; // reg number qualifier at time of this year: RP1, RP1C, RP1D etc.
+  isRepeat?: boolean; // true if this is a repeat year entry (ENG.16)
+  eng15bBlock?: boolean; // true if student was blocked from final year entry
+  challenges?: JourneyChallenges;
+
+  // ── STATUS_CHANGE nodes ──────────────────────────────────────────────────
+  fromStatus?: string; // status before the event
+  toStatus?: string; // status after the event
+  reason?: string; // human-readable reason text
+  leaveInfo?: JourneyLeaveInfo; // populated for leave/deferral events
+
+  // ── CARRY_FORWARD nodes (ENG.14) ─────────────────────────────────────────
+  cfUnits?: string[]; // unit codes granted CF
+  qualifier?: string; // RP1C, RP2C, RP3C
+
+  // ── DEFERRED_SUPP nodes (ENG.13b / ENG.18c) ─────────────────────────────
+  unitCode?: string; // the specific unit deferred
+  unitName?: string;
+
+  // ── DISCIPLINARY nodes ────────────────────────────────────────────────────
+  grounds?: string; // "exam_irregularity" | "misconduct" etc.
+  outcome?: string; // "PENDING" | "SENT_HOME" | "WARNING" | "REINSTATED" etc.
+  caseId?: string; // DisciplinaryCase._id (last 8 chars shown in UI)
+  hearingDate?: string; // ISO date string
+
+  // ── GRADUATION nodes ──────────────────────────────────────────────────────
+  // annualMean is re-used here to carry the final WAA
+  // status carries "GRADUATED"
+  // reason carries the classification string
+}
+
+// ── Top-level journey response ─────────────────────────────────────────────
 export interface StudentJourneyResponse {
-  admissionYear: string;
-  intake: string;
-  currentStatus: string;
-  cumulativeMean: string;
-  totalTimeOutYears?: number;
+  admissionYear: string; // e.g. "2016/2017"
+  intake: string; // "JAN" | "MAY" | "SEPT"
+  currentStatus: string; // student.status uppercased
+  cumulativeMean: string; // projected WAA as "65.42"
+  totalTimeOutYears?: number; // years spent on leave/deferred
+  classification?: string; // projected classification label
   timeline: StudentJourneyTimeline[];
 }
 

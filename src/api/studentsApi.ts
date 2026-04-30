@@ -25,10 +25,6 @@ export const getStudents = async (search: string = "", page: number = 1): Promis
   return res.data;
 };
 
-
-
-
-
 export const deleteStudent = async (id: string) => {
   await api.delete(`/students/${id}`);
 };

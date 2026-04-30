@@ -77,7 +77,7 @@ export default function Sidebar() {
           <div className="flex items-center space-x-3  p-3 ">
             {/* <Image src={branding.devComLogo} alt={branding.devCom} width={28} height={28} className="grayscale brightness-200" /> */}
              <div className="flex flex-col space-y-1">
-            <span className="text-[8px] uppercase tracking-[0.4em] text-white font-bold">Engineered by</span>
+            <span className="text-[8px] uppercase tracking-[0.4em] text-white font-bold">Powered By</span>
             <span className="text-[10px] text-yellow-gold uppercase font-medium tracking-widest">{branding.devCom || "NEWTSOLHUB"}</span>
           </div>
           </div>
