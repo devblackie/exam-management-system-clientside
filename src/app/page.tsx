@@ -82,7 +82,7 @@ import LandingClient from "./LandingClient";
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://senatedesk.com";
 
 export const metadata: Metadata = {
-  title: "Engineering Academic Progression Software — SenateDesk",
+  title: "Academic Progression Software — SenateDesk",
   description:
     "SenateDesk automates student promotion, senate reports, supplementary " +
     "tracking, carry-forward units, and ENG regulation compliance for " +

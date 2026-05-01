@@ -4,7 +4,7 @@
 // All interactive/animated parts of the landing page.
 // Kept separate from page.tsx so metadata can stay in a server component.
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, useInView } from "framer-motion";
@@ -151,7 +151,7 @@ export default function LandingClient() {
       <nav className="fixed top-0 left-0 right-0 z-50 border-b border-[#D4AF37]/20 bg-[#0A1F16]/90 backdrop-blur-md">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3">
-            <Image src="/Logo.png" alt="SenateDesk" width={36} height={36} />
+            <Image src="/icon-512.png" alt="SenateDesk" width={36} height={36} />
             <span className="font-serif text-lg font-bold text-[#D4AF37] tracking-wide">
               SenateDesk
             </span>
@@ -428,14 +428,7 @@ export default function LandingClient() {
                   The engine doesn&apos;t guess; it calculates.
                 </p>
                 <div className="flex flex-wrap gap-2">
-                  {[
-                    "ENG.13 Supp threshold",
-                    "ENG.14 Carry-forward",
-                    "ENG.15 Stayout",
-                    "ENG.16 Repeat year",
-                    "ENG.19 Duration limit",
-                    "ENG.22 Discontinuation",
-                  ].map((rule) => (
+                  {["ENG.13 Supp threshold", "ENG.14 Carry-forward", "ENG.15 Stayout", "ENG.16 Repeat year", "ENG.19 Duration limit", "ENG.22 Discontinuation"].map((rule) => (
                     <span
                       key={rule}
                       className="text-xs border border-[#D4AF37]/30 text-[#D4AF37]/80 px-3 py-1 rounded-full"
@@ -705,7 +698,7 @@ export default function LandingClient() {
       <footer className="border-t border-[#D4AF37]/10 py-10 px-6">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <Image src="/Logo.png" alt="SenateDesk" width={28} height={28} />
+            <Image src="/icon-192.png" alt="SenateDesk" width={28} height={28} />
             <span className="text-sm font-serif text-[#D4AF37]">
               SenateDesk
             </span>
