@@ -35,6 +35,8 @@ import {
   Loader2,
 } from "lucide-react";
 import { getPublicInstitutions } from "@/api/institutionsApi";
+import { useToast } from "@/context/ToastContext";
+
 
 interface Institution {
   _id: string;
@@ -57,6 +59,8 @@ export default function CoordinatorSecretRegisterPage() {
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
   const router = useRouter();
+    const { addToast } = useToast();
+  
 
   useEffect(() => {
     const fetchInstitutions = async () => {
@@ -75,7 +79,7 @@ export default function CoordinatorSecretRegisterPage() {
       }
     };
     fetchInstitutions();
-  }, []);
+  }, [addToast]);
 
   // ── Form submission ────────────────────────────────────────────────────────
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {

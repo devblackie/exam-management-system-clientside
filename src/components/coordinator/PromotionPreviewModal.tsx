@@ -15,7 +15,7 @@ import {
   downloadCmsWithProgress,
   undoPromotionApi,
   PromotionParams,
-  downloadJourneyCmsWithProgress,
+
 } from "@/api/promoteApi";
 
 interface PreviewModalProps { data: PromotionPreviewResponse; params: PromotionParams; onClose: () => void; onConfirm: () => void;}
@@ -41,9 +41,6 @@ export default function PromotionPreviewModal({ data, params, onClose, onConfirm
   // const [journeyProgress, setJourneyProgress] = useState<number | null>(null);
   // const [journeyMsg, setJourneyMsg] = useState("");
 
-  const [_isJourneyDownloading, setIsJourneyDownloading] = useState(false);
-const [_journeyProgress, setJourneyProgress] = useState<number | null>(null);
-const [_journeyMsg, setJourneyMsg] = useState("");
 
   const currentList: PromotionPreviewRecord[] = activeTab === "eligible" ? data.eligible : data.blocked;
 
@@ -104,27 +101,7 @@ const [_journeyMsg, setJourneyMsg] = useState("");
     }
   };
 
-  const _handleDownloadJourneyCms = async () => {
-      setJourneyProgress(0);
-      setJourneyMsg("Initializing...");
-      setIsJourneyDownloading(true);
-      try {
-        await downloadJourneyCmsWithProgress(
-          params,
-          params.programName || "Program",
-          (percent, message) => {
-            setJourneyProgress(percent);
-            setJourneyMsg(message);
-          },
-        );
-      } catch (error) {
-        console.error("Journey CMS download error:", error);
-        alert("Failed to generate Journey CMS.");
-      } finally {
-        setIsJourneyDownloading(false);
-        setTimeout(() => setJourneyProgress(null), 1000);
-      }
-  };
+  
 
   // ── Undo promotion ───────────────────────────────────────────────────
   const initiateUndo = (studentId: string, studentName: string) => {

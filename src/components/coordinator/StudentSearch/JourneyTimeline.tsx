@@ -60,21 +60,21 @@ type TimelineNode = StudentJourneyTimeline & {
 // The shared JourneyChallenges type may use HurdleUnit or UnitHurdle.
 // We cast each array to RawUnit[] at the point of use — one cast per block,
 // never scattered through the render logic.
-type NodeChallenges = {
-  supplementary?: RawUnit[];
-  retakes?: RawUnit[];
-  stayouts?: RawUnit[];
-  specials?: RawUnit[];
-  carryForwards?: RawUnit[];
-  deferred?: RawUnit[];
-  incomplete?: RawUnit[];
-  discontinuationRisk?: RawUnit[];
-};
+// type NodeChallenges = {
+//   supplementary?: RawUnit[];
+//   retakes?: RawUnit[];
+//   stayouts?: RawUnit[];
+//   specials?: RawUnit[];
+//   carryForwards?: RawUnit[];
+//   deferred?: RawUnit[];
+//   incomplete?: RawUnit[];
+//   discontinuationRisk?: RawUnit[];
+// };
 
-function _getChallenges(m: TimelineNode): NodeChallenges {
-  // Cast once here; every caller receives a typed object with no `any`.
-  return (m.challenges ?? {}) as NodeChallenges;
-}
+// function _getChallenges(m: TimelineNode): NodeChallenges {
+//   // Cast once here; every caller receives a typed object with no `any`.
+//   return (m.challenges ?? {}) as NodeChallenges;
+// }
 const classify = (mean: number) => {
   if (mean >= 70)
     return {
