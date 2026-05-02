@@ -11,7 +11,7 @@ function getCookie(name: string): string | undefined {
 }
 
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000",
+  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api",
   withCredentials: true,
   // xsrfCookieName: "csrfToken",       // works for same site, but we need to read token from cookie and set header manually for cross-site requests  
   // xsrfHeaderName: "X-CSRF-Token",     // works for same site
