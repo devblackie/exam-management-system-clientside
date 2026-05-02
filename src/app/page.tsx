@@ -77,7 +77,8 @@
 // so Sidebar and Navbar do NOT render on the landing page.
 
 import type { Metadata } from "next";
-import LandingClient from "./LandingClient";
+import LandingClient from "./(marketing)/LandingClient";
+// import LandingClient from "./LandingClient";
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://senatedesk.com";
 
