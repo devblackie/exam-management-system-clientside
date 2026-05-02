@@ -27,7 +27,7 @@ export default function InvitesTablePage() {
     try {
       const res = await getInvites();
       setInvites(res);
-    } catch (err) {
+    } catch  {
       addToast("Failed to sync invite registry", "error");
     } finally {
       setLoading(false);
@@ -36,7 +36,7 @@ export default function InvitesTablePage() {
 
   useEffect(() => {
     fetchInvites();
-  }, []);
+  }, [fetchInvites]);
 
   const handleRevoke = async (id: string) => {
     if (!confirm("CRITICAL: Invalidate this access token immediately?")) return;

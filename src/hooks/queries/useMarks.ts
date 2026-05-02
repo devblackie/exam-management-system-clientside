@@ -1,12 +1,6 @@
 // clientside/src/hooks/queries/useMarks.ts
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import {
-  uploadMarks,
-  downloadTemplate,
-  approveSpecialExam,
-  
-} from "@/api/marksApi";
-import { useQuery } from "@tanstack/react-query";
+import { uploadMarks, approveSpecialExam } from "@/api/marksApi";
 
 // Note: getAcademicYears and getPrograms are duplicated in marksApi.ts
 // They should only be called from useAcademicYears/usePrograms hooks.
@@ -21,13 +15,7 @@ export const MARKS_KEYS = {
 export const useUploadMarks = () => {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({
-      file,
-      templateMode,
-    }: {
-      file: File;
-      templateMode?: "detailed" | "direct";
-    }) => uploadMarks(file, templateMode),
+    mutationFn: ({ file }: { file: File }) => uploadMarks(file),
     onSuccess: () => {
       // Marks changed — invalidate anything that shows mark data
       qc.invalidateQueries({ queryKey: ["students"] });

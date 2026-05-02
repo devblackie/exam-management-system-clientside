@@ -50,7 +50,7 @@ export const YearTable = ({ years, onUpdate }: YearTableProps) => {
       await deleteAcademicYear(id);
       addToast("Session deleted", "success");
       window.location.reload();
-    } catch (err) {
+    } catch {
       addToast("Delete failed", "error");
     }
   };

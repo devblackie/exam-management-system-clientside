@@ -6,7 +6,7 @@ import { useState } from "react";
 import {
   X, CheckCircle, AlertCircle, ArrowRight, FileText, Loader2,
   GraduationCap, ArrowUpRight, ShieldCheck, RotateCcw, Table2,
-  BookOpen,
+  
 } from "lucide-react";
 import {
   PromotionPreviewResponse,
@@ -37,9 +37,13 @@ export default function PromotionPreviewModal({ data, params, onClose, onConfirm
   const [isUndoing, setIsUndoing] = useState(false);
   const [undoError, setUndoError] = useState<string | null>(null);
 
-  const [isJourneyDownloading, setIsJourneyDownloading] = useState(false);
-  const [journeyProgress, setJourneyProgress] = useState<number | null>(null);
-  const [journeyMsg, setJourneyMsg] = useState("");
+  // const [isJourneyDownloading, setIsJourneyDownloading] = useState(false);
+  // const [journeyProgress, setJourneyProgress] = useState<number | null>(null);
+  // const [journeyMsg, setJourneyMsg] = useState("");
+
+  const [_isJourneyDownloading, setIsJourneyDownloading] = useState(false);
+const [_journeyProgress, setJourneyProgress] = useState<number | null>(null);
+const [_journeyMsg, setJourneyMsg] = useState("");
 
   const currentList: PromotionPreviewRecord[] = activeTab === "eligible" ? data.eligible : data.blocked;
 
@@ -100,7 +104,7 @@ export default function PromotionPreviewModal({ data, params, onClose, onConfirm
     }
   };
 
-  const handleDownloadJourneyCms = async () => {
+  const _handleDownloadJourneyCms = async () => {
       setJourneyProgress(0);
       setJourneyMsg("Initializing...");
       setIsJourneyDownloading(true);

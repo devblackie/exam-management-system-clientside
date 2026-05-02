@@ -15,7 +15,8 @@ interface CurriculumTableProps {
 }
 
 export const CurriculumTable: React.FC<CurriculumTableProps> = ({
-  curriculum, programs, selectedProgramId, loading, submitting, onEdit, onDelete,
+  curriculum, programs, selectedProgramId, onEdit, onDelete,
+  // loading and submitting kept in interface for API compat but not destructured
 }) => {
   const selectedProgram = programs.find((p) => p._id === selectedProgramId);
   const sortedCurriculum = [...curriculum].sort((a, b) => 

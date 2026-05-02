@@ -2,7 +2,6 @@
 
 import React from "react";
 import { X } from "lucide-react";
-import CommonButton from "@/components/ui/CommonButton";
 import type { Unit, ProgramUnit, CurriculumFormState } from "@/api/types";
 
 // Define the specific shape of your form state here

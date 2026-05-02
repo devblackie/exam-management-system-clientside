@@ -1,4 +1,4 @@
-// clientside/src/app/admin/audit-logs/page.tsx
+// clientside/src/app/admin/logs/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";

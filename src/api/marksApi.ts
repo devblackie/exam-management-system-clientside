@@ -70,9 +70,12 @@ async function extractBlobErrorMessage(error: unknown): Promise<string> {
 // ─── uploadMarks ──────────────────────────────────────────────────────────────
 // Both template modes post to /marks/upload — server auto-detects by cell E15.
 
-export async function uploadMarks(
-  file: File, templateMode: "detailed" | "direct" = "detailed",
-): Promise<UploadResult> {
+// export async function uploadMarks(
+//   file: File, _templateMode: "detailed" | "direct" = "detailed",
+// ): Promise<UploadResult> {
+  export async function uploadMarks(
+    file: File,
+  ): Promise<UploadResult> {
   const formData = new FormData();
   formData.append("file", file);
 

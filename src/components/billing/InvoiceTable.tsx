@@ -258,7 +258,7 @@ export default function InvoiceTable({ currency = "KES" }: { currency?: string }
               <tr>
                 <td colSpan={7} className="py-20 text-center">
                   <p className="text-[11px] font-mono text-slate-300 uppercase tracking-widest">No invoices found</p>
-                  <p className="text-[10px] text-slate-300 mt-1">Click "Generate Invoice" to create the first one.</p>
+                  <p className="text-[10px] text-slate-300 mt-1">Click &quot;Generate Invoice&quot; to create the first one.</p>
                 </td>
               </tr>
             ) : invoices.map(inv => (

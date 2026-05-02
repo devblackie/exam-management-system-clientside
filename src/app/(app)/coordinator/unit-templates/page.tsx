@@ -17,7 +17,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Search,
-  Database,
   Save,
   Command,
 } from "lucide-react";

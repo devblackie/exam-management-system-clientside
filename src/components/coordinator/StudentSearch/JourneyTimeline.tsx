@@ -71,7 +71,7 @@ type NodeChallenges = {
   discontinuationRisk?: RawUnit[];
 };
 
-function getChallenges(m: TimelineNode): NodeChallenges {
+function _getChallenges(m: TimelineNode): NodeChallenges {
   // Cast once here; every caller receives a typed object with no `any`.
   return (m.challenges ?? {}) as NodeChallenges;
 }
