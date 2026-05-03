@@ -150,9 +150,9 @@ import { branding } from "@/config/branding";
 import Providers from "./providers";
 
 const APP_NAME = branding.devName;
-const APP_URL  = process.env.NEXT_PUBLIC_APP_URL ?? "https://senatedesk.com";
+const APP_URL  = process.env.NEXT_PUBLIC_APP_URL ?? "https://acadedesk.com";
 const APP_DESC =
-  "SenateDesk automates academic progression for engineering schools — " +
+  "AcadeDesk automates academic progression for engineering schools — " +
   "senate reports, supplementary tracking, ENG regulation compliance, " +
   "carry-forward units, and student promotion. Built by newtsolhub.";
 
@@ -181,7 +181,7 @@ export const metadata: Metadata = {
     "board of examiners software",
     "student promotion system",
     "carry forward units",
-    "SenateDesk",
+    "AcadeDesk",
     "newtsolhub",
   ],
 
@@ -202,7 +202,7 @@ export const metadata: Metadata = {
       url:    "/og-image.png",
       width:  1200,
       height: 630,
-      alt:    "SenateDesk — Academic Progression System",
+      alt:    "AcadeDesk — Academic Progression System",
     }],
   },
 

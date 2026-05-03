@@ -4,16 +4,18 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
+import { branding } from "@/config/branding";
+
 
 export const metadata: Metadata = {
   title: "Blog — ENG Regulations, Senate Reports & Academic Automation",
   description:
     "In-depth guides on ENG academic regulations, senate report automation, " +
     "supplementary exam workflows, and university academic progression. " +
-    "By the SenateDesk team at newtsolhub.",
+    "By the AcadeDesk team at newtsolhub.",
   robots: { index: true, follow: true },
   alternates: {
-    canonical: `${process.env.NEXT_PUBLIC_APP_URL ?? "https://senatedesk.com"}/blog`,
+    canonical: `${process.env.NEXT_PUBLIC_APP_URL ?? "https://acadedesk.com"}/blog`,
   },
 };
 
@@ -75,9 +77,9 @@ export default function BlogIndex() {
       <nav className="fixed top-0 left-0 right-0 z-50 border-b border-[#D4AF37]/20 bg-[#0A1F16]/90 backdrop-blur-md">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3">
-            <Image src="/Logo.png" alt="SenateDesk" width={32} height={32} />
+            <Image src={branding.logoIcon} alt={branding.devName} width={32} height={32} />
             <span className="font-serif text-lg font-bold text-[#D4AF37]">
-              SenateDesk
+              {branding.devName}
             </span>
           </Link>
           <Link
@@ -137,7 +139,7 @@ export default function BlogIndex() {
       {/* Footer */}
       <footer className="border-t border-[#D4AF37]/10 py-8 px-6 text-center">
         <p className="text-xs text-white/20">
-          © {new Date().getFullYear()} newtsolhub · SenateDesk
+          © {new Date().getFullYear()} {branding.devCom} · {branding.devName}
         </p>
       </footer>
     </div>

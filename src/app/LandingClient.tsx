@@ -8,6 +8,8 @@ import { useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, useInView } from "framer-motion";
+import { branding } from "@/config/branding";
+
 
 // ── Fade-in wrapper used throughout ─────────────────────────────────────────
 function FadeIn({
@@ -151,9 +153,9 @@ export default function LandingClient() {
       <nav className="fixed top-0 left-0 right-0 z-50 border-b border-[#D4AF37]/20 bg-[#0A1F16]/90 backdrop-blur-md">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3">
-            <Image src="/icon-512.png" alt="SenateDesk" width={36} height={36} />
+            <Image src={branding.logoIcon} alt={branding.devName} width={36} height={36} />
             <span className="font-serif text-lg font-bold text-[#D4AF37] tracking-wide">
-              SenateDesk
+              {branding.devName}
             </span>
           </Link>
 
@@ -268,7 +270,7 @@ export default function LandingClient() {
             </h1>
 
             <p className="text-lg text-white/60 max-w-2xl leading-relaxed mb-10">
-              SenateDesk handles everything from marks upload to senate report
+              {branding.devName} handles everything from marks upload to senate report
               generation — ENG regulation compliance, supplementary tracking,
               carry-forward units, and promotion decisions. Built for
               engineering school coordinators who spend too many hours doing
@@ -422,7 +424,7 @@ export default function LandingClient() {
                   Every ENG rule, correctly applied
                 </h2>
                 <p className="text-white/60 text-sm leading-relaxed mb-6">
-                  SenateDesk implements ENG.10 through ENG.27 — supplementary
+                  {branding.devName} implements ENG.10 through ENG.27 — supplementary
                   thresholds, stayout decisions, carry-forward limits, 10-year
                   BSc and 8-year BEd duration caps, and deferred unit handling.
                   The engine doesn&apos;t guess; it calculates.
@@ -672,7 +674,7 @@ export default function LandingClient() {
               Ready to eliminate manual promotion cycles?
             </h2>
             <p className="text-white/50 text-sm mb-10 leading-relaxed">
-              Request a demo and see how SenateDesk handles your
+              Request a demo and see how {branding.devName} handles your
               institution&apos;s full academic cycle — from upload to senate
               board.
             </p>
@@ -698,9 +700,9 @@ export default function LandingClient() {
       <footer className="border-t border-[#D4AF37]/10 py-10 px-6">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <Image src="/icon-192.png" alt="SenateDesk" width={28} height={28} />
+            <Image src={branding.logoIcon} alt={branding.devName} width={28} height={28} />
             <span className="text-sm font-serif text-[#D4AF37]">
-              SenateDesk
+             {branding.devName}
             </span>
             <span className="text-white/20 text-sm">by</span>
             <Image

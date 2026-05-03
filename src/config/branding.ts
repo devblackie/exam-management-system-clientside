@@ -6,11 +6,11 @@ export const branding = {
   devComUrl: "https://newtsolhub.com",
 
   // ── Product ───────────────────────────────────────────────────────────────
-  devName: "SenateDesk",
+  devName: "AcadeDesk",
   appName: "Exams Coordinator", // shown inside the app
   tagLine: "Academic progression, automated.",
-  logoIcon: "/Logo.png", // the SD column mark
-  logoAltText: "SenateDesk",
+  logoIcon: "/icon-512.png", // the SD column mark
+  logoAltText: "AcadeDesk",
 
   // ── Institution (set per deployment) ─────────────────────────────────────
   // In a multi-institution deployment, these would come from InstitutionSettings.
@@ -19,6 +19,6 @@ export const branding = {
   school: "University of Technology",
 
   // ── URLs ──────────────────────────────────────────────────────────────────
-  appUrl: process.env.NEXT_PUBLIC_APP_URL ?? "https://senatedesk.com",
+  appUrl: process.env.NEXT_PUBLIC_APP_URL ?? "https://acadedesk.com",
   supportEmail: "hello@newtsolhub.com",
 };

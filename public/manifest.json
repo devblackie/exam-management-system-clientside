@@ -1,6 +1,6 @@
 {
-  "name": "SenateDesk",
-  "short_name": "SenateDesk",
+  "name": "AcadeDesk",
+  "short_name": "AcadeDesk",
   "description": "Engineering Academic Progression System by newtsolhub",
   "start_url": "/",
   "display": "standalone",

@@ -15,6 +15,7 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, useInView, useScroll, useTransform, useSpring, AnimatePresence } from "framer-motion";
+import { branding } from "@/config/branding";
 
 // ─── Motion safety ────────────────────────────────────────────────────────────
 function useReducedMotion(): boolean {
@@ -594,7 +595,7 @@ function GlowCard({
 
 // ─── Terminal typewriter ──────────────────────────────────────────────────────
 const RULE_LINES = [
-  { text: "// ENG.13(a) — SenateDesk engine", col: "text-[#D4AF37]/50" },
+  { text: "// ENG.13(a) — {branding.devName} engine", col: "text-[#D4AF37]/50" },
   { text: "if fail_rate >= 0.50:", col: "text-white/30" },
   { text: "  → REPEAT YEAR", col: "text-red-400" },
   { text: "elif mean < 40:", col: "text-white/30" },
@@ -665,12 +666,12 @@ function TerminalBlock() {
 // ─── FAQ ─────────────────────────────────────────────────────────────────────
 const FAQS = [
   {
-    q: "How does SenateDesk handle student data security?",
-    a: "All data is encrypted at rest (AES-256) and in transit (TLS 1.3). SenateDesk runs on ISO 27001-certified infrastructure. Your institution retains full data ownership — we hold nothing after contract termination. A Data Processing Agreement is signed before onboarding.",
+    q: "How does AcadeDesk handle student data security?",
+    a: "All data is encrypted at rest (AES-256) and in transit (TLS 1.3). {branding.devName} runs on ISO 27001-certified infrastructure. Your institution retains full data ownership — we hold nothing after contract termination. A Data Processing Agreement is signed before onboarding.",
   },
   {
     q: "Can it integrate with our existing Student Information System?",
-    a: "SenateDesk accepts standard Excel scoresheet uploads from any SIS. Enterprise plan customers receive API access for direct SIS integration with Banner, PeopleSoft, and custom systems. We also provide migration support for historical student records.",
+    a: "AcadeDesk accepts standard Excel scoresheet uploads from any SIS. Enterprise plan customers receive API access for direct SIS integration with Banner, PeopleSoft, and custom systems. We also provide migration support for historical student records.",
   },
   {
     q: "What if our regulations differ from the standard ENG rules?",
@@ -853,7 +854,7 @@ const TESTIMONIALS = [
   },
   {
     quote:
-      "The regulation engine catches edge cases our manual process missed for years. We had carry-forward unit errors that went undetected. SenateDesk flagged every one on the first upload.",
+      "The regulation engine catches edge cases our manual process missed for years. We had carry-forward unit errors that went undetected. {branding.devName} flagged every one on the first upload.",
     name: "Eng. Peter Muthoni",
     title: "Faculty Coordinator, Engineering",
     institution: "Meru University of Science & Technology",
@@ -861,7 +862,7 @@ const TESTIMONIALS = [
   },
   {
     quote:
-      "The Board of Examiners accepted our first SenateDesk senate report without a single correction. In seven years of this role, that has never happened with a manual process.",
+      "The Board of Examiners accepted our first {branding.devName} senate report without a single correction. In seven years of this role, that has never happened with a manual process.",
     name: "Mrs. Grace Kamau",
     title: "Deputy Registrar, Examinations",
     institution: "Karatina University",
@@ -905,15 +906,15 @@ export default function LandingClient() {
             <div className="relative">
               <div className="absolute inset-0 bg-[#D4AF37]/20 rounded-full blur-md group-hover:bg-[#D4AF37]/40 transition-all" />
               <Image
-                src="/Logo.png"
-                alt="SenateDesk"
+                src={branding.logoIcon}
+                alt={branding.devCom}
                 width={36}
                 height={36}
                 className="relative"
               />
             </div>
             <span className="font-serif text-lg font-bold text-[#D4AF37] tracking-wide">
-              SenateDesk
+              {branding.devName}
             </span>
           </Link>
 
@@ -1017,7 +1018,7 @@ export default function LandingClient() {
           className="relative max-w-6xl mx-auto px-6 py-28 w-full"
         >
           {/* Trust strip — social proof above fold */}
-          <FadeIn className="mb-10">
+          {/* <FadeIn className="mb-10">
             <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
               <span className="text-xs text-white/28 tracking-widest uppercase font-medium">
                 Trusted by
@@ -1036,7 +1037,7 @@ export default function LandingClient() {
                 </span>
               ))}
             </div>
-          </FadeIn>
+          </FadeIn> */}
 
           <div className="grid lg:grid-cols-2 gap-14 items-center">
             {/* Copy */}
@@ -1045,7 +1046,7 @@ export default function LandingClient() {
                 <div className="inline-flex items-center gap-2 border border-[#D4AF37]/28 rounded-full px-4 py-1.5 mb-8 bg-[#D4AF37]/6 backdrop-blur-sm">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#D4AF37] animate-pulse" />
                   <span className="text-xs text-[#D4AF37] tracking-widest uppercase font-medium">
-                    Built for Engineering Schools
+                    Built for Institutions of Higher Learning
                   </span>
                 </div>
               </FadeIn>
@@ -1075,7 +1076,7 @@ export default function LandingClient() {
 
               <FadeIn delay={0.2}>
                 <p className="text-base text-white/48 leading-relaxed mb-7 max-w-lg">
-                  SenateDesk handles everything from marks upload to senate
+                  {branding.devName} handles everything from marks upload to senate
                   report generation — ENG regulation compliance, supplementary
                   tracking, carry-forward units, and promotion decisions. Built
                   for engineering school coordinators who spend too many hours
@@ -1084,10 +1085,10 @@ export default function LandingClient() {
               </FadeIn>
 
               {/* Above-fold testimonial quote */}
-              <FadeIn delay={0.26}>
+              {/* <FadeIn delay={0.26}>
                 <div className="border-l-2 border-[#D4AF37]/45 pl-4 mb-8 py-1">
                   <p className="text-sm text-white/52 italic leading-relaxed">
-                    &ldquo;The Board of Examiners accepted our first SenateDesk
+                    &ldquo;The Board of Examiners accepted our first {branding.devName}
                     senate report without a single correction. In seven years of
                     this role, that has never happened with a manual
                     process.&rdquo;
@@ -1096,7 +1097,7 @@ export default function LandingClient() {
                     — Mrs. Grace Kamau, Deputy Registrar, Karatina University
                   </p>
                 </div>
-              </FadeIn>
+              </FadeIn> */}
 
               <FadeIn delay={0.32}>
                 <div className="flex flex-col sm:flex-row gap-3">
@@ -1367,7 +1368,7 @@ export default function LandingClient() {
                   Every ENG rule, correctly applied
                 </h2>
                 <p className="text-white/48 text-sm leading-relaxed mb-7">
-                  SenateDesk implements ENG.10 through ENG.27 — supplementary
+                  {branding.devName} implements ENG.10 through ENG.27 — supplementary
                   thresholds, stayout decisions, carry-forward limits, 10-year
                   BSc and 8-year BEd duration caps, and deferred unit handling.
                   The engine doesn&apos;t guess; it calculates.
@@ -1660,16 +1661,18 @@ export default function LandingClient() {
                 aria-hidden
                 className="absolute inset-0 bg-[#D4AF37]/14 rounded-full blur-sm"
               />
-              <Image src="/Logo.png" alt="SenateDesk" width={28} height={28} className="relative" />
+              <Image src={branding.logoIcon} alt={branding.devName} width={28} height={28} className="relative" />
             </div>
             <span className="text-sm font-serif text-[#D4AF37] font-bold">
-              SenateDesk
+              {branding.devName}
             </span>
             <span className="text-white/16 text-sm">by</span>
             <Image
               src="/newtsolhubLogo.png"
               alt="newtsolhub"
-              width={90}
+              width={28}
+              // width={90}
+              // height={22}
               height={22}
               className="opacity-32 hover:opacity-65 transition-opacity"
             />
@@ -1686,7 +1689,7 @@ export default function LandingClient() {
             ))}
           </div>
           <p className="text-xs text-white/16">
-            © {new Date().getFullYear()} newtsolhub. All rights reserved.
+            © {new Date().getFullYear()} {branding.devCom}. All rights reserved.
           </p>
         </div>
       </footer>

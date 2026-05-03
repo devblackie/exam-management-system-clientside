@@ -80,18 +80,18 @@ import type { Metadata } from "next";
 import LandingClient from "./(marketing)/LandingClient";
 // import LandingClient from "./LandingClient";
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://senatedesk.com";
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://acadedesk.com";
 
 export const metadata: Metadata = {
-  title: "Academic Progression Software — SenateDesk",
+  title: "Academic Progression Software — AcadeDesk",
   description:
-    "SenateDesk automates student promotion, senate reports, supplementary " +
+    "AcadeDesk automates student promotion, senate reports, supplementary " +
     "tracking, carry-forward units, and ENG regulation compliance for " +
     "university engineering schools. Built for coordinators, designed for accuracy.",
   robots: { index: true, follow: true },
   alternates: { canonical: APP_URL },
   openGraph: {
-    title:       "SenateDesk — Engineering Academic Progression System",
+    title:       "AcadeDesk — Engineering Academic Progression System",
     description: "Automates senate reports, supplementary tracking, and ENG regulation compliance.",
     url:          APP_URL,
     images:      [{ url: "/og-image.png", width: 1200, height: 630 }],
@@ -103,7 +103,7 @@ export default function LandingPage() {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
-    name: "SenateDesk",
+    name: "AcadeDesk",
     applicationCategory: "EducationalApplication",
     operatingSystem: "Web",
     description:

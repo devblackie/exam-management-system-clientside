@@ -4,7 +4,7 @@
 
 import { MetadataRoute } from "next";
 
-const BASE = process.env.NEXT_PUBLIC_APP_URL ?? "https://senatedesk.com";
+const BASE = process.env.NEXT_PUBLIC_APP_URL ?? "https://acadedesk.com";
 
 // Blog posts — add a new entry for each post you publish
 const BLOG_POSTS = [

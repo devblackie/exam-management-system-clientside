@@ -7,8 +7,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
+import { branding } from "@/config/branding";
 
-const BASE = process.env.NEXT_PUBLIC_APP_URL ?? "https://senatedesk.com";
+
+const BASE = process.env.NEXT_PUBLIC_APP_URL ?? "https://acadedesk.com";
 const SLUG = "eng-16-repeat-year-automation";
 const TITLE =
   "How ENG.16 Repeat-Year Decisions Work — and How to Automate Them";
@@ -71,9 +73,9 @@ export default function ENG16Post() {
       <nav className="fixed top-0 left-0 right-0 z-50 border-b border-[#D4AF37]/20 bg-[#0A1F16]/90 backdrop-blur-md">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3">
-            <Image src="/Logo.png" alt="SenateDesk" width={32} height={32} />
+            <Image src={branding.logoIcon} alt={branding.devName} width={32} height={32} />
             <span className="font-serif text-lg font-bold text-[#D4AF37]">
-              SenateDesk
+              {branding.devName}
             </span>
           </Link>
           <div className="flex items-center gap-4">
@@ -308,7 +310,7 @@ return "PROMOTED";`}</pre>
           {/* CTA */}
           <div className="mt-12 border border-[#D4AF37]/30 rounded-xl p-8 text-center bg-[#123828]/30">
             <p className="text-[#D4AF37] font-serif font-bold text-lg mb-3">
-              SenateDesk implements all of this automatically
+              {branding.devName} implements all of this automatically
             </p>
             <p className="text-white/50 text-sm mb-6">
               Dynamic thresholds, deferred unit handling, mean mark calculation
@@ -333,8 +335,8 @@ return "PROMOTED";`}</pre>
             className="opacity-60"
           />
           <div>
-            <p className="text-xs text-white/30">Published by newtsolhub</p>
-            <p className="text-xs text-white/20">Builders of SenateDesk</p>
+            <p className="text-xs text-white/30">Published by {branding.devCom}</p>
+            <p className="text-xs text-white/20">Builders of {branding.devName}</p>
           </div>
         </footer>
       </article>

@@ -1,4 +1,4 @@
-# robots.txt — SenateDesk
+# robots.txt — AcadeDesk
 # Allow public marketing pages. Block all authenticated app routes.
 
 User-agent: *
@@ -19,4 +19,4 @@ Allow: /pricing/
 Allow: /og-image.png
 Allow: /Logo.png
 
-Sitemap: https://senatedesk.com/sitemap.xml
+Sitemap: https://acadedesk.com/sitemap.xml
