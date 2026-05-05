@@ -33,21 +33,17 @@ import type { NextRequest } from "next/server";
 
 function isPublicPath(pathname: string): boolean {
   return (
-    pathname === "/"                         ||
-    pathname === "/login"                    ||
-    pathname === "/coordinator-secret"       ||
-    pathname === "/secret-register"          ||
-    pathname === "/unauthorized"             ||
-    pathname.startsWith("/reset-password")   ||
+    pathname === "/" ||
+    pathname === "/login" ||
+    pathname === "/coordinator-secret" ||
+    pathname === "/secret-register" ||
+    pathname === "/unauthorized" ||
+    pathname === "/demo" || // Interactive demo page
+    pathname === "/signup" || // Pilot signup page
+    pathname.startsWith("/reset-password") ||
     pathname.startsWith("/register")
   );
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Read the role claim from the JWT payload WITHOUT verifying the signature.
-// Safe here because we only use this for redirect UX — every real data
-// request still goes to the backend which does full signature verification.
-// ─────────────────────────────────────────────────────────────────────────────
 
 function getRoleFromToken(token: string): string | null {
   try {

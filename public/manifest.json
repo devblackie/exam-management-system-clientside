@@ -1,7 +1,7 @@
 {
   "name": "AcadeDesk",
   "short_name": "AcadeDesk",
-  "description": "Engineering Academic Progression System by newtsolhub",
+  "description": "Academic Progression System by newtsolhub",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0A1F16",
