@@ -308,36 +308,30 @@
 //   );
 // }
 
+
+
+
+
+
+
+
+
+
+
+
+
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import PageHeader from "@/components/ui/PageHeader";
 import { useToast } from "@/context/ToastContext";
-import {
-  getBillingSummary,
-  generateInvoice,
-  STATUS_COLORS,
-  formatCurrency,
-  formatDate,
-  type BillingSummary,
-} from "@/api/billingApi";
+import { getBillingSummary, generateInvoice, STATUS_COLORS, formatCurrency, formatDate, type BillingSummary } from "@/api/billingApi";
 import BillingStatCards from "@/components/billing/BillingStatCards";
 import SeatUsageBar from "@/components/billing/SeatUsageBar";
 import InvoiceTable from "@/components/billing/InvoiceTable";
-import {
-  AlertBanners,
-  PlanSettings,
-  BillingContactCard,
-} from "@/components/billing/BillingSettings";
-import {
-  Receipt,
-  FileText,
-  Settings,
-  Loader2,
-  Plus,
-  RefreshCcw,
-} from "lucide-react";
+import { AlertBanners, PlanSettings, BillingContactCard } from "@/components/billing/BillingSettings";
+import { Receipt, FileText, Settings, Loader2, Plus, RefreshCcw } from "lucide-react";
 
 type Tab = "overview" | "invoices" | "settings";
 
@@ -404,7 +398,7 @@ export default function BillingPage() {
   if (loading) {
     return (
       <ProtectedRoute allowed={["admin"]}>
-        <div className="max-w-8xl ml-40 my-10">
+        <div className="max-w-8xl lg:ml-48 my-10">
           <div className="bg-[#F8F9FA] min-h-[100vh] rounded-xl shadow-2xl p-10">
             <div className="flex items-center gap-4 mb-10">
               <div className="h-10 w-48 bg-slate-200 rounded-lg animate-pulse" />

@@ -29,7 +29,7 @@ export default function SystemHealthTab() {
   };
 
   return (
-    <div className="max-w-9xl ml-40 my-10 animate-in fade-in duration-700">
+    <div className="max-w-9xl lg:ml-48 my-10 animate-in fade-in duration-700">
       <div className="bg-[#F8F9FA] min-h-screen rounded-xl shadow-2xl p-10">
         
         <PageHeader

@@ -19,6 +19,6 @@ export const branding = {
   school: "University of Technology",
 
   // ── URLs ──────────────────────────────────────────────────────────────────
-  appUrl: process.env.NEXT_PUBLIC_APP_URL ?? "https://acadedesk.com",
+  appUrl: process.env.NEXT_PUBLIC_BACKEND_URL ?? "https://acadedesk.com",
   supportEmail: "hello@newtsolhub.com",
 };

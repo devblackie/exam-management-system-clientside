@@ -9,16 +9,8 @@ import { branding } from "@/config/branding";
 import { motion, AnimatePresence } from "framer-motion";
 import { forgotPassword } from "@/api/authApi";
 import {
-  Mail,
-  Lock,
-  Eye,
-  EyeOff,
-  Loader2,
-  ShieldCheck,
-  ChevronLeft,
-  ArrowRight,
-  RotateCcw,
-  User,
+  Mail, Lock, Eye, EyeOff, Loader2, ShieldCheck,
+  ChevronLeft, ArrowRight, RotateCcw, User,
 } from "lucide-react";
 
 type View = "email" | "password" | "otp" | "forgot";
@@ -353,15 +345,15 @@ export default function LoginPage() {
         <div className="flex items-center gap-4">
           <div className="h-px w-10 bg-yellow-gold" />
           <span className="text-[10px] font-bold uppercase tracking-[0.5em] text-white/30">
-            {branding.school}
+            {branding.devName}
           </span>
         </div>
         <div>
-          <h1 className="text-7xl font-black text-white leading-tight tracking-tighter">
-            Exams
+          <h1 className="text-5xl font-black text-white leading-tight tracking-tighter">
+            {branding.devName}            
             <br />
             <span className="text-5xl text-yellow-gold font-light">
-              Management System.
+              Exams Management System.
             </span>
           </h1>
           <p className="text-white/40 max-w-md mt-6 text-sm font-medium leading-relaxed tracking-wide">

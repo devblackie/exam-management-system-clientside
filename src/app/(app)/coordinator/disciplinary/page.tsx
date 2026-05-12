@@ -299,7 +299,7 @@ export default function DisciplinaryPage() {
 
   return (
     <ProtectedRoute allowed={["coordinator", "admin"]}>
-      <div className="max-w-8xl ml-40 my-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="max-w-8xl lg:ml-48 my-14 animate-in fade-in slide-in-from-bottom-4 duration-700">
         <div className="bg-[#F8F9FA] min-h-[100vh] rounded-xl shadow-2xl p-10 relative overflow-hidden">
           <Gavel
             size={400}

@@ -4,6 +4,7 @@ import {
   getUsers,
   updateUserRole,
   updateUserStatus,
+  updateUserDetails,
   deleteUser,
   sendInvite,
   getInvites,
@@ -19,54 +20,91 @@ export const ADMIN_KEYS = {
 };
 
 export const useUsers = () =>
-  useQuery({ queryKey: ADMIN_KEYS.users, queryFn: getUsers });
+  useQuery({ 
+    queryKey: ADMIN_KEYS.users, 
+    queryFn: getUsers,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
 
 export const useLecturers = () =>
-  useQuery({ queryKey: ADMIN_KEYS.lecturers, queryFn: getLecturers });
+  useQuery({ 
+    queryKey: ADMIN_KEYS.lecturers, 
+    queryFn: getLecturers,
+    staleTime: 5 * 60 * 1000,
+  });
 
 export const useInvites = () =>
-  useQuery({ queryKey: ADMIN_KEYS.invites, queryFn: getInvites });
+  useQuery({ 
+    queryKey: ADMIN_KEYS.invites, 
+    queryFn: getInvites,
+    staleTime: 5 * 60 * 1000,
+  });
 
 export const useUpdateUserRole = () => {
-  const qc = useQueryClient();
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ id, role }: { id: string; role: Role }) =>
       updateUserRole(id, role),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ADMIN_KEYS.users }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ADMIN_KEYS.users });
+    },
   });
 };
 
 export const useUpdateUserStatus = () => {
-  const qc = useQueryClient();
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ id, status }: { id: string; status: Status }) =>
       updateUserStatus(id, status),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ADMIN_KEYS.users }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ADMIN_KEYS.users });
+    },
+  });
+};
+
+// NEW: Update user details mutation
+export const useUpdateUserDetails = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: { name?: string; schoolCode?: string; departmentCode?: string; institutionWide?: boolean } }) =>
+      updateUserDetails(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ADMIN_KEYS.users });
+    },
   });
 };
 
 export const useDeleteUser = () => {
-  const qc = useQueryClient();
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: deleteUser,
-    onSuccess: () => qc.invalidateQueries({ queryKey: ADMIN_KEYS.users }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ADMIN_KEYS.users });
+    },
   });
 };
 
 export const useSendInvite = () => {
-  const qc = useQueryClient();
+  const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ email, role, name }: {
-      email: string; role: Role; name?: string;
-    }) => sendInvite(email, role, name),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ADMIN_KEYS.invites }),
+    mutationFn: ({ email, role, name, scope }: { 
+      email: string; 
+      role: Role; 
+      name?: string;
+      scope?: { schoolCode?: string; departmentCode?: string; institutionWide?: boolean };
+    }) => sendInvite(email, role, name, scope),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ADMIN_KEYS.invites });
+    },
   });
 };
 
 export const useRevokeInvite = () => {
-  const qc = useQueryClient();
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: revokeInvite,
-    onSuccess: () => qc.invalidateQueries({ queryKey: ADMIN_KEYS.invites }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ADMIN_KEYS.invites });
+    },
   });
 };

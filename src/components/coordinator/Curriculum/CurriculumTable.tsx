@@ -1,3 +1,4 @@
+// clientside/src/components/coordinator/Curriculum/CurriculumTable.tsx
 "use client";
 
 import React from "react";

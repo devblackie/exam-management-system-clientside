@@ -34,6 +34,9 @@ export interface User {
   status:      Status;
   institution: string;
   createdAt:   string;
+  schoolCode?:      string;   // For coordinators - which school they belong to
+  departmentCode?:  string;   // For coordinators - which department they belong to
+  institutionWide?: boolean;
 }
  
 export type Lecturer    = User & { role: "lecturer" };
@@ -73,14 +76,28 @@ export interface UnitAssignment {
   createdAt: string;
 }
 
+// export interface Program {
+//   _id: string;
+//   name: string;
+//   code: string;
+//   description?: string;
+//   durationYears?: number;
+//   createdAt?: string;
+//   updatedAt?: string;
+// }
+
 export interface Program {
-  _id: string;
-  name: string;
-  code: string;
-  description?: string;
-  durationYears?: number;
-  createdAt?: string;
-  updatedAt?: string;
+  _id:            string;
+  name:           string;
+  code:           string;
+  description?:   string;
+  durationYears:  number;
+  degreeType:     string;
+  schoolCode:     string;
+  departmentCode: string;
+  institution:    string;
+  intakes:        ("JAN" | "MAY" | "SEPT")[];
+  isActive:       boolean;
 }
 
 export interface ProgramUnit {
@@ -149,28 +166,130 @@ export interface Institution {
   code: string;
 }
 
-export interface InstitutionSettings {
-  _id?: string;
-  institution?: string;
-
-  // MAX MARKS — Real-world values
-  cat1Max: number;
-  cat2Max: number;
-  cat3Max: number;        // 0 = not used
-  assignmentMax: number;  // 0 = not used
-  practicalMax: number;   // 0 = not used
-
-  examMax: 70; // Always fixed
-
-  passMark: number;
-  supplementaryThreshold: number;
-  retakeThreshold: number;
-
-  gradingScale?: GradingScale[];
-
-  createdAt?: string;
-  updatedAt?: string;
+export interface GradeEntry {
+  min:   number;
+  max:   number;
+  grade: "A" | "B" | "C" | "D" | "E";
+  label: string;
 }
+
+export interface WAAClassification {
+  min:            number;
+  max:            number;
+  classification: string;
+}
+
+export interface RegNoPattern {
+  prefix:       string;
+  separator:    string;
+  yearDigits:   number;
+  example:      string;
+  manualRegex?: string;
+}
+
+export interface Department {
+  _id:           string;
+  name:          string;
+  shortName:     string;
+  code:          string;
+  hod?:          string;
+  regNoPatterns: RegNoPattern[];
+}
+
+export interface School {
+  _id:         string;
+  name:        string;
+  shortName:   string;
+  code:        string;
+  dean?:       string;
+  departments: Department[];
+}
+
+export interface InstitutionRuleSet {
+  supplementaryThreshold:   number;
+  stayoutThreshold:         number;
+  repeatYearMeanThreshold:  number;
+  passMark:                 number;
+  maxCarryForwardUnits:     number;
+  carryForwardToFinalYear:  boolean;
+  maxDurationMultiplier:    number;
+  maxAttempts:              number;
+  caWeight:                 number;
+  examWeight:               number;
+  catMax:                   number;
+  assignmentMax:            number;
+  practicalMax:             number;
+  labMax:                   number;
+  suppMarkCap:              number;
+  hasLab:                   boolean;
+  hasPractical:             boolean;
+  hasWorkshop:              boolean;
+  useSemesterWeighting:     boolean;
+  minCourseworkAttendance:  number;
+  maxAbsentExams:           number;
+  gradeAppealWindowDays:    number;
+}
+
+export interface DocumentMeta {
+  universityName:  string;
+  universityAbbr:  string;
+  schoolName:      string;
+  departmentName:  string;
+  registrar:       string;
+  postalAddress:   string;
+  telephone:       string;
+  email:           string;
+  website:         string;
+  country:         string;
+  city:            string;
+}
+
+export interface InstitutionBranding {
+  universityLogoPath?: string;
+  reportHeaderText?:   string;
+  cmsHeaderColor?:     string;
+  cmsAccentColor?:     string;
+  wordDocFontFamily?:  string;
+  wordDocFontSize?:    number;
+  useLetterhead?:      boolean;
+}
+
+export interface InstitutionSettings {
+  _id?:              string;
+  institution?:      string;
+  docMeta:           DocumentMeta;
+  schools:           School[];
+  ruleSet:           Partial<InstitutionRuleSet>;
+  semesterWeights:   Array<{ year: number; weight: number }>;
+  gradingScale:      GradeEntry[];
+  waaClassification: WAAClassification[];
+  branding:          InstitutionBranding;
+  supportedIntakes:  ("JAN" | "MAY" | "SEPT")[];
+  enforceRegNoPattern: boolean;
+}
+
+// export interface InstitutionSettings {
+//   _id?: string;
+//   institution?: string;
+
+//   // MAX MARKS — Real-world values
+//   cat1Max: number;
+//   cat2Max: number;
+//   cat3Max: number;        // 0 = not used
+//   assignmentMax: number;  // 0 = not used
+//   practicalMax: number;   // 0 = not used
+
+//   examMax: 70; // Always fixed
+
+//   passMark: number;
+//   supplementaryThreshold: number;
+//   retakeThreshold: number;
+
+//   gradingScale?: GradingScale[];
+
+//   createdAt?: string;
+//   updatedAt?: string;
+// }
 
 // For saving/updating
 export interface InstitutionSettingsInput {

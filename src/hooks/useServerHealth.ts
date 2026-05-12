@@ -29,12 +29,46 @@
 
 
 
+// // clientside/src/hooks/useServerHealth.ts
+// import { useState, useEffect, useCallback } from "react";
+// import axios from "axios";
+
+// export function useServerHealth() {
+//   const [isOnline, setIsOnline] = useState<boolean | null>(null);
+
+//   const checkHealth = useCallback(async () => {
+//     try {
+//       const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/health`;
+//       const response = await axios.get(url, {
+//         timeout: 5000,
+//         withCredentials: false,
+//       });
+//       setIsOnline(response.status === 200);
+//     } catch {
+//       setIsOnline(false);
+//     }
+//   }, []);
+
+//   useEffect(() => {
+//     checkHealth();
+//     const interval = setInterval(checkHealth, 10000);
+//     return () => clearInterval(interval);
+//   }, [checkHealth]);
+
+//   return isOnline; // null = checking, true = online, false = offline
+// }
+
+
+
+
+
+
 // clientside/src/hooks/useServerHealth.ts
 import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 
-export function useServerHealth() {
-  const [isOnline, setIsOnline] = useState<boolean | null>(null);
+export function useServerHealth(): boolean {
+  const [isOnline, setIsOnline] = useState<boolean>(true); // Default to true, not null
 
   const checkHealth = useCallback(async () => {
     try {
@@ -55,5 +89,5 @@ export function useServerHealth() {
     return () => clearInterval(interval);
   }, [checkHealth]);
 
-  return isOnline; // null = checking, true = online, false = offline
+  return isOnline; // Always returns boolean (true/false)
 }

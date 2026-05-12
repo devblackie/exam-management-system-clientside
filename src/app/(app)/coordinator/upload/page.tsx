@@ -222,7 +222,7 @@ export default function UploadMarks() {
 
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
-    <div className="ml-48 my-10 min-h-screen bg-[#F8F9FA] overflow-hidden">
+    <div className="lg:ml-48 my-14 min-h-screen bg-[#F8F9FA] overflow-hidden">
       {/* Loading overlay */}
       {(uploading || isTemplateDownloading) && (
         <div className="fixed inset-0 bg-green-darkest/30 backdrop-blur-sm z-[200] flex items-center justify-center">

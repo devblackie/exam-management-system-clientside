@@ -95,7 +95,7 @@ export default function CoordinatorPage() {
 
   return (
     <ProtectedRoute allowed={["coordinator"]}>
-      <div className="max-w-8xl ml-48 my-10 ">
+      <div className="max-w-8xl lg:ml-48 my-14 ">
         <div className="bg-[#F8F9FA] min-h-screen rounded-xl shadow-2xl p-10">
         
          {/* 1. PAGE HEADER */}

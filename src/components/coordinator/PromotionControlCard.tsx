@@ -58,7 +58,7 @@ export default function PromotionControlCard({ onRunPreview, isLoading }: Select
   // Custom Input Styles for the Bespoke Look
   const inputBase = `
     w-full p-3.5 bg-slate-50/50 border border-slate-200 
-    text-green-darkest font-semibold text-sm rounded-md
+    text-green-darkest font-semibold text-[10px] rounded-md
     transition-all duration-300 outline-none appearance-none
     disabled:opacity-40
   `;
@@ -89,7 +89,7 @@ export default function PromotionControlCard({ onRunPreview, isLoading }: Select
           {/* Program Selection */}
           <div className="space-y-3">
             <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">
-              Academic Program
+              Program
             </label>
             <div className="relative">
               <select
@@ -98,7 +98,7 @@ export default function PromotionControlCard({ onRunPreview, isLoading }: Select
                 value={formData.programId}
                 onChange={(e) => setFormData({ ...formData, programId: e.target.value })}
               >
-                <option value="">Select Curriculum...</option>
+                <option value="">Program...</option>
                 {programs.map(p => (
                   <option key={p._id} value={p._id}>{p.code} — {p.name}</option>
                 ))}
