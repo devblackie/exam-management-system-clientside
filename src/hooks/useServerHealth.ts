@@ -67,13 +67,16 @@
 import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 
-export function useServerHealth(): boolean {
-  const [isOnline, setIsOnline] = useState<boolean>(true); // Default to true, not null
+export function useServerHealth(): boolean | null {
+  const [isOnline, setIsOnline] = useState<boolean | null>(null); // null = still checking
 
   const checkHealth = useCallback(async () => {
     try {
-      const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/health`;
-      const response = await axios.get(url, {
+      const base = process.env.NEXT_PUBLIC_BACKEND_URL || 
+                   process.env.NEXT_PUBLIC_API_URL?.replace("/api", "") ||
+                   "https://acadedesk.com";
+
+      const response = await axios.get(`${base}/health`, {
         timeout: 5000,
         withCredentials: false,
       });
@@ -85,9 +88,9 @@ export function useServerHealth(): boolean {
 
   useEffect(() => {
     checkHealth();
-    const interval = setInterval(checkHealth, 10000);
+    const interval = setInterval(checkHealth, 30000); // every 30s not 10s
     return () => clearInterval(interval);
   }, [checkHealth]);
 
-  return isOnline; // Always returns boolean (true/false)
+  return isOnline;
 }
