@@ -78,9 +78,10 @@ api.interceptors.request.use(config => {
 // Pages where a 401 should NOT redirect to /login.
 // These pages are intentionally unauthenticated — redirecting breaks them.
 const NO_REDIRECT_PAGES = [
+  "/",
   "/login",
   "/secret-register",
-  "/register",          // invite-based registration
+  "/register", // invite-based registration
   "/reset-password",
   "/unauthorized",
   "/coordinator-secret",
