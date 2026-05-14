@@ -240,11 +240,11 @@ export default function Navbar() {
 
         <div className="flex items-center gap-6">
           {/* University Info - Show for all roles */}
-          <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10">
+          {/* <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10">
             <span className="text-[10px] font-medium text-white/80">
               {universityName}
             </span>
-          </div>
+          </div> */}
 
           {/* Server status badge */}
           <div
