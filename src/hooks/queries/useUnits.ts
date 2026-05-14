@@ -1,4 +1,5 @@
 // clientside/src/hooks/queries/useUnits.ts
+
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   getUnitTemplates,
@@ -23,7 +24,9 @@ export const useCreateUnit = () => {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (data: UnitTemplateFormData) => createUnitTemplate(data),
-    onSuccess: () => qc.invalidateQueries({ queryKey: UNIT_KEYS.all }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: UNIT_KEYS.all });
+    },
   });
 };
 
@@ -37,14 +40,18 @@ export const useUpdateUnit = () => {
       id: string;
       data: Partial<UnitTemplateFormData>;
     }) => updateUnitTemplate(id, data),
-    onSuccess: () => qc.invalidateQueries({ queryKey: UNIT_KEYS.all }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: UNIT_KEYS.all });
+    },
   });
 };
 
 export const useDeleteUnit = () => {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: deleteUnitTemplate,
-    onSuccess: () => qc.invalidateQueries({ queryKey: UNIT_KEYS.all }),
+    mutationFn: (id: string) => deleteUnitTemplate(id),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: UNIT_KEYS.all });
+    },
   });
 };

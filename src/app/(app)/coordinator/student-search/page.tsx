@@ -183,7 +183,7 @@ export default function StudentSearchPage() {
   };
 
   return (
-    <div className="max-w-8xl ml-48 my-10">
+    <div className="max-w-8xl ml-48 my-14">
       <div className="bg-[#F8F9FA] rounded-lg shadow-2xl p-10 min-h-screen">
         <PageHeader
           title="Student Academic"

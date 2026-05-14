@@ -11,7 +11,7 @@ import { getPrograms }   from "@/api/programsApi";
 import { useInstitutionSettings } from "@/hooks/queries/useInstitutionSettings";
 import type { RegNoPattern, School, Department } from "@/api/types";
 import PageHeader from "@/components/ui/PageHeader";
-import { FileDown, Trash2, AlertCircle, ClipboardCheck, Zap, ShieldAlert } from "lucide-react";
+import { FileDown, Trash2, AlertCircle, ClipboardCheck, Zap} from "lucide-react";
 import api from "@/config/axiosInstance";
 
 // ── Reg-no validation helpers ──────────────────────────────────────────────────
@@ -287,7 +287,7 @@ export default function RegisterStudents() {
         />
 
         {/* Scope badge */}
-        {myDeptCode && (
+        {/* {myDeptCode && (
           <div className="flex items-center gap-2 mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg w-fit">
             <ShieldAlert size={14} className="text-blue-600 shrink-0" />
             <p className="text-[10px] text-blue-700 font-bold">
@@ -295,10 +295,10 @@ export default function RegisterStudents() {
               {" "}— programs and students in this department only
             </p>
           </div>
-        )}
+        )} */}
 
         {/* Reg no format info */}
-        {currentPatterns.length > 0 && settings?.enforceRegNoPattern && (
+        {/* {currentPatterns.length > 0 && settings?.enforceRegNoPattern && (
           <div className="flex items-center gap-2 mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg w-fit">
             <AlertCircle size={14} className="text-amber-600 shrink-0" />
             <p className="text-[10px] text-amber-700 font-bold">
@@ -306,7 +306,7 @@ export default function RegisterStudents() {
               {currentPatterns.map(p => p.example).filter(Boolean).join("  or  ")}
             </p>
           </div>
-        )}
+        )} */}
 
         {currentPatterns.length === 0 && myDeptCode && (
           <div className="flex items-center gap-2 mb-4 p-3 bg-slate-50 border border-slate-200 rounded-lg w-fit">

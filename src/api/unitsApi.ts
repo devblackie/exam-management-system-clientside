@@ -1,33 +1,71 @@
+// // clientside/src/api/unitsApi.ts
+
+// import api from "@/config/axiosInstance";
+// import type { Unit } from "./types";
+
+// // 1. Data for creating/updating a base template (NO program/year/semester fields)
+// export interface UnitTemplateFormData {
+//   code: string;
+//   name: string;
+// }
+
+// // 2. CREATE Unit Template
+// export const createUnitTemplate = async (data: UnitTemplateFormData) => {
+//   const res = await api.post<Unit>("/units", data);
+//   return res.data;
+// };
+
+// // 3. GET All Unit Templates (for use in dropdowns)
+// export const getUnitTemplates = async (): Promise<Unit[]> => {
+//   const res = await api.get<Unit[]>("/units");
+//   return res.data;
+// };
+
+// // 4. UPDATE Unit Template (Only code/name allowed by backend)
+// export const updateUnitTemplate = async (id: string, data: Partial<UnitTemplateFormData>) => {
+//   const res = await api.put<Unit>(`/units/${id}`, data);
+//   return res.data;
+// };
+
+// // 5. DELETE Unit Template (Subject to backend constraints)
+// export const deleteUnitTemplate = async (id: string) => {
+//   await api.delete(`/units/${id}`);
+// };
+
+
+
+
+
 // clientside/src/api/unitsApi.ts
 
 import api from "@/config/axiosInstance";
 import type { Unit } from "./types";
 
-// 1. Data for creating/updating a base template (NO program/year/semester fields)
 export interface UnitTemplateFormData {
   code: string;
   name: string;
 }
 
-// 2. CREATE Unit Template
-export const createUnitTemplate = async (data: UnitTemplateFormData) => {
-  const res = await api.post<Unit>("/units", data);
-  return res.data;
-};
-
-// 3. GET All Unit Templates (for use in dropdowns)
 export const getUnitTemplates = async (): Promise<Unit[]> => {
   const res = await api.get<Unit[]>("/units");
   return res.data;
 };
 
-// 4. UPDATE Unit Template (Only code/name allowed by backend)
-export const updateUnitTemplate = async (id: string, data: Partial<UnitTemplateFormData>) => {
+export const createUnitTemplate = async (
+  data: UnitTemplateFormData
+): Promise<{ message: string; unit: Unit }> => {
+  const res = await api.post<{ message: string; unit: Unit }>("/units", data);
+  return res.data;
+};
+
+export const updateUnitTemplate = async (
+  id: string,
+  data: Partial<UnitTemplateFormData>
+): Promise<Unit> => {
   const res = await api.put<Unit>(`/units/${id}`, data);
   return res.data;
 };
 
-// 5. DELETE Unit Template (Subject to backend constraints)
-export const deleteUnitTemplate = async (id: string) => {
+export const deleteUnitTemplate = async (id: string): Promise<void> => {
   await api.delete(`/units/${id}`);
 };
