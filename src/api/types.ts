@@ -3,6 +3,11 @@ export type Role = "admin" | "lecturer" | "coordinator";
 // export type Status = "active" | "suspended";
 export type Status =  "active" | "inactive" | "graduated" | "suspended" | "deferred" | "disciplinary_suspension" | "discontinued" | "readmitted";
 export type DisciplinaryOutcome = "PENDING" | "WARNING" | "SENT_HOME" | "REINSTATED" | "DISCONTINUED" | "DISMISSED";
+export type ExamMode = "standard" | "mandatory_q1";
+export type UnitType = "theory" | "lab" | "workshop";
+export type TemplateMode = "detailed" | "direct";
+
+
 export interface UnitHurdle {
   code:     string;         // unit code, e.g. "ECE 301"
   name?:    string;         // full unit name

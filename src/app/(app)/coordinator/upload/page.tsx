@@ -17,10 +17,9 @@ import UploadTemplateCard from "@/components/coordinator/Upload/UploadTemplateCa
 import UploadDropZone from "@/components/coordinator/Upload/UploadDropZone";
 import UploadResultSummary from "@/components/coordinator/Upload/UploadResultSummary";
 import UploadRecordsTab from "@/components/coordinator/Upload/UploadRecordsTab";
+import { UnitType, ExamMode, TemplateMode } from "@/api/types";
 
-export type ExamMode = "standard" | "mandatory_q1";
-export type UnitType = "theory" | "lab" | "workshop";
-export type TemplateMode = "detailed" | "direct";
+
 
 export default function UploadMarksPage() {
   const { addToast } = useToast();

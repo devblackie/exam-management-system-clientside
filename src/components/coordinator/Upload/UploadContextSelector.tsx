@@ -3,7 +3,7 @@
 
 import React from "react";
 import type { Program, AcademicYear, ProgramUnit } from "@/api/types";
-import type { ExamMode, UnitType, TemplateMode } from "@/app/coordinator/upload/page";
+import { UnitType, ExamMode, TemplateMode } from "@/api/types";
 
 const YEARS_OF_STUDY = [1, 2, 3, 4, 5] as const;
 const SEMESTERS = [1, 2] as const;

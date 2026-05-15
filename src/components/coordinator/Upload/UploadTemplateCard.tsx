@@ -6,7 +6,8 @@ import { FileDown, Loader2 } from "lucide-react";
 import { downloadTemplate } from "@/api/marksApi";
 import { useToast } from "@/context/ToastContext";
 import { getErrorMessage } from "@/lib/api";
-import type { ExamMode, UnitType, TemplateMode } from "@/app/coordinator/upload/page";
+import { UnitType, ExamMode, TemplateMode } from "@/api/types";
+
 
 interface UploadTemplateCardProps {
   isDownloadEnabled: boolean;
