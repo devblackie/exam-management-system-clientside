@@ -3,22 +3,8 @@
 
 import React from "react";
 import {
-  AlertCircle,
-  CheckCircle2,
-  GraduationCap,
-  History,
-  AlertTriangle,
-  PlaneTakeoff,
-  Clock,
-  RefreshCcw,
-  Zap,
-  ShieldAlert,
-  ArrowRight,
-  BookMarked,
-  TrendingUp,
-  Trophy,
-  Calendar,
-  Gavel,
+  AlertCircle, CheckCircle2, GraduationCap, History, AlertTriangle, PlaneTakeoff, Clock,
+  RefreshCcw, Zap, ShieldAlert, ArrowRight, BookMarked, TrendingUp, Trophy, Calendar, Gavel,
 } from "lucide-react";
 import { StudentJourneyResponse, StudentJourneyTimeline } from "@/api/types";
 
@@ -56,60 +42,17 @@ type TimelineNode = StudentJourneyTimeline & {
   deferralStatus?: "pending" | "passed" | "failed";
 };
 
-// ── challenges arrays use RawUnit ─────────────────────────────────────────
-// The shared JourneyChallenges type may use HurdleUnit or UnitHurdle.
-// We cast each array to RawUnit[] at the point of use — one cast per block,
-// never scattered through the render logic.
-// type NodeChallenges = {
-//   supplementary?: RawUnit[];
-//   retakes?: RawUnit[];
-//   stayouts?: RawUnit[];
-//   specials?: RawUnit[];
-//   carryForwards?: RawUnit[];
-//   deferred?: RawUnit[];
-//   incomplete?: RawUnit[];
-//   discontinuationRisk?: RawUnit[];
-// };
 
-// function _getChallenges(m: TimelineNode): NodeChallenges {
-//   // Cast once here; every caller receives a typed object with no `any`.
-//   return (m.challenges ?? {}) as NodeChallenges;
-// }
 const classify = (mean: number) => {
   if (mean >= 70)
-    return {
-      label: "First Class Honours",
-      color: "text-emerald-600",
-      bg: "bg-emerald-50",
-      border: "border-emerald-200",
-    };
+    return { label: "First Class Honours", color: "text-emerald-600", bg: "bg-emerald-50", border: "border-emerald-200" };
   if (mean >= 60)
-    return {
-      label: "Second Class (Upper)",
-      color: "text-blue-600",
-      bg: "bg-blue-50",
-      border: "border-blue-200",
-    };
+    return { label: "Second Class (Upper)", color: "text-blue-600", bg: "bg-blue-50", border: "border-blue-200" };
   if (mean >= 50)
-    return {
-      label: "Second Class (Lower)",
-      color: "text-amber-600",
-      bg: "bg-amber-50",
-      border: "border-amber-200",
-    };
+    return { label: "Second Class (Lower)", color: "text-amber-600", bg: "bg-amber-50", border: "border-amber-200" };
   if (mean >= 40)
-    return {
-      label: "Pass",
-      color: "text-slate-600",
-      bg: "bg-slate-50",
-      border: "border-slate-200",
-    };
-  return {
-    label: "Below Pass Mark",
-    color: "text-red-600",
-    bg: "bg-red-50",
-    border: "border-red-200",
-  };
+    return { label: "Pass", color: "text-slate-600", bg: "bg-slate-50", border: "border-slate-200" };
+  return { label: "Below Pass Mark", color: "text-red-600", bg: "bg-red-50", border: "border-red-200" };
 };
 
 const barWidth = (w: number, maxW: number) =>
@@ -118,88 +61,44 @@ const barWidth = (w: number, maxW: number) =>
 
 // ── Node visual identity ───────────────────────────────────────────────────
 function nodeStyle(m: TimelineNode): {
-  text: string;
-  color: string;
-  bg: string;
-  border: string;
-  icon: React.ReactNode;
-  nodeBg: string;
+  text: string; color: string; bg: string; border: string; icon: React.ReactNode; nodeBg: string;
 } {
   switch (m.type) {
     case "GRADUATION":
       return {
-        text: "GRADUATED — DEGREE AWARDED",
-        color: "text-emerald-700",
-        bg: "bg-emerald-50",
-        border: "border-emerald-300",
-        icon: <Trophy size={14} />,
-        nodeBg: "bg-emerald-600",
+        text: "GRADUATED — DEGREE AWARDED", color: "text-emerald-700", bg: "bg-emerald-50", 
+        border: "border-emerald-300", icon: <Trophy size={14} />, nodeBg: "bg-emerald-600",
       };
 
     case "CARRY_FORWARD":
       return {
         text: `CARRY FORWARD GRANTED (${m.qualifier || "RP1C"}) — ENG.14`,
-        color: "text-teal-700",
-        bg: "bg-teal-50",
-        border: "border-teal-200",
-        icon: <BookMarked size={14} />,
-        nodeBg: "bg-teal-600",
+        color: "text-teal-700", bg: "bg-teal-50",
+        border: "border-teal-200", icon: <BookMarked size={14} />, nodeBg: "bg-teal-600",
       };
 
     case "DEFERRED_SUPP": {
       const sp = m.reason === "special_deferred";
       return {
-        text: sp
-          ? "SPECIAL DEFERRED — ENG.18c"
-          : "SUPPLEMENTARY DEFERRED — ENG.13b",
-        color: "text-indigo-700",
-        bg: "bg-indigo-50",
-        border: "border-indigo-200",
-        icon: <Calendar size={14} />,
-        nodeBg: "bg-indigo-600",
+        text: sp ? "SPECIAL DEFERRED — ENG.18c" : "SUPPLEMENTARY DEFERRED — ENG.13b",
+        color: "text-indigo-700", bg: "bg-indigo-50",
+        border: "border-indigo-200", icon: <Calendar size={14} />, nodeBg: "bg-indigo-600",
       };
     }
 
     case "DISCIPLINARY": {
       const O: Record<string, { text: string; nodeBg: string; color: string }> =
         {
-          PENDING: {
-            text: "DISCIPLINARY — PENDING HEARING",
-            nodeBg: "bg-red-500",
-            color: "text-red-700",
-          },
-          SENT_HOME: {
-            text: "DISCIPLINARY — SENT HOME",
-            nodeBg: "bg-red-700",
-            color: "text-red-900",
-          },
-          WARNING: {
-            text: "DISCIPLINARY — WARNING ISSUED",
-            nodeBg: "bg-orange-600",
-            color: "text-orange-800",
-          },
-          REINSTATED: {
-            text: "DISCIPLINARY — REINSTATED",
-            nodeBg: "bg-emerald-600",
-            color: "text-emerald-700",
-          },
-          DISCONTINUED: {
-            text: "DISCIPLINARY — DISCONTINUED",
-            nodeBg: "bg-slate-800",
-            color: "text-slate-800",
-          },
-          DISMISSED: {
-            text: "DISCIPLINARY — CASE DISMISSED",
-            nodeBg: "bg-slate-500",
-            color: "text-slate-600",
-          },
+          PENDING: { text: "DISCIPLINARY — PENDING HEARING", nodeBg: "bg-red-500", color: "text-red-700" },
+          SENT_HOME: { text: "DISCIPLINARY — SENT HOME", nodeBg: "bg-red-700", color: "text-red-900" },
+          WARNING: { text: "DISCIPLINARY — WARNING ISSUED", nodeBg: "bg-orange-600", color: "text-orange-800" },
+          REINSTATED: { text: "DISCIPLINARY — REINSTATED", nodeBg: "bg-emerald-600", color: "text-emerald-700" },
+          DISCONTINUED: { text: "DISCIPLINARY — DISCONTINUED", nodeBg: "bg-slate-800", color: "text-slate-800" },
+          DISMISSED: { text: "DISCIPLINARY — CASE DISMISSED", nodeBg: "bg-slate-500", color: "text-slate-600" },
         };
       const o = O[m.outcome || "PENDING"] ?? O.PENDING;
       return {
-        ...o,
-        bg: "bg-red-50",
-        border: "border-red-300",
-        icon: <Gavel size={14} />,
+        ...o, bg: "bg-red-50", border: "border-red-300", icon: <Gavel size={14} />,
       };
     }
 
@@ -207,74 +106,43 @@ function nodeStyle(m: TimelineNode): {
       const to = (m.toStatus || "").toLowerCase();
       if (to.includes("disciplinary"))
         return {
-          text: "DISCIPLINARY SUSPENSION",
-          color: "text-red-700",
-          bg: "bg-red-50",
-          border: "border-red-300",
-          icon: <ShieldAlert size={14} />,
-          nodeBg: "bg-red-600",
+          text: "DISCIPLINARY SUSPENSION", color: "text-red-700", bg: "bg-red-50",
+          border: "border-red-300", icon: <ShieldAlert size={14} />, nodeBg: "bg-red-600",
         };
       if (to === "active")
         return {
-          text: "STUDIES RESUMED",
-          color: "text-emerald-700",
-          bg: "bg-emerald-50",
-          border: "border-emerald-200",
-          icon: <RefreshCcw size={14} />,
-          nodeBg: "bg-emerald-700",
+          text: "STUDIES RESUMED", color: "text-emerald-700", bg: "bg-emerald-50",
+          border: "border-emerald-200", icon: <RefreshCcw size={14} />, nodeBg: "bg-emerald-700",
         };
       if (to === "deferred")
         return {
-          text: "ADMISSION DEFERRED",
-          color: "text-indigo-700",
-          bg: "bg-indigo-50",
-          border: "border-indigo-200",
-          icon: <Clock size={14} />,
-          nodeBg: "bg-indigo-700",
+          text: "ADMISSION DEFERRED", color: "text-indigo-700", bg: "bg-indigo-50",
+          border: "border-indigo-200", icon: <Clock size={14} />, nodeBg: "bg-indigo-700",
         };
       if (to === "on_leave" || to === "academic_leave")
         return {
-          text: "ACADEMIC LEAVE GRANTED",
-          color: "text-amber-700",
-          bg: "bg-amber-50",
-          border: "border-amber-200",
-          icon: <PlaneTakeoff size={14} />,
-          nodeBg: "bg-amber-600",
+          text: "ACADEMIC LEAVE GRANTED", color: "text-amber-700", bg: "bg-amber-50",
+          border: "border-amber-200", icon: <PlaneTakeoff size={14} />, nodeBg: "bg-amber-600",
         };
       if (to === "discontinued")
         return {
-          text: "DISCONTINUED — ENG.22",
-          color: "text-red-700",
-          bg: "bg-red-50",
-          border: "border-red-300",
-          icon: <AlertCircle size={14} />,
-          nodeBg: "bg-red-700",
+          text: "DISCONTINUED — ENG.22", color: "text-red-700", bg: "bg-red-50",
+          border: "border-red-300", icon: <AlertCircle size={14} />, nodeBg: "bg-red-700",
         };
       if (to === "deregistered")
         return {
-          text: "DEREGISTERED — ENG.23",
-          color: "text-red-700",
-          bg: "bg-red-50",
-          border: "border-red-300",
-          icon: <AlertCircle size={14} />,
-          nodeBg: "bg-red-700",
+          text: "DEREGISTERED — ENG.23", color: "text-red-700", bg: "bg-red-50",
+          border: "border-red-300", icon: <AlertCircle size={14} />, nodeBg: "bg-red-700",
         };
       if (to === "graduand" || to === "graduated")
         return {
-          text: "GRADUAND STATUS SET",
-          color: "text-emerald-700",
-          bg: "bg-emerald-50",
-          border: "border-emerald-200",
-          icon: <Trophy size={14} />,
-          nodeBg: "bg-emerald-600",
+          text: "GRADUAND STATUS SET", color: "text-emerald-700", bg: "bg-emerald-50",
+          border: "border-emerald-200", icon: <Trophy size={14} />, nodeBg: "bg-emerald-600",
         };
       return {
         text: (m.toStatus || "ADMIN EVENT").toUpperCase().replace(/_/g, " "),
-        color: "text-slate-700",
-        bg: "bg-slate-50",
-        border: "border-slate-200",
-        icon: <History size={14} />,
-        nodeBg: "bg-slate-600",
+        color: "text-slate-700", bg: "bg-slate-50",
+        border: "border-slate-200", icon: <History size={14} />, nodeBg: "bg-slate-600",
       };
     }
 
@@ -283,57 +151,34 @@ function nodeStyle(m: TimelineNode): {
       const s = (m.status || "").toUpperCase();
       if (s.includes("REPEAT"))
         return {
-          text: s,
-          color: "text-red-600",
-          bg: "bg-red-50",
-          border: "border-red-200",
-          icon: <AlertCircle size={14} />,
-          nodeBg: "bg-red-600",
+          text: s, color: "text-red-600", bg: "bg-red-50",
+          border: "border-red-200", icon: <AlertCircle size={14} />, nodeBg: "bg-red-600",
         };
       if (s === "STAYOUT" || s.includes("STAY"))
         return {
-          text: "STAY OUT — ENG.15h",
-          color: "text-amber-700",
-          bg: "bg-amber-50",
-          border: "border-amber-200",
-          icon: <AlertTriangle size={14} />,
-          nodeBg: "bg-amber-600",
+          text: "STAY OUT — ENG.15h", color: "text-amber-700", bg: "bg-amber-50",
+          border: "border-amber-200", icon: <AlertTriangle size={14} />, nodeBg: "bg-amber-600",
         };
       if (s.includes("SUPP") || s.includes("SPEC"))
         return {
-          text: s,
-          color: "text-amber-600",
-          bg: "bg-amber-50",
-          border: "border-amber-200",
-          icon: <AlertTriangle size={14} />,
-          nodeBg: "bg-yellow-600",
+          text: s, color: "text-amber-600", bg: "bg-amber-50",
+          border: "border-amber-200", icon: <AlertTriangle size={14} />, nodeBg: "bg-yellow-600",
         };
       if (s.includes("SESSION IN PROGRESS"))
         return {
-          text: "SESSION IN PROGRESS",
-          color: "text-blue-600",
-          bg: "bg-blue-50",
-          border: "border-blue-200",
-          icon: <History size={14} />,
-          nodeBg: "bg-blue-600",
+          text: "SESSION IN PROGRESS", color: "text-blue-600", bg: "bg-blue-50",
+          border: "border-blue-200", icon: <History size={14} />, nodeBg: "bg-blue-600",
         };
       if (s.includes("DEREGISTERED") || s.includes("DISCONTINUED"))
         return {
-          text: s,
-          color: "text-red-600",
-          bg: "bg-red-50",
-          border: "border-red-300",
-          icon: <AlertCircle size={14} />,
-          nodeBg: "bg-red-700",
+          text: s, color: "text-red-600", bg: "bg-red-50",
+          border: "border-red-300", icon: <AlertCircle size={14} />, nodeBg: "bg-red-700",
         };
       // Pass / promoted
       return {
-        text: s || "PASS (PROMOTED)",
-        color: "text-[#002B1B]",
-        bg: "bg-white",
-        border: "border-slate-100",
-        icon: <Zap size={14} className="fill-current" />,
-        nodeBg: "bg-[#002B1B]",
+        text: s || "PASS (PROMOTED)", color: "text-[#002B1B]", bg: "bg-white",
+        border: "border-slate-100", 
+        icon: <Zap size={14} className="fill-current" />, nodeBg: "bg-[#002B1B]",
       };
     }
   }
@@ -430,11 +275,7 @@ export default function JourneyTimeline({ data }: JourneyProps) {
   const academicEntries = data.timeline.filter((m) => m.type === "ACADEMIC");
   const maxWeight = Math.max(...academicEntries.map((m) => m.weight || 0), 1);
   const isTerminal = [
-    "DEREGISTERED",
-    "DISCONTINUED",
-    "ON_LEAVE",
-    "DEFERRED",
-    "DISCIPLINARY_SUSPENSION",
+    "DEREGISTERED", "DISCONTINUED", "ON_LEAVE", "DEFERRED", "DISCIPLINARY_SUSPENSION",
   ].includes(data.currentStatus.toUpperCase());
 
   return (

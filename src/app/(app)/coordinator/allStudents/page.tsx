@@ -1,4 +1,4 @@
-
+// clientside/src/app/(app)/coordinator/allStudents/page.tsx
 "use client";
 
 import { useState, useEffect, useCallback } from "react";

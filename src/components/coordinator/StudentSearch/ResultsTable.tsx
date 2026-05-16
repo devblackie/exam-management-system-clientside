@@ -3,10 +3,7 @@
 
 import { StudentSearchResult } from "@/api/types";
 import { 
-  Fingerprint, 
-  GraduationCap, 
-  SearchCode,
-  ArrowUpRight
+  Fingerprint, GraduationCap, SearchCode, ArrowUpRight
 } from "lucide-react";
 import { UserMinusIcon } from "@heroicons/react/24/outline";
 

@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
     // Validate email domain - institutional emails only
     const emailDomain = email.split("@")[1];
     const freeEmailDomains = [
-      "gmail.com",
+      // "gmail.com",
       "yahoo.com", "hotmail.com", "outlook.com", "protonmail.com",
     ];
     if (freeEmailDomains.includes(emailDomain?.toLowerCase() || "")) {
