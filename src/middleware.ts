@@ -17,6 +17,7 @@ import type { NextRequest } from "next/server";
 
 const PUBLIC_EXACT: ReadonlySet<string> = new Set([
   "/",
+  "/lead-capture",
   "/login",
   "/demo",           // Interactive demo (no auth needed — has its own email gate)
   "/signup",         // Pilot request form

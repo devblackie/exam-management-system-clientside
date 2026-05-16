@@ -28,6 +28,7 @@ const PUBLIC_PREFIXES = [
   "/reset-password",
   "/register",            // /register/:token — invite acceptance
   "/unauthorized",
+  "/lead-capture",
   "/demo",                // Interactive demo
   "/signup",              // Pilot request form
 ];
