@@ -1,133 +1,114 @@
 // clientside/src/components/billing/BillingSettings.tsx
-//
-// Three components in one file — all used only on the billing page.
-// AlertBanners, PlanSettings, BillingContactCard.
 "use client";
 
 import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
-  changePlan, updateBillingContact, switchBillingCycle,
-  formatCurrency,
+  changePlan, updateBillingContact, switchBillingCycle, formatCurrency,
   type BillingSummary, type ChangePlanPayload, type BillingContactPayload,
 } from "@/api/billingApi";
 import { useToast } from "@/context/ToastContext";
-import { AlertCircle, Info, TrendingUp, CreditCard, Building2, Loader2, ChevronDown } from "lucide-react";
+import {
+  AlertCircle, Info, TrendingUp, CreditCard,
+  Building2, Loader2, ChevronDown, X
+} from "lucide-react";
 
-// ── Shared tokens ──────────────────────────────────────────────────────────────
-const inp = "w-full bg-white border border-green-darkest/10 rounded-lg py-2.5 px-4 text-xs font-mono text-green-darkest placeholder:text-slate-300 outline-none focus:ring-2 focus:ring-yellow-gold/20 focus:border-yellow-gold/50 transition-all";
-const lbl = "text-[10px] font-black uppercase tracking-[0.25em] text-green-darkest/50 block mb-1.5";
-const card = "bg-white rounded-xl border border-green-darkest/5 shadow-sm p-6";
+// const inp = "w-full bg-slate-50/50 border border-slate-200 rounded-xl py-3 px-4 text-xs font-mono text-green-darkest placeholder:text-slate-300 outline-none focus:ring-4 focus:ring-green-darkest/5 focus:border-green-darkest/40 focus:bg-white transition-all";
+// const lbl = "text-[9px] font-black uppercase tracking-[0.2em] text-green-darkest/40 block mb-2";
+// const card = "bg-white rounded-2xl border border-slate-200/60 p-6 shadow-sm";
 
-// ══════════════════════════════════════════════════════════════════════════════
-// AlertBanners
-// ══════════════════════════════════════════════════════════════════════════════
+ const inp =
+   "w-full bg-white border border-green-darkest/10 rounded-lg py-2.5 px-4 text-xs font-mono text-green-darkest placeholder:text-slate-300 outline-none focus:ring-2 focus:ring-yellow-gold/20 focus:border-yellow-gold/50 transition-all";
+ const lbl = "text-[10px] font-black uppercase tracking-[0.25em] text-green-darkest/50 block mb-1.5";
+ const card = "bg-white rounded-xl border border-green-darkest/5 shadow-sm p-6";
+
 export function AlertBanners({ summary }: { summary: BillingSummary }) {
   const { alerts, plan, usage, billing } = summary;
 
+  const banners = [
+    {
+      condition: billing.accountStatus === "trial",
+      bg: "bg-amber-50/60 border-amber-200 text-amber-800",
+      icon: <Info size={15} className="text-amber-600 flex-shrink-0" />,
+      text: `Account operating in evaluation window. Active until ${billing.trialEndsAt ? new Date(billing.trialEndsAt).toLocaleDateString("en-KE", { day: "2-digit", month: "long", year: "numeric" }) : ""}. Establish a core settlement framework to prevent service pauses.`
+    },
+    {
+      condition: billing.accountStatus === "suspended",
+      bg: "bg-red-50 border-red-200 text-red-800",
+      icon: <AlertCircle size={15} className="text-red-600 flex-shrink-0" />,
+      text: `Operational system freeze active. ${billing.suspensionReason || "Contact root system security administrators to resume operations."}`
+    },
+    {
+      condition: alerts.overdueCount > 0,
+      bg: "bg-red-50/60 border-red-200 text-red-700",
+      icon: <AlertCircle size={15} className="text-red-500 flex-shrink-0" />,
+      text: `${alerts.overdueCount} statement(s) outstanding — total overhead of ${formatCurrency(alerts.unpaidTotal, plan.currency)}. Resolve within the active workspace.`
+    },
+    {
+      condition: alerts.overageWarning,
+      bg: "bg-orange-50 border-orange-200 text-orange-800",
+      icon: <TrendingUp size={15} className="text-orange-600 flex-shrink-0" />,
+      text: `System scale limits exceeded by ${usage.extraSeats} allocation tracks. Current excess costs mapping at ${formatCurrency(usage.extraSeats * plan.perSeatRate, plan.currency)}/mo.`
+    },
+    {
+      condition: alerts.nearLimit && !alerts.overageWarning,
+      bg: "bg-blue-50/60 border-blue-200 text-blue-800",
+      icon: <Info size={15} className="text-blue-500 flex-shrink-0" />,
+      text: `Workspace volume usage currently optimized at ${usage.usagePercent}% capacity limit (${usage.activeStudents}/${usage.includedSeats}).`
+    }
+  ];
+
   return (
     <div className="space-y-3">
-      {/* Trial notice */}
-      {billing.accountStatus === "trial" && (
-        <div className="flex items-center gap-3 bg-yellow-50 border border-yellow-200 rounded-xl px-5 py-3.5">
-          <Info size={15} className="text-yellow-600 flex-shrink-0" />
-          <p className="text-[11px] font-bold text-yellow-800">
-            You are on a free trial.
-            {billing.trialEndsAt && (
-              <> Trial ends {new Date(billing.trialEndsAt).toLocaleDateString("en-KE", { day: "2-digit", month: "long", year: "numeric" })}.</>
-            )}
-            {" "}Contact us to activate a paid plan.
-          </p>
-        </div>
-      )}
-
-      {/* Suspended */}
-      {billing.accountStatus === "suspended" && (
-        <div className="flex items-center gap-3 bg-red-50 border border-red-300 rounded-xl px-5 py-3.5">
-          <AlertCircle size={15} className="text-red-600 flex-shrink-0" />
-          <p className="text-[11px] font-bold text-red-800">
-            Account suspended.{" "}
-            {billing.suspensionReason && <span className="font-normal">{billing.suspensionReason}</span>}
-            {" "}Contact support to reactivate.
-          </p>
-        </div>
-      )}
-
-      {/* Overdue invoices */}
-      {alerts.overdueCount > 0 && (
-        <div className="flex items-center gap-3 bg-red-50 border border-red-200 rounded-xl px-5 py-3.5">
-          <AlertCircle size={15} className="text-red-500 flex-shrink-0" />
-          <p className="text-[11px] font-bold text-red-700">
-            {alerts.overdueCount} overdue invoice{alerts.overdueCount > 1 ? "s" : ""} —{" "}
-            {formatCurrency(alerts.unpaidTotal, plan.currency)} outstanding. Mark as paid in the Invoices tab.
-          </p>
-        </div>
-      )}
-
-      {/* Overage warning */}
-      {alerts.overageWarning && (
-        <div className="flex items-center gap-3 bg-orange-50 border border-orange-200 rounded-xl px-5 py-3.5">
-          <TrendingUp size={15} className="text-orange-600 flex-shrink-0" />
-          <p className="text-[11px] font-bold text-orange-800">
-            {usage.overage} seat{usage.overage !== 1 ? "s" : ""} over your plan limit.
-            Overage charge: {formatCurrency(usage.overage * plan.overageRate, plan.currency)}/month.
-            Consider upgrading your plan.
-          </p>
-        </div>
-      )}
-
-      {/* Near limit */}
-      {alerts.nearLimit && !alerts.overageWarning && (
-        <div className="flex items-center gap-3 bg-blue-50 border border-blue-200 rounded-xl px-5 py-3.5">
-          <Info size={15} className="text-blue-500 flex-shrink-0" />
-          <p className="text-[11px] font-bold text-blue-800">
-            {usage.usagePercent}% of your seat limit used ({usage.activeStudents}/{usage.seatLimit}).
-            You may need to upgrade soon.
-          </p>
-        </div>
-      )}
+      <AnimatePresence>
+        {banners.map((b, i) => b.condition && (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, height: 0, y: -10 }}
+            animate={{ opacity: 1, height: "auto", y: 0 }}
+            exit={{ opacity: 0, height: 0, y: -10 }}
+            transition={{ type: "spring", stiffness: 500, damping: 35 }}
+            className={`flex items-start gap-3 border rounded-xl px-5 py-4 overflow-hidden shadow-xs ${b.bg}`}
+          >
+            <div className="mt-0.5">{b.icon}</div>
+            <p className="text-[11px] font-medium leading-relaxed tracking-wide">{b.text}</p>
+          </motion.div>
+        ))}
+      </AnimatePresence>
     </div>
   );
 }
 
-// ══════════════════════════════════════════════════════════════════════════════
-// PlanSettings
-// ══════════════════════════════════════════════════════════════════════════════
-export function PlanSettings({
-  summary,
-  onRefresh,
-}: {
-  summary:   BillingSummary;
-  onRefresh: () => void;
-}) {
-  const { addToast }  = useToast();
-  const { plan }      = summary;
+export function PlanSettings({ summary, onRefresh }: { summary: BillingSummary; onRefresh: () => void }) {
+  const { addToast } = useToast();
+  const { plan } = summary;
 
-  const [showModal, setShowModal]   = useState(false);
-  const [newPlan, setNewPlan]       = useState(plan.name);
-  const [reason, setReason]         = useState("");
-  const [customSeats, setCustomSeats]   = useState("");
-  const [customBase, setCustomBase]     = useState("");
-  const [customOverage, setCustomOverage] = useState("");
-  const [saving, setSaving]         = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [newPlan, setNewPlan] = useState(plan.name);
+  const [reason, setReason] = useState("");
+  const [customSeats, setCustomSeats] = useState("");
+  const [customBase, setCustomBase] = useState("");
+  const [customPerSeat, setCustomPerSeat] = useState("");
+  const [saving, setSaving] = useState(false);
   const [cycleLoading, setCycleLoading] = useState(false);
 
   const handleChangePlan = async () => {
-    if (!newPlan.trim()) { addToast("Select a plan.", "error"); return; }
+    if (!newPlan.trim()) return;
     setSaving(true);
     try {
       const payload: ChangePlanPayload = {
-        newPlanName:        newPlan,
-        reason:             reason || undefined,
-        customSeatLimit:    customSeats   ? Number(customSeats)   : undefined,
-        customBasePrice:    customBase    ? Number(customBase)    : undefined,
-        customOverageRate:  customOverage ? Number(customOverage) : undefined,
+        newPlanName: newPlan,
+        reason: reason || undefined,
+        customSeatLimit: customSeats ? Number(customSeats) : undefined,
+        customBasePrice: customBase ? Number(customBase) : undefined,
+        customPerSeatRate: customPerSeat ? Number(customPerSeat) : undefined,
       };
       const res = await changePlan(payload);
       addToast(res.message, "success");
       setShowModal(false);
       onRefresh();
     } catch (err: unknown) {
-      const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message ?? "Failed.";
+      const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message ?? "Configuration shift failed.";
       addToast(msg, "error");
     } finally {
       setSaving(false);
@@ -142,7 +123,7 @@ export function PlanSettings({
       addToast(res.message, "success");
       onRefresh();
     } catch (err: unknown) {
-      const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message ?? "Failed.";
+      const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message ?? "Cycle alteration rejected.";
       addToast(msg, "error");
     } finally {
       setCycleLoading(false);
@@ -152,150 +133,173 @@ export function PlanSettings({
   return (
     <>
       <div className={card}>
-        <div className="flex items-center justify-between mb-5">
-          <p className="text-[11px] font-black text-green-darkest uppercase tracking-wider">Plan & Pricing</p>
-          <button
-            onClick={() => { setShowModal(true); setNewPlan(plan.name); setReason(""); setCustomSeats(""); setCustomBase(""); setCustomOverage(""); }}
-            className="text-[10px] font-bold text-yellow-gold hover:text-yellow-500 transition-colors flex items-center gap-1"
+        <div className="flex items-center justify-between mb-6">
+          <p className="text-xs font-black text-green-darkest uppercase tracking-wider">
+            Plan Infrastructure
+          </p>
+          <motion.button
+            whileHover={{ x: 2 }}
+            onClick={() => {
+              setShowModal(true);
+              setNewPlan(plan.name);
+            }}
+            className="text-[10px] font-bold text-yellow-gold hover:text-amber-600 transition-colors flex items-center gap-1.5"
           >
-            <CreditCard size={11} /> Change Plan
-          </button>
+            <CreditCard size={12} /> Mutate Framework
+          </motion.button>
         </div>
 
-        {/* Plan details */}
-        <div className="space-y-2.5 mb-6">
+        <div className="space-y-3 mb-6">
           {[
-            { label: "Plan",          value: plan.name + (plan.isCustomPlan ? " (Custom)" : "") },
-            { label: "Seat Limit",    value: plan.seatLimit.toLocaleString() + " students"      },
-            { label: "Base Price",    value: `${formatCurrency(plan.basePrice, plan.currency)} / month` },
-            { label: "Overage Rate",  value: `${formatCurrency(plan.overageRate, plan.currency)} / seat above limit` },
-            { label: "Tax Rate",      value: `${(plan.taxRate * 100).toFixed(0)}%`               },
-          ].map(r => (
-            <div key={r.label} className="flex items-center justify-between py-1.5 border-b border-slate-100 last:border-0">
+            { label: "Active Model", value: plan.name + (plan.isCustomPlan ? " (Customized)" : "") },
+            { label: "Included Student Allocation", value: `${plan.includedSeats.toLocaleString()} seats` },
+            { label: "Contract Baseline Base", value: `${formatCurrency(plan.basePrice, plan.currency)} / mo` },
+            { label: "Overage Incremental Rate", value: `${formatCurrency(plan.perSeatRate, plan.currency)} / active seat` },
+            { label: "Tax Obligation Mapping", value: `${(plan.taxRate * 100).toFixed(0)}%` },
+          ].map((r) => (
+            <div key={r.label} className="flex items-center justify-between py-2 border-b border-slate-100 last:border-0">
               <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider">{r.label}</span>
-              <span className="text-[11px] font-mono text-green-darkest">{r.value}</span>
+              <span className="text-xs font-mono text-green-darkest font-medium">{r.value}</span>
             </div>
           ))}
         </div>
 
-        {/* Billing cycle toggle */}
         <div>
-          <p className={lbl}>Billing Cycle</p>
+          <p className={lbl}>Settlement Invoicing Interval</p>
           <div className="grid grid-cols-2 gap-3">
-            {(["monthly","annual"] as const).map(cycle => (
-              <button
-                key={cycle}
-                onClick={() => handleCycleSwitch(cycle)}
-                disabled={cycleLoading}
-                className={`p-3.5 rounded-xl border-2 text-left transition-all disabled:opacity-50 ${
-                  plan.cycle === cycle
-                    ? "border-green-darkest bg-green-darkest/5 shadow-sm"
-                    : "border-slate-200 hover:border-green-darkest/30"
-                }`}
-              >
-                <p className={`text-[11px] font-black uppercase tracking-tight capitalize ${plan.cycle === cycle ? "text-green-darkest" : "text-slate-500"}`}>
-                  {cycle}
-                </p>
-                {cycle === "annual" && (
-                  <p className="text-[9px] font-bold text-emerald-600 mt-0.5">10% off — save {formatCurrency(plan.basePrice * 12 * 0.1, plan.currency)}/yr</p>
-                )}
-              </button>
-            ))}
+            {(["monthly", "annual"] as const).map((cycle) => {
+              const active = plan.cycle === cycle;
+              return (
+                <button
+                  key={cycle}
+                  onClick={() => handleCycleSwitch(cycle)}
+                  disabled={cycleLoading}
+                  className={`p-4 rounded-xl border-2 text-left relative overflow-hidden transition-all disabled:opacity-50 ${
+                    active ? "border-green-darkest bg-green-darkest/[0.02]" : "border-slate-100 hover:border-slate-300"
+                  }`}
+                >
+                  <p className={`text-xs font-black uppercase tracking-wider ${active ? "text-green-darkest" : "text-slate-400"}`}>
+                    {cycle}
+                  </p>
+                  {cycle === "annual" && (
+                    <p className="text-[9px] font-bold text-emerald-600 mt-1 font-mono">
+                      Save {formatCurrency(plan.basePrice * 12 * 0.15, plan.currency)}/yr
+                    </p>
+                  )}
+                  {active && (
+                    <motion.div layoutId="activeCycleDot" className="absolute right-3 top-3 w-1.5 h-1.5 bg-green-darkest rounded-full" />
+                  )}
+                </button>
+              );
+            })}
           </div>
         </div>
       </div>
 
-      {/* Change plan modal */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-6">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md border border-green-darkest/5 animate-in fade-in zoom-in-95 duration-200">
-            <div className="bg-green-darkest rounded-t-2xl px-7 py-5 flex items-center justify-between">
-              <div>
-                <p className="text-yellow-gold text-[9px] font-black uppercase tracking-[0.3em] mb-1">Plan Management</p>
-                <h3 className="text-white text-sm font-black">Change Plan</h3>
-              </div>
-              <button onClick={() => setShowModal(false)} className="text-white/40 hover:text-white text-xl leading-none">✕</button>
-            </div>
-            <div className="p-7 space-y-4">
-              <div>
-                <label className={lbl}>New Plan</label>
-                <div className="relative">
-                  <select className={inp + " pr-8 appearance-none"} value={newPlan} onChange={e => setNewPlan(e.target.value)}>
-                    {summary.planCatalogue.map(p => (
-                      <option key={p.name} value={p.name}>
-                        {p.name} — {p.seatLimit.toLocaleString()} seats @ KES {p.monthlyKES.toLocaleString()}/mo
-                      </option>
-                    ))}
-                    <option value="Custom">Custom (Enterprise)</option>
-                  </select>
-                  <ChevronDown size={11} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+      <AnimatePresence>
+        {showModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }} 
+              animate={{ opacity: 1 }} 
+              exit={{ opacity: 0 }} 
+              onClick={() => setShowModal(false)}
+              className="absolute inset-0 bg-green-darkest/20 backdrop-blur-md" 
+            />
+            
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 15 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 15 }}
+              transition={{ type: "spring", stiffness: 450, damping: 32 }}
+              className="bg-white rounded-2xl shadow-2xl w-full max-w-lg border border-slate-100 relative z-10 overflow-hidden"
+            >
+              <div className="bg-green-darkest px-6 py-5 flex items-center justify-between">
+                <div>
+                  <p className="text-yellow-gold text-[9px] font-black uppercase tracking-[0.25em] mb-0.5">Configuration Engine</p>
+                  <h3 className="text-white text-sm font-black">Alter Infrastructure Metrics</h3>
                 </div>
-              </div>
-
-              {newPlan === "Custom" && (
-                <div className="grid grid-cols-3 gap-3">
-                  <div>
-                    <label className={lbl}>Seat Limit</label>
-                    <input type="number" className={inp} placeholder="3000" value={customSeats} onChange={e => setCustomSeats(e.target.value)} />
-                  </div>
-                  <div>
-                    <label className={lbl}>Base (KES)</label>
-                    <input type="number" className={inp} placeholder="60000" value={customBase} onChange={e => setCustomBase(e.target.value)} />
-                  </div>
-                  <div>
-                    <label className={lbl}>Overage/Seat</label>
-                    <input type="number" className={inp} placeholder="20" value={customOverage} onChange={e => setCustomOverage(e.target.value)} />
-                  </div>
-                </div>
-              )}
-
-              <div>
-                <label className={lbl}>Reason (optional)</label>
-                <input type="text" className={inp} placeholder="e.g. Enrolled new cohort" value={reason} onChange={e => setReason(e.target.value)} />
-              </div>
-
-              <div className="flex gap-3 pt-1">
-                <button onClick={() => setShowModal(false)} className="flex-1 border border-green-darkest/10 text-green-darkest py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-slate-50 transition-all">
-                  Cancel
-                </button>
-                <button onClick={handleChangePlan} disabled={saving} className="flex-1 bg-green-darkest hover:bg-green-800 text-white py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 disabled:opacity-50 transition-all">
-                  {saving ? <Loader2 size={13} className="animate-spin" /> : <CreditCard size={13} className="text-yellow-gold" />}
-                  {saving ? "Saving…" : "Confirm Change"}
+                <button onClick={() => setShowModal(false)} className="text-slate-400 hover:text-white transition-colors">
+                  <X size={18} />
                 </button>
               </div>
-            </div>
+
+              <div className="p-6 space-y-4">
+                <div>
+                  <label className={lbl}>Target Framework Profile</label>
+                  <div className="relative">
+                    <select className={`${inp} appearance-none pr-10`} value={newPlan} onChange={(e) => setNewPlan(e.target.value)}>
+                      {summary.planCatalogue.map((p) => (
+                        <option key={p.name} value={p.name}>
+                          {p.name} — Allocation threshold: {p.includedSeats.toLocaleString()} seats
+                        </option>
+                      ))}
+                      <option value="Custom">Custom Enterprise Profile</option>
+                    </select>
+                    <ChevronDown size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                  </div>
+                </div>
+
+                <AnimatePresence>
+                  {newPlan === "Custom" && (
+                    <motion.div 
+                      initial={{ opacity: 0, height: 0 }} 
+                      animate={{ opacity: 1, height: "auto" }} 
+                      exit={{ opacity: 0, height: 0 }}
+                      className="grid grid-cols-3 gap-3"
+                    >
+                      <div>
+                        <label className={lbl}>Seats Limit</label>
+                        <input type="number" className={inp} placeholder="2500" value={customSeats} onChange={(e) => setCustomSeats(e.target.value)} />
+                      </div>
+                      <div>
+                        <label className={lbl}>Base Price</label>
+                        <input type="number" className={inp} placeholder="50000" value={customBase} onChange={(e) => setCustomBase(e.target.value)} />
+                      </div>
+                      <div>
+                        <label className={lbl}>Overage / Unit</label>
+                        <input type="number" className={inp} placeholder="15" value={customPerSeat} onChange={(e) => setCustomPerSeat(e.target.value)} />
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                <div>
+                  <label className={lbl}>Modification Justification Logging</label>
+                  <input type="text" className={inp} placeholder="Internal audit justification token" value={reason} onChange={(e) => setReason(e.target.value)} />
+                </div>
+
+                <div className="flex gap-3 pt-4 border-t border-slate-100">
+                  <button onClick={() => setShowModal(false)} className="flex-1 bg-slate-50 hover:bg-slate-100 text-slate-600 font-bold py-3 rounded-xl text-[10px] uppercase tracking-widest transition-colors">
+                    Abort Changes
+                  </button>
+                  <button onClick={handleChangePlan} disabled={saving} className="flex-1 bg-green-darkest hover:bg-green-900 text-white font-bold py-3 rounded-xl text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 transition-colors disabled:opacity-40">
+                    {saving ? <Loader2 size={13} className="animate-spin" /> : <CreditCard size={13} className="text-yellow-gold" />}
+                    Commit System Vector
+                  </button>
+                </div>
+              </div>
+            </motion.div>
           </div>
-        </div>
-      )}
+        )}
+      </AnimatePresence>
     </>
   );
 }
 
-// ══════════════════════════════════════════════════════════════════════════════
-// BillingContactCard
-// ══════════════════════════════════════════════════════════════════════════════
-export function BillingContactCard({
-  summary,
-  onRefresh,
-}: {
-  summary:   BillingSummary;
-  onRefresh: () => void;
-}) {
-  const { addToast }    = useToast();
-  const contact         = summary.billingContact;
+export function BillingContactCard({ summary, onRefresh }: { summary: BillingSummary; onRefresh: () => void }) {
+  const { addToast } = useToast();
+  const contact = summary.billingContact;
 
   const [showModal, setShowModal] = useState(false);
-  const [name, setName]     = useState(contact?.name    ?? "");
-  const [email, setEmail]   = useState(contact?.email   ?? "");
-  const [phone, setPhone]   = useState(contact?.phone   ?? "");
+  const [name, setName] = useState(contact?.name ?? "");
+  const [email, setEmail] = useState(contact?.email ?? "");
+  const [phone, setPhone] = useState(contact?.phone ?? "");
   const [address, setAddress] = useState(contact?.address ?? "");
   const [saving, setSaving] = useState(false);
 
   const handleSave = async () => {
-    if (!name.trim() || !email.trim()) {
-      addToast("Name and email are required.", "error");
-      return;
-    }
+    if (!name.trim() || !email.trim()) return;
     setSaving(true);
     try {
       const payload: BillingContactPayload = { name, email, phone: phone || undefined, address: address || undefined };
@@ -304,7 +308,7 @@ export function BillingContactCard({
       setShowModal(false);
       onRefresh();
     } catch (err: unknown) {
-      const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message ?? "Failed.";
+      const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message ?? "Contact persist mutation failure.";
       addToast(msg, "error");
     } finally {
       setSaving(false);
@@ -314,85 +318,103 @@ export function BillingContactCard({
   return (
     <>
       <div className={card}>
-        <div className="flex items-center justify-between mb-5">
-          <p className="text-[11px] font-black text-green-darkest uppercase tracking-wider">Billing Contact</p>
-          <button
-            onClick={() => { setShowModal(true); setName(contact?.name ?? ""); setEmail(contact?.email ?? ""); setPhone(contact?.phone ?? ""); setAddress(contact?.address ?? ""); }}
-            className="text-[10px] font-bold text-yellow-gold hover:text-yellow-500 transition-colors flex items-center gap-1"
+        <div className="flex items-center justify-between mb-6">
+          <p className="text-xs font-black text-green-darkest uppercase tracking-wider">
+            Operational Registry Node
+          </p>
+          <motion.button
+            whileHover={{ x: 2 }}
+            onClick={() => {
+              setShowModal(true);
+              setName(contact?.name ?? "");
+              setEmail(contact?.email ?? "");
+            }}
+            className="text-[10px] font-bold text-yellow-gold hover:text-amber-600 transition-colors flex items-center gap-1.5"
           >
-            <Building2 size={11} /> Edit
-          </button>
+            <Building2 size={12} /> Modify Registry
+          </motion.button>
         </div>
 
         {contact ? (
           <div className="space-y-3">
             {[
-              { label: "Name",    value: contact.name             },
-              { label: "Email",   value: contact.email            },
-              { label: "Phone",   value: contact.phone   ?? "—"   },
-              { label: "Address", value: contact.address ?? "—"   },
-            ].map(r => (
-              <div key={r.label} className="flex items-start justify-between py-1.5 border-b border-slate-100 last:border-0 gap-4">
+              { label: "Target Representative", value: contact.name },
+              { label: "Secure Destination Route", value: contact.email },
+              { label: "Communications Line", value: contact.phone ?? "—" },
+              { label: "Physical Processing Node", value: contact.address ?? "—" },
+            ].map((r) => (
+              <div key={r.label} className="flex items-start justify-between py-2 border-b border-slate-100 last:border-0 gap-4">
                 <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider flex-shrink-0">{r.label}</span>
-                <span className="text-[11px] font-mono text-green-darkest text-right break-all">{r.value}</span>
+                <span className="text-xs font-mono text-green-darkest text-right font-medium break-all">{r.value}</span>
               </div>
             ))}
           </div>
         ) : (
-          <div className="py-6 text-center">
-            <p className="text-[11px] text-slate-300 font-mono uppercase tracking-widest mb-3">No contact set</p>
-            <button
-              onClick={() => setShowModal(true)}
-              className="text-[10px] font-bold text-yellow-gold hover:text-yellow-500 transition-colors"
-            >
-              Add billing contact →
+          <div className="py-8 text-center bg-slate-50/50 rounded-xl border border-dashed border-slate-200">
+            <p className="text-[10px] text-slate-400 font-mono uppercase tracking-widest mb-3">No contact profile structured</p>
+            <button onClick={() => setShowModal(true)} className="text-[11px] font-bold text-yellow-gold hover:underline">
+              Bind Contact Signature →
             </button>
           </div>
         )}
       </div>
 
-      {showModal && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-6">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md border border-green-darkest/5 animate-in fade-in zoom-in-95 duration-200">
-            <div className="bg-green-darkest rounded-t-2xl px-7 py-5 flex items-center justify-between">
-              <div>
-                <p className="text-yellow-gold text-[9px] font-black uppercase tracking-[0.3em] mb-1">Account Settings</p>
-                <h3 className="text-white text-sm font-black">Billing Contact</h3>
-              </div>
-              <button onClick={() => setShowModal(false)} className="text-white/40 hover:text-white text-xl leading-none">✕</button>
-            </div>
-            <div className="p-7 space-y-4">
-              <div>
-                <label className={lbl}>Full Name</label>
-                <input type="text" className={inp} placeholder="Finance Director" value={name} onChange={e => setName(e.target.value)} />
-              </div>
-              <div>
-                <label className={lbl}>Email</label>
-                <input type="email" className={inp} placeholder="finance@institution.ac.ke" value={email} onChange={e => setEmail(e.target.value)} />
-              </div>
-              <div className="grid grid-cols-2 gap-3">
+      <AnimatePresence>
+        {showModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowModal(false)} className="absolute inset-0 bg-green-darkest/20 backdrop-blur-md" />
+            
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 15 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 15 }}
+              transition={{ type: "spring", stiffness: 450, damping: 32 }}
+              className="bg-white rounded-2xl shadow-2xl w-full max-w-md border border-slate-100 relative z-10 overflow-hidden"
+            >
+              <div className="bg-green-darkest px-6 py-5 flex items-center justify-between">
                 <div>
-                  <label className={lbl}>Phone (optional)</label>
-                  <input type="text" className={inp} placeholder="+254…" value={phone} onChange={e => setPhone(e.target.value)} />
+                  <p className="text-yellow-gold text-[9px] font-black uppercase tracking-[0.25em] mb-0.5">Contact Mapping</p>
+                  <h3 className="text-white text-sm font-black">Registry Assignment</h3>
                 </div>
-                <div>
-                  <label className={lbl}>Address (optional)</label>
-                  <input type="text" className={inp} placeholder="P.O. Box…" value={address} onChange={e => setAddress(e.target.value)} />
-                </div>
-              </div>
-              <div className="flex gap-3 pt-1">
-                <button onClick={() => setShowModal(false)} className="flex-1 border border-green-darkest/10 text-green-darkest py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-slate-50 transition-all">
-                  Cancel
-                </button>
-                <button onClick={handleSave} disabled={saving} className="flex-1 bg-green-darkest hover:bg-green-800 text-white py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 disabled:opacity-50 transition-all">
-                  {saving ? <Loader2 size={13} className="animate-spin" /> : <Building2 size={13} className="text-yellow-gold" />}
-                  {saving ? "Saving…" : "Save Contact"}
+                <button onClick={() => setShowModal(false)} className="text-slate-400 hover:text-white transition-colors">
+                  <X size={18} />
                 </button>
               </div>
-            </div>
+
+              <div className="p-6 space-y-4">
+                <div>
+                  <label className={lbl}>Representative Authority Name</label>
+                  <input type="text" className={inp} placeholder="Finance Executive Signature" value={name} onChange={(e) => setName(e.target.value)} />
+                </div>
+                <div>
+                  <label className={lbl}>System Communications Endpoint</label>
+                  <input type="email" className={inp} placeholder="billing@institution.ac.ke" value={email} onChange={(e) => setEmail(e.target.value)} />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className={lbl}>Phone Vector</label>
+                    <input type="text" className={inp} placeholder="+254..." value={phone} onChange={(e) => setPhone(e.target.value)} />
+                  </div>
+                  <div>
+                    <label className={lbl}>Mailing Endpoint</label>
+                    <input type="text" className={inp} placeholder="P.O. Box..." value={address} onChange={(e) => setAddress(e.target.value)} />
+                  </div>
+                </div>
+
+                <div className="flex gap-3 pt-4 border-t border-slate-100">
+                  <button onClick={() => setShowModal(false)} className="flex-1 bg-slate-50 hover:bg-slate-100 text-slate-600 font-bold py-3 rounded-xl text-[10px] uppercase tracking-widest transition-colors">
+                    Cancel Shift
+                  </button>
+                  <button onClick={handleSave} disabled={saving} className="flex-1 bg-green-darkest hover:bg-green-900 text-white font-bold py-3 rounded-xl text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 transition-colors disabled:opacity-40">
+                    {saving ? <Loader2 size={13} className="animate-spin" /> : <Building2 size={13} className="text-yellow-gold" />}
+                    Bind Metadata
+                  </button>
+                </div>
+              </div>
+            </motion.div>
           </div>
-        </div>
-      )}
+        )}
+      </AnimatePresence>
     </>
   );
 }

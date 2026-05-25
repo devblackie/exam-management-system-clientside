@@ -640,3 +640,30 @@ export interface StudentJourneyResponse {
     suspensionStart?: string;
     suspensionEnd?: string;
   }
+
+export interface HierarchyResponse {
+  schools: {
+    schoolName: string;
+    schoolCode: string;
+    totalStudents: number;
+    departments: {
+      deptName: string;
+      deptCode: string;
+      totalStudents: number;
+      seatLimit: number | null;
+      overage: number;
+      programs: {
+        programName: string;
+        programId: string;
+        activeStudents: number;
+      }[];
+    }[];
+  }[];
+  institutionCurrency: string;
+  institutionOverageRate: number;
+}
+
+export interface DepartmentSeatPayload {
+  departmentCode: string;
+  seatLimit: number;
+}

@@ -52,9 +52,9 @@ export interface BillingSummary {
   plan: {
     name: string;
     cycle: "monthly" | "annual";
-    seatLimit: number;
+    includedSeats: number;        // previously seatLimit
     basePrice: number;
-    overageRate: number;
+    perSeatRate: number;          // previously overageRate
     currency: string;
     taxRate: number;
     isCustomPlan: boolean;
@@ -62,8 +62,8 @@ export interface BillingSummary {
   usage: {
     activeStudents: number;
     totalStudents: number;
-    seatLimit: number;
-    overage: number;
+    includedSeats: number;
+    extraSeats: number;           // active – included (0 if within band)
     usagePercent: number;
   };
   billing: {
@@ -76,7 +76,7 @@ export interface BillingSummary {
   alerts: {
     overdueCount: number;
     unpaidTotal: number;
-    overageWarning: boolean;
+    overageWarning: boolean;      // still true if extraSeats > 0
     nearLimit: boolean;
   };
   recentInvoices: Invoice[];
@@ -86,7 +86,12 @@ export interface BillingSummary {
     phone?: string;
     address?: string;
   };
-  planCatalogue: PlanCatalogueEntry[];
+  planCatalogue: {
+    name: string;
+    includedSeats: number;
+    monthlyKES: number;
+    perSeatRate: number;
+  }[];
 }
 
 export interface InvoiceListResponse {
@@ -106,9 +111,9 @@ export interface RecordPaymentPayload {
 export interface ChangePlanPayload {
   newPlanName: string;
   reason?: string;
-  customSeatLimit?: number;
+  customSeatLimit?: number;   // was customSeatLimit, now means included seats
   customBasePrice?: number;
-  customOverageRate?: number;
+  customPerSeatRate?: number; // rename from customOverageRate
 }
 
 export interface BillingContactPayload {
