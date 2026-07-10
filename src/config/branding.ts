@@ -1,7 +1,7 @@
 // clientside/src/config/branding.ts
 export const branding = {
   // ── Company (developer/maintainer) ───────────────────────────────────────
-  devCom: "newtsolhub",
+  devCom: "Solinvar",
   devComLogo: "/newtsolhubLogo.png",
   devComUrl: "https://newtsolhub.com",
 

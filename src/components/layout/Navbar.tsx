@@ -5,7 +5,7 @@
 import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
 import { branding } from "@/config/branding";
-import { LogOut, Server, ServerOff, Loader2, WifiOff } from "lucide-react";
+import { LogOut, Server, Unplug, Loader2, WifiOff } from "lucide-react";
 import { useServerHealth } from "@/hooks/useServerHealth";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import { useInstitutionSettings } from "@/hooks/queries/useInstitutionSettings";
@@ -49,7 +49,7 @@ export default function Navbar() {
     },
     "server-down": {
       className: "border-red-500/20 bg-red-500/5 text-red-500 animate-pulse",
-      icon: <ServerOff size={14} />,
+      icon: <Unplug size={14} />,
       label: "Server Offline",
     },
   }[status];
