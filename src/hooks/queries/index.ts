@@ -11,3 +11,4 @@ export * from "./useAuditLogs";
 export * from "./useAwardList";
 export * from "./useMaintenance";
 export * from "./useDisciplinary";
+export * from "./useCoordinatorDashboard";

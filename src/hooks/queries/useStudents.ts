@@ -15,18 +15,16 @@ import {
   grantAcademicLeave,
   readmitStudent,
   revertStatusToActive,
+  uploadStudentExcel,
 } from "@/api/studentsApi";
 
 export const STUDENT_KEYS = {
-  list: (search: string, page: number) =>
-    ["students", "list", search, page] as const,
+  list: (search: string, page: number) => ["students", "list", search, page] as const,
   stats: () => ["students", "stats"] as const,
   search: (q: string) => ["students", "search", q] as const,
-  record: (regNo: string, year: number | string) =>
-    ["students", "record", regNo, year] as const,
+  record: (regNo: string, year: number | string) => ["students", "record", regNo, year] as const,
   journey: (regNo: string) => ["students", "journey", regNo] as const,
-  marks: (regNo: string, year: number) =>
-    ["students", "marks", regNo, year] as const,
+  marks: (regNo: string, year: number) => ["students", "marks", regNo, year] as const,
 };
 
 /** Search-gated list — never loads all students, empty until user types */
@@ -137,5 +135,21 @@ export const useRevertStatusToActive = () => {
   return useMutation({
     mutationFn: revertStatusToActive,
     onSuccess: () => qc.invalidateQueries({ queryKey: ["students"] }),
+  });
+};
+
+export const useUploadStudentExcel = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      file,
+      onProgress,
+    }: {
+      file:       File;
+      onProgress?: (pct: number) => void;
+    }) => uploadStudentExcel(file, onProgress),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["students"] });
+    },
   });
 };

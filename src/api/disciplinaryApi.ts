@@ -6,18 +6,10 @@ import api from "@/config/axiosInstance";
 
 export type DisciplinaryGrounds =
   | "exam_irregularity"
-  | "academic_misconduct"
-  | "misconduct"
-  | "financial"
-  | "other";
+  | "academic_misconduct" | "misconduct" | "financial" | "other";
 
 export type DisciplinaryOutcome =
-  | "PENDING"
-  | "WARNING"
-  | "SENT_HOME"
-  | "REINSTATED"
-  | "DISCONTINUED"
-  | "DISMISSED";
+  | "PENDING" | "WARNING" | "SENT_HOME" | "REINSTATED" | "DISCONTINUED" | "DISMISSED";
 
 export type AppealOutcome = "UPHELD" | "DISMISSED";
 
@@ -152,10 +144,7 @@ export async function getDisciplinaryCase(
 export async function raiseCase(
   payload: RaiseCasePayload,
 ): Promise<{ message: string; caseId: string }> {
-  const res = await api.post<{ message: string; caseId: string }>(
-    "/disciplinary/raise",
-    payload,
-  );
+  const res = await api.post<{ message: string; caseId: string }>("/disciplinary/raise", payload);
   return res.data;
 }
 

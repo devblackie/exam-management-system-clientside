@@ -148,5 +148,36 @@ export const downloadStudentRegistrationTemplate = async (
   }
 };
 
+export async function uploadStudentExcel(
+  file: File,
+  onUploadProgress?: (percent: number) => void,
+): Promise<{
+  message:    string;
+  registered: string[];
+  duplicates: string[];
+  errors:     string[];
+  skipped:    number;
+}> {
+  const form = new FormData();
+  form.append("file", file);
+
+  const res = await api.post("/students/upload-excel", form, {
+    headers: { "Content-Type": "multipart/form-data" },
+    onUploadProgress: (e) => {
+      if (onUploadProgress && e.total) {
+        onUploadProgress(Math.round((e.loaded * 100) / e.total));
+      }
+    },
+  });
+
+  return res.data as {
+    message:    string;
+    registered: string[];
+    duplicates: string[];
+    errors:     string[];
+    skipped:    number;
+  };
+}
+
 
 

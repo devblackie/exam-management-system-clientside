@@ -8,16 +8,8 @@ import type { Unit } from "@/api/types";
 import type { UnitTemplateFormData } from "@/api/unitsApi";
 import { useToast } from "@/context/ToastContext";
 import {
-  X,
-  Trash2,
-  PenLine,
-  ChevronLeft,
-  ChevronRight,
-  Search,
-  Save,
-  BookOpen,
-  AlertTriangle,
-  Library,
+  X, Trash2, PenLine, ChevronLeft, ChevronRight, Search,
+  Save, BookOpen, AlertTriangle, Library,
 } from "lucide-react";
 import PageHeader from "@/components/ui/PageHeader";
 import { LoadingState } from "@/components/ui/LoadingState";

@@ -341,7 +341,7 @@ export default function AdminDashboard() {
                     </h2>
                   </div>
                   <Link
-                    href="/admin/invite"
+                    href="/admin/admit"
                     className="text-[11px] font-bold text-yellow-gold hover:text-yellow-600 flex items-center gap-1 transition-colors"
                   >
                     Send invite <ArrowUpRight size={12} />
@@ -412,7 +412,7 @@ export default function AdminDashboard() {
                 </div>
                 <div className="flex flex-col gap-2">
                   {[
-                    { label: "Send invite",          sub: "Add staff by email",      href: "/admin/invite",     icon: <Mail size={16} />      },
+                    { label: "Send invite",          sub: "Add staff by email",      href: "/admin/admit",     icon: <Mail size={16} />      },
                     { label: "Manage users",         sub: "Roles, status, deletion", href: "/admin/users",      icon: <Users size={16} />     },
                     { label: "Invite registry",      sub: "View all invitations",    href: "/admin/invitations", icon: <BookOpen size={16} />  },
                     { label: "Institution Settings",         sub: "University name, contact and details",     href: "/admin/settings",    icon: <Building2 size={16} />    },

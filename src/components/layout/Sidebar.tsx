@@ -39,7 +39,7 @@
    ];
 
    const NavContent = () => (
-     <nav className="flex-1 px-6 py-10 space-y-6">
+     <nav className="flex-1 px-6 py-10 space-y-5">
        {filteredMenu.map((item) => {
          const Icon = item.icon;
          const isActive = item.name === "Dashboard" ? pathname === item.href  : pathname.startsWith(item.href);

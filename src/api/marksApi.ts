@@ -12,8 +12,6 @@ export interface UploadResult {
   errors:  string[];
 }
 
-// clientside/src/api/marksApi.ts — ADD these exports
-
 export interface BatchInfo {
   batchId: string;
   unitCode: string;

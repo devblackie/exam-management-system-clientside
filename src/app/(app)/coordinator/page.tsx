@@ -1,66 +1,335 @@
+// // src/app/coordinator/page.tsx
+// "use client";
+
+// import { Upload, FileCog, Scale, FilePenLine, User, UserCheck, Users, UserX } from "lucide-react";
+// import { useState, useEffect } from "react";
+// import ProtectedRoute from "@/components/ProtectedRoute";
+// import { getStudentStats } from "@/api/studentsApi";
+// import { StudentStats, UnitStats } from "@/api/types";
+// import { bulkPromoteClass, previewPromotion, PromotionParams, PromotionPreviewResponse } from "@/api/promoteApi";
+// import PromotionControlCard from "@/components/coordinator/PromotionControlCard";
+// import PromotionPreviewModal from "@/components/coordinator/PromotionPreviewModal";
+// import Image from "next/image";
+// import { branding } from "@/config/branding";
+// import PageHeader from "@/components/ui/PageHeader";
+// import { getProgramUnitStats } from "@/api/programUnitsApi";
+
+// export default function CoordinatorPage() {
+//   const [stats, setStats] = useState<StudentStats>({ active: 0, inactive: 0, total: 0 });
+//   const [unitCount, setUnitCount]= useState<UnitStats>({ totalUnits:0 });
+//   const [loadingStats, setLoadingStats] = useState(true);
+//   const [isPreviewLoading, setIsPreviewLoading] = useState(false);
+//   const [previewData, setPreviewData] = useState<PromotionPreviewResponse | null>(null);
+//   const [showPreview, setShowPreview] = useState(false);
+//   const [currentParams, setCurrentParams] = useState<PromotionParams | null>(null);
+ 
+
+//   useEffect(() => {
+//     const loadStats = async () => {
+//       try {
+//         const data = await getStudentStats();
+//         setStats(data);
+//       } catch (e) {
+//         console.error("Failed to fetch student stats:", e);
+//       } finally {
+//         setLoadingStats(false);
+//       }
+//     };
+//     loadStats();
+//   }, []);
+
+//   useEffect(() => {
+//     const loadUnitCount = async () => {
+//       try {
+//         const data = await getProgramUnitStats();
+//         setUnitCount(data);
+//       } catch (e) {
+//         console.error("Failed to fetch unit stats:", e);
+//       } finally {
+//         setLoadingStats(false);
+//       }
+//     };
+//     loadUnitCount();
+//   }, []);
+
+//   const dashboardStats = [
+//     { title: "Active Students", value: loadingStats ? "..." : stats.active.toLocaleString(), icon: <UserCheck className="w-6 h-6 " /> },
+//     { title: "Inactive/Other", value: loadingStats ? "..." : stats.inactive.toLocaleString(), icon: <UserX className="w-6 h-6 " /> },
+//     { title: "Total Students", value: loadingStats ? "..." : stats.total.toLocaleString(), icon: <Users className="w-6 h-6 " /> },
+//     { title: "Units Offered", value: loadingStats ? "..." : unitCount.totalUnits.toLocaleString(), icon: <FilePenLine className="w-6 h-6 " /> },
+//     { title: "Marks Uploaded", value: "98.2%", icon: <Upload className="w-6 h-6 " /> },
+//     { title: "Disciplinary Issues", value: "47", icon: <Scale className="w-6 h-6 " /> },
+//   ];
+
+//   const handleRunPreview = async (params: PromotionParams) => {
+//     setIsPreviewLoading(true);
+//     setCurrentParams(params);
+//     try {
+//       const data = await previewPromotion(params);
+//       setPreviewData(data);
+//       setShowPreview(true);
+//     } catch {
+//       alert("Error fetching promotion data. Check if units are set for this year.");
+//     } finally {
+//       setIsPreviewLoading(false);
+//     }
+//   };
+
+//   const handleFinalPromote = async () => {
+//     //  Check if data exists before accessing eligibleCount
+//     if (!previewData || !currentParams) {
+//       alert("No data to process.");
+//       return;
+//     }
+
+//     if (!confirm(`Are you sure you want to promote ${previewData.eligibleCount} students?`)) return;
+
+//     try {
+//       const res = await bulkPromoteClass(currentParams);
+//       alert(res.message);
+//       setShowPreview(false);
+//     } catch {
+//       alert("Promotion failed.");
+//     }
+//   };
+
+//   return (
+//     <ProtectedRoute allowed={["coordinator"]}>
+//       <div className="max-w-8xl lg:ml-48 my-14 ">
+//         <div className="bg-[#F8F9FA] min-h-screen rounded-xl shadow-2xl p-10">
+        
+//          {/* 1. PAGE HEADER */}
+//           <PageHeader
+//             title="Coordinator"
+//             highlightedTitle="Overview"
+//             systemLabel=" "
+//           />
+
+//           {/* EXECUTIVE DATA RIBBON */}
+//           <div className="mb-16">
+//             {/* Section Label */}
+//             <div className="flex items-center gap-4 mb-6 px-2">
+//               <h2 className="text-[10px] font-black uppercase tracking-[0.5em] text-green-darkest/30">
+//                 Academic Intelligence Summary
+//               </h2>
+//               <div className="h-[1px] flex-1 bg-gradient-to-r from-green-darkest/10 to-transparent" />
+//             </div>
+
+//             <div className="bg-white border-y border-green-darkest/5 py-10 relative overflow-hidden">
+//               {/* Subtle Background Watermark */}
+//               <div className="absolute right-0 top-0 h-full flex items-center pr-10 opacity-[0.03] pointer-events-none select-none">
+//                 <Image src={branding.institutionLogo} alt="" width={200} height={200} />
+//               </div>
+
+//               <div className="max-w-[1600px] mx-auto flex flex-wrap lg:flex-nowrap items-center">
+//                 {dashboardStats.map((stat, index) => (
+//                   <div key={stat.title} className="flex-1 px-10 relative group border-r border-green-darkest/[0.06] last:border-r-0">
+//                     <div className="relative ">
+//                       <div className="mb-4 flex items-center justify-between">
+//                         <div className="text-green-darkest/20 group-hover:text-yellow-gold transition-all duration-500 transform group-hover:-translate-y-1">
+//                           {stat.icon}
+//                         </div>
+
+//                         <span className="text-[9px] font-mono text-slate-300 group-hover:text-green-darkest transition-colors">
+//                           0{index + 1}
+//                         </span>
+//                       </div>
+
+//                       <div className="flex items-center gap-2 mb-1">
+//                         <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
+//                           {stat.title}
+//                         </span>
+//                       </div>
+
+
+//                       <div className="flex items-baseline gap-1">
+//                         <span className="text-5xl font-light text-green-darkest tracking-tighter group-hover:tracking-normal transition-all duration-500">
+//                           {stat.value.split('.')[0]}
+//                         </span>
+//                         {stat.value.includes('.') && (
+//                           <span className="text-xl font-black text-yellow-gold">
+//                             .{stat.value.split('.')[1]}
+//                           </span>
+//                         )}
+//                       </div>
+
+//                       <div className="mt-6 w-0 group-hover:w-full h-[2px] bg-yellow-gold transition-all duration-700 ease-in-out" />
+
+//                     </div>
+//                   </div>
+//                 ))}
+//               </div>
+//             </div>
+//           </div>
+
+//           {/* 3. PRIMARY ACTION ZONE: "Floating Console" */}
+//           <div className="grid grid-cols-12 gap-10">
+
+//             {/* Left Side: Promotion Console (The Core Task) */}
+//             <div className="col-span-12 lg:col-span-8">
+//               <div className="relative group">
+//                 <div className="absolute -inset-1 bg-gradient-to-r from-yellow-gold/20 to-green-darkest/5 rounded-[2.5rem] blur opacity-25 group-hover:opacity-50 transition duration-1000" />
+//                 <div className="relative bg-white border border-green-darkest/5 rounded-lg p-10 shadow-sm">
+
+//                   <PromotionControlCard onRunPreview={handleRunPreview} isLoading={isPreviewLoading} />
+//                 </div>
+//               </div>
+//             </div>
+
+//             {/* Right Side: High-End Quick Access */}
+//             <div className="col-span-12 lg:col-span-4 flex flex-col gap-5">
+//               <div className="flex items-center gap-1 mb-1 px-2">
+//                 <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 px-2">
+//                   System Utilities
+//                 </h3>
+//                 <div className="h-[2px] flex-1 bg-gradient-to-r from-green-darkest/20 to-transparent" />
+//               </div>
+//               {[
+//                 { label: "Institution Settings", icon: <FileCog size={18} />, href: "/coordinator/institution-settings", desc: "Exam Marks, CAT Marks Threshhold Settings" },
+//                 { label: "Disciplinary Registry", icon: <Scale size={18} />, href: "/coordinator/disciplinary", desc: "Disciplinary Cases" },
+//                 { label: "Student Registry", icon: <User size={18} />, href: "/coordinator/allStudents", desc: "Student Details Editing" },
+//               ].map((action) => (
+//                 <a
+//                   key={action.label}
+//                   href={action.href}
+//                   className="group flex items-center gap-5 p-3 bg-white border border-green-darkest/5 rounded-lg hover:bg-green-darkest transition-all duration-300 shadow-sm hover:shadow-2xl hover:shadow-green-darkest/20"
+//                 >
+//                   <div className="h-8 w-8 rounded-xl bg-slate-50 group-hover:bg-white/10 flex items-center justify-center text-green-darkest group-hover:text-yellow-gold transition-colors">
+//                     {action.icon}
+//                   </div>
+//                   <div>
+//                     <p className="font-black text-green-darkest group-hover:text-white text-xs uppercase tracking-tight">
+//                       {action.label}
+//                     </p>
+//                     <p className="text-[10px] text-slate-400 group-hover:text-white/50 font-medium">
+//                       {action.desc}
+//                     </p>
+//                   </div>
+//                 </a>
+//               ))}
+//             </div>
+//           </div>
+
+//         </div>
+//       </div>
+
+//       {showPreview && previewData && currentParams && (
+//         <PromotionPreviewModal
+//           data={previewData}
+//           params={currentParams}
+//           onClose={() => setShowPreview(false)}
+//           onConfirm={handleFinalPromote}
+//         />
+//       )}
+//     </ProtectedRoute>
+//   );
+// }
+
+
+
+
+
+
+
 // src/app/coordinator/page.tsx
 "use client";
 
-import { Upload, FileCog, Scale, FilePenLine, User, UserCheck, Users, UserX } from "lucide-react";
-import { useState, useEffect } from "react";
+import {
+  Upload, FileCog, Scale, FilePenLine,
+  User, UserCheck, Users, UserX, ShieldAlert,
+} from "lucide-react";
+import { useState } from "react";
 import ProtectedRoute from "@/components/ProtectedRoute";
-import { getStudentStats } from "@/api/studentsApi";
-import { StudentStats, UnitStats } from "@/api/types";
-import { bulkPromoteClass, previewPromotion, PromotionParams, PromotionPreviewResponse } from "@/api/promoteApi";
-import PromotionControlCard from "@/components/coordinator/PromotionControlCard";
-import PromotionPreviewModal from "@/components/coordinator/PromotionPreviewModal";
-import Image from "next/image";
+import {
+  bulkPromoteClass,
+  previewPromotion,
+  type PromotionParams,
+  type PromotionPreviewResponse,
+} from "@/api/promoteApi";
+import PromotionControlCard   from "@/components/coordinator/PromotionControlCard";
+import PromotionPreviewModal  from "@/components/coordinator/PromotionPreviewModal";
+import Image   from "next/image";
 import { branding } from "@/config/branding";
 import PageHeader from "@/components/ui/PageHeader";
-import { getProgramUnitStats } from "@/api/programUnitsApi";
 
+// ── TanStack hooks ────────────────────────────────────────────────────────────
+import { useStudentStats }              from "@/hooks/queries/useStudents";
+import { useProgramUnitStats }          from "@/hooks/queries/useProgramUnits";
+import { useCoordinatorDashboardStats } from "@/hooks/queries/useCoordinatorDashboard";
+import { useDisciplinaryCases }         from "@/hooks/queries/useDisciplinary";
+
+// ─────────────────────────────────────────────────────────────────────────────
 export default function CoordinatorPage() {
-  const [stats, setStats] = useState<StudentStats>({ active: 0, inactive: 0, total: 0 });
-  const [unitCount, setUnitCount]= useState<UnitStats>({ totalUnits:0 });
-  const [loadingStats, setLoadingStats] = useState(true);
+  // ── Promotion state (unchanged) ───────────────────────────────────────────
   const [isPreviewLoading, setIsPreviewLoading] = useState(false);
-  const [previewData, setPreviewData] = useState<PromotionPreviewResponse | null>(null);
-  const [showPreview, setShowPreview] = useState(false);
-  const [currentParams, setCurrentParams] = useState<PromotionParams | null>(null);
- 
+  const [previewData,      setPreviewData]      = useState<PromotionPreviewResponse | null>(null);
+  const [showPreview,      setShowPreview]      = useState(false);
+  const [currentParams,    setCurrentParams]    = useState<PromotionParams | null>(null);
 
-  useEffect(() => {
-    const loadStats = async () => {
-      try {
-        const data = await getStudentStats();
-        setStats(data);
-      } catch (e) {
-        console.error("Failed to fetch student stats:", e);
-      } finally {
-        setLoadingStats(false);
-      }
-    };
-    loadStats();
-  }, []);
+  // ── Dynamic data via TanStack Query ──────────────────────────────────────
+  const { data: studentStats,  isLoading: loadingStudents  } = useStudentStats();
+  const { data: unitStats,     isLoading: loadingUnits      } = useProgramUnitStats();
+  const { data: dashStats,     isLoading: loadingDash       } = useCoordinatorDashboardStats();
+  const { data: disciplinary                                 } = useDisciplinaryCases({
+    outcome: "PENDING",
+    limit:   1,
+  });
 
-  useEffect(() => {
-    const loadUnitCount = async () => {
-      try {
-        const data = await getProgramUnitStats();
-        setUnitCount(data);
-      } catch (e) {
-        console.error("Failed to fetch unit stats:", e);
-      } finally {
-        setLoadingStats(false);
-      }
-    };
-    loadUnitCount();
-  }, []);
+  const loadingStats = loadingStudents || loadingUnits || loadingDash;
 
+  // ── Resolve live values ───────────────────────────────────────────────────
+  const activeStudents  = studentStats?.active        ?? dashStats?.students.active  ?? 0;
+  const inactiveStudents= studentStats?.inactive      ?? 0;
+  const totalStudents   = studentStats?.total         ?? dashStats?.students.total   ?? 0;
+  const totalUnits      = unitStats?.totalUnits       ?? 0;
+  const totalUploads    = dashStats?.marks.totalUploads ?? 0;
+  const openCases       = disciplinary?.total         ?? dashStats?.disciplinary.openCases ?? 0;
+
+  // Last upload percentage — derived from upload count as a display metric
+  // "Marks Uploaded" shows actual batch count instead of hardcoded 98.2%
+  const uploadsDisplay  = loadingStats
+    ? "..."
+    : totalUploads > 0
+      ? totalUploads.toLocaleString()
+      : "0";
+
+  const disciplinaryDisplay = loadingStats ? "..." : openCases.toLocaleString();
+
+  // ── Ribbon stat definitions — only values replaced, layout untouched ──────
   const dashboardStats = [
-    { title: "Active Students", value: loadingStats ? "..." : stats.active.toLocaleString(), icon: <UserCheck className="w-6 h-6 " /> },
-    { title: "Inactive/Other", value: loadingStats ? "..." : stats.inactive.toLocaleString(), icon: <UserX className="w-6 h-6 " /> },
-    { title: "Total Students", value: loadingStats ? "..." : stats.total.toLocaleString(), icon: <Users className="w-6 h-6 " /> },
-    { title: "Units Offered", value: loadingStats ? "..." : unitCount.totalUnits.toLocaleString(), icon: <FilePenLine className="w-6 h-6 " /> },
-    { title: "Marks Uploaded", value: "98.2%", icon: <Upload className="w-6 h-6 " /> },
-    { title: "Disciplinary Issues", value: "47", icon: <Scale className="w-6 h-6 " /> },
+    {
+      title: "Active Students",
+      value: loadingStats ? "..." : activeStudents.toLocaleString(),
+      icon:  <UserCheck className="w-6 h-6" />,
+    },
+    {
+      title: "Inactive/Other",
+      value: loadingStats ? "..." : inactiveStudents.toLocaleString(),
+      icon:  <UserX className="w-6 h-6" />,
+    },
+    {
+      title: "Total Students",
+      value: loadingStats ? "..." : totalStudents.toLocaleString(),
+      icon:  <Users className="w-6 h-6" />,
+    },
+    {
+      title: "Units Offered",
+      value: loadingStats ? "..." : totalUnits.toLocaleString(),
+      icon:  <FilePenLine className="w-6 h-6" />,
+    },
+    {
+      title: "Mark Uploads",
+      value: uploadsDisplay,
+      icon:  <Upload className="w-6 h-6" />,
+    },
+    {
+      title: "Open Cases",
+      value: disciplinaryDisplay,
+      icon:  <ShieldAlert className="w-6 h-6" />,
+    },
   ];
 
+  // ── Promotion handlers (unchanged) ────────────────────────────────────────
   const handleRunPreview = async (params: PromotionParams) => {
     setIsPreviewLoading(true);
     setCurrentParams(params);
@@ -76,14 +345,11 @@ export default function CoordinatorPage() {
   };
 
   const handleFinalPromote = async () => {
-    //  Check if data exists before accessing eligibleCount
     if (!previewData || !currentParams) {
       alert("No data to process.");
       return;
     }
-
     if (!confirm(`Are you sure you want to promote ${previewData.eligibleCount} students?`)) return;
-
     try {
       const res = await bulkPromoteClass(currentParams);
       alert(res.message);
@@ -93,21 +359,21 @@ export default function CoordinatorPage() {
     }
   };
 
+  // ─────────────────────────────────────────────────────────────────────────
   return (
     <ProtectedRoute allowed={["coordinator"]}>
-      <div className="max-w-8xl lg:ml-48 my-14 ">
+      <div className="max-w-8xl lg:ml-48 my-14">
         <div className="bg-[#F8F9FA] min-h-screen rounded-xl shadow-2xl p-10">
-        
-         {/* 1. PAGE HEADER */}
+
+          {/* 1. PAGE HEADER — unchanged */}
           <PageHeader
             title="Coordinator"
             highlightedTitle="Overview"
             systemLabel=" "
           />
 
-          {/* EXECUTIVE DATA RIBBON */}
+          {/* EXECUTIVE DATA RIBBON — layout identical, values now dynamic */}
           <div className="mb-16">
-            {/* Section Label */}
             <div className="flex items-center gap-4 mb-6 px-2">
               <h2 className="text-[10px] font-black uppercase tracking-[0.5em] text-green-darkest/30">
                 Academic Intelligence Summary
@@ -116,20 +382,22 @@ export default function CoordinatorPage() {
             </div>
 
             <div className="bg-white border-y border-green-darkest/5 py-10 relative overflow-hidden">
-              {/* Subtle Background Watermark */}
+              {/* Background watermark — unchanged */}
               <div className="absolute right-0 top-0 h-full flex items-center pr-10 opacity-[0.03] pointer-events-none select-none">
                 <Image src={branding.institutionLogo} alt="" width={200} height={200} />
               </div>
 
               <div className="max-w-[1600px] mx-auto flex flex-wrap lg:flex-nowrap items-center">
                 {dashboardStats.map((stat, index) => (
-                  <div key={stat.title} className="flex-1 px-10 relative group border-r border-green-darkest/[0.06] last:border-r-0">
-                    <div className="relative ">
+                  <div
+                    key={stat.title}
+                    className="flex-1 px-10 relative group border-r border-green-darkest/[0.06] last:border-r-0"
+                  >
+                    <div className="relative">
                       <div className="mb-4 flex items-center justify-between">
                         <div className="text-green-darkest/20 group-hover:text-yellow-gold transition-all duration-500 transform group-hover:-translate-y-1">
                           {stat.icon}
                         </div>
-
                         <span className="text-[9px] font-mono text-slate-300 group-hover:text-green-darkest transition-colors">
                           0{index + 1}
                         </span>
@@ -141,20 +409,25 @@ export default function CoordinatorPage() {
                         </span>
                       </div>
 
-
                       <div className="flex items-baseline gap-1">
-                        <span className="text-5xl font-light text-green-darkest tracking-tighter group-hover:tracking-normal transition-all duration-500">
-                          {stat.value.split('.')[0]}
-                        </span>
-                        {stat.value.includes('.') && (
-                          <span className="text-xl font-black text-yellow-gold">
-                            .{stat.value.split('.')[1]}
-                          </span>
+                        {/* Loading pulse replaces the number while fetching */}
+                        {stat.value === "..." ? (
+                          <span className="h-10 w-20 bg-slate-200 animate-pulse rounded-lg inline-block" />
+                        ) : (
+                          <>
+                            <span className="text-5xl font-light text-green-darkest tracking-tighter group-hover:tracking-normal transition-all duration-500">
+                              {stat.value.split(".")[0]}
+                            </span>
+                            {stat.value.includes(".") && (
+                              <span className="text-xl font-black text-yellow-gold">
+                                .{stat.value.split(".")[1]}
+                              </span>
+                            )}
+                          </>
                         )}
                       </div>
 
                       <div className="mt-6 w-0 group-hover:w-full h-[2px] bg-yellow-gold transition-all duration-700 ease-in-out" />
-
                     </div>
                   </div>
                 ))}
@@ -162,21 +435,23 @@ export default function CoordinatorPage() {
             </div>
           </div>
 
-          {/* 3. PRIMARY ACTION ZONE: "Floating Console" */}
+          {/* 3. PRIMARY ACTION ZONE — identical to original */}
           <div className="grid grid-cols-12 gap-10">
 
-            {/* Left Side: Promotion Console (The Core Task) */}
+            {/* Left Side: Promotion Console */}
             <div className="col-span-12 lg:col-span-8">
               <div className="relative group">
                 <div className="absolute -inset-1 bg-gradient-to-r from-yellow-gold/20 to-green-darkest/5 rounded-[2.5rem] blur opacity-25 group-hover:opacity-50 transition duration-1000" />
                 <div className="relative bg-white border border-green-darkest/5 rounded-lg p-10 shadow-sm">
-
-                  <PromotionControlCard onRunPreview={handleRunPreview} isLoading={isPreviewLoading} />
+                  <PromotionControlCard
+                    onRunPreview={handleRunPreview}
+                    isLoading={isPreviewLoading}
+                  />
                 </div>
               </div>
             </div>
 
-            {/* Right Side: High-End Quick Access */}
+            {/* Right Side: Quick Access */}
             <div className="col-span-12 lg:col-span-4 flex flex-col gap-5">
               <div className="flex items-center gap-1 mb-1 px-2">
                 <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 px-2">
@@ -185,10 +460,25 @@ export default function CoordinatorPage() {
                 <div className="h-[2px] flex-1 bg-gradient-to-r from-green-darkest/20 to-transparent" />
               </div>
               {[
-                { label: "Institution Settings", icon: <FileCog size={18} />, href: "/coordinator/institution-settings", desc: "Exam Marks, CAT Marks Threshhold Settings" },
-                { label: "Disciplinary Registry", icon: <Scale size={18} />, href: "/coordinator/disciplinary", desc: "Disciplinary Cases" },
-                { label: "Student Registry", icon: <User size={18} />, href: "/coordinator/allStudents", desc: "Student Details Editing" },
-              ].map((action) => (
+                {
+                  label: "Institution Settings",
+                  icon:  <FileCog size={18} />,
+                  href:  "/coordinator/institution-settings",
+                  desc:  "Exam Marks, CAT Marks Threshhold Settings",
+                },
+                {
+                  label: "Disciplinary Registry",
+                  icon:  <Scale size={18} />,
+                  href:  "/coordinator/disciplinary",
+                  desc:  "Disciplinary Cases",
+                },
+                {
+                  label: "Student Registry",
+                  icon:  <User size={18} />,
+                  href:  "/coordinator/allStudents",
+                  desc:  "Student Details Editing",
+                },
+              ].map(action => (
                 <a
                   key={action.label}
                   href={action.href}
@@ -213,6 +503,7 @@ export default function CoordinatorPage() {
         </div>
       </div>
 
+      {/* Promotion preview modal — unchanged */}
       {showPreview && previewData && currentParams && (
         <PromotionPreviewModal
           data={previewData}

@@ -1,20 +1,11 @@
-// // clientside/src/app/coordinator/award-list/page.tsx
+// clientside/src/app/coordinator/award-list/page.tsx
 
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
 import {
-  GraduationCap,
-  Spotlight,
-  Loader2,
-  Trophy,
-  Users,
-  ChevronDown,
-  ChevronRight,
-  Filter,
-  Fingerprint,
-  ShieldAlert,
-  FileSpreadsheet,
+  GraduationCap, Spotlight, Loader2, Trophy, Users, ChevronDown,
+  ChevronRight, Filter, Fingerprint, ShieldAlert, FileSpreadsheet,
 } from "lucide-react";
 import { getPrograms } from "@/api/programsApi";
 import { getAcademicYears } from "@/api/academicYearsApi";
@@ -32,24 +23,14 @@ const CLASS_ORDER = [
 ];
 
 const CLASS_STYLES: Record<string, { badge: string; row: string }> = {
-  "FIRST CLASS HONOURS": {
-    badge: "text-yellow-800",
-    row: "border-l-1 border-yellow-50",
-  },
-  "SECOND CLASS HONOURS (UPPER DIVISION)": {
-    badge: "text-blue-800",
-    row: "border-l-1 border-blue-50",
-  },
-  "SECOND CLASS HONOURS (LOWER DIVISION)": {
-    badge: "text-slate-700",
-    row: "border-l-1 border-slate-50",
-  },
+  "FIRST CLASS HONOURS": { badge: "text-yellow-800", row: "border-l-1 border-yellow-50" },
+  "SECOND CLASS HONOURS (UPPER DIVISION)": { badge: "text-blue-800", row: "border-l-1 border-blue-50" },
+  "SECOND CLASS HONOURS (LOWER DIVISION)": { badge: "text-slate-700", row: "border-l-1 border-slate-50" },
   PASS: { badge: "text-emerald-800", row: "border-l-1 border-emerald-50" },
 };
 
 function ClassGroup({
-  classification,
-  students,
+  classification, students,
 }: {
   classification: string;
   students: AwardListEntry[];
@@ -240,7 +221,7 @@ export default function AwardListPage() {
   })).filter((s) => s.count > 0);
 
   return (
-    <div className="ml-40 my-10 animate-in fade-in duration-700">
+    <div className="max-w-8xl lg:ml-48 my-14 animate-in fade-in duration-700">
       <div className="bg-[#F8F9FA] min-h-screen rounded-lg shadow-2xl p-10">
         <PageHeader
           title="Graduation"
