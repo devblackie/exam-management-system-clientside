@@ -99,7 +99,7 @@ export default function UploadMarksPage() {
   const isLoading = uploadMarks.isPending;
 
   return (
-    <div className="lg:ml-48 my-14 min-h-screen bg-[#F8F9FA] overflow-hidden">
+    <div className="lg:ml-48 mt-14 min-h-screen bg-[#F8F9FA] overflow-hidden">
       {/* Loading overlay */}
       {isLoading && (
         <div className="fixed inset-0 bg-green-darkest/30 backdrop-blur-sm z-[200] flex items-center justify-center">
@@ -121,7 +121,7 @@ export default function UploadMarksPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1.0] }}
-        className="bg-[#F8F9FA] min-h-screen rounded-lg shadow-2xl p-9 border border-white"
+        className="bg-[#F8F9FA] min-h-screen rounded shadow-2xl p-9 border border-white"
       >
         <PageHeader
           title="Upload"

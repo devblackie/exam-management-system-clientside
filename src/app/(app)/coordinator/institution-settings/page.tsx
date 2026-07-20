@@ -183,8 +183,8 @@ export default function CoordinatorInstitutionSettingsPage() {
   ];
 
   return (
-    <div className="max-w-8xl lg:ml-48 my-14">
-      <div className="bg-[#F8F9FA] rounded-lg shadow-2xl p-10 min-h-screen">
+    <div className="max-w-8xl lg:ml-48 mt-14">
+      <div className="bg-[#F8F9FA] rounded shadow-2xl p-10 min-h-screen">
         <PageHeader
           title="Institution" highlightedTitle="Settings"
           subtitle="Configure academic rules, grading, and registration number formats"

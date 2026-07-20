@@ -221,8 +221,8 @@ export default function AwardListPage() {
   })).filter((s) => s.count > 0);
 
   return (
-    <div className="max-w-8xl lg:ml-48 my-14 animate-in fade-in duration-700">
-      <div className="bg-[#F8F9FA] min-h-screen rounded-lg shadow-2xl p-10">
+    <div className="max-w-8xl lg:ml-48 mt-14 animate-in fade-in duration-700">
+      <div className="bg-[#F8F9FA] min-h-screen rounded shadow-2xl p-10">
         <PageHeader
           title="Graduation"
           highlightedTitle="Award List"

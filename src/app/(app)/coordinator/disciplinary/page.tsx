@@ -1000,8 +1000,8 @@ export default function DisciplinaryPage() {
 
   return (
     <ProtectedRoute allowed={["coordinator", "admin"]}>
-      <div className="max-w-8xl lg:ml-48 my-14 animate-in fade-in slide-in-from-bottom-4 duration-700">
-        <div className="bg-[#F8F9FA] min-h-screen rounded-xl shadow-2xl p-10 relative overflow-hidden">
+      <div className="max-w-8xl lg:ml-48 mt-14 animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <div className="bg-[#F8F9FA] min-h-screen rounded shadow-2xl p-10 relative overflow-hidden">
 
           {/* Watermark — same as coordinator page */}
           <Gavel size={400} className="absolute -right-20 -bottom-20 opacity-[0.02] text-green-darkest pointer-events-none" />

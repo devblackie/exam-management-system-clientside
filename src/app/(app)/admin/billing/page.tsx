@@ -71,8 +71,8 @@ export default function BillingPage() {
   if (summaryLoading) {
     return (
       <ProtectedRoute allowed={["admin"]}>
-        <div className="max-w-7xl lg:ml-48 my-10">
-          <div className="bg-[#F8F9FA] min-h-screen rounded-xl shadow-2xl p-10">
+        <div className="max-w-7xl lg:ml-48 mt-10">
+          <div className="bg-[#F8F9FA] min-h-screen rounded shadow-2xl p-10">
             <PageHeader
               title="Billing &amp;"
               highlightedTitle="Subscriptions"
@@ -110,8 +110,8 @@ export default function BillingPage() {
   if (summaryError || !summary) {
     return (
       <ProtectedRoute allowed={["admin"]}>
-        <div className="max-w-7xl lg:ml-48 my-10">
-          <div className="bg-[#F8F9FA] min-h-screen rounded-xl shadow-2xl p-10 relative">
+        <div className="max-w-7xl lg:ml-48 mt-10">
+          <div className="bg-[#F8F9FA] min-h-screen rounded shadow-2xl p-10 relative">
             <Receipt
               size={400}
               className="absolute -right-16 -bottom-16 opacity-[0.02] text-green-darkest pointer-events-none"
@@ -197,12 +197,12 @@ export default function BillingPage() {
   return (
     <ProtectedRoute allowed={["admin"]}>
       <motion.div
-        className="max-w-7xl lg:ml-48 my-10"
+        className="max-w-7xl lg:ml-48 mt-10"
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
       >
-        <div className="bg-[#F8F9FA] min-h-screen rounded-xl shadow-2xl p-6 md:p-10 relative overflow-hidden">
+        <div className="bg-[#F8F9FA] min-h-screen rounded shadow-2xl p-6 md:p-10 relative overflow-hidden">
           <Receipt
             size={400}
             className="absolute -right-16 -bottom-16 opacity-[0.02] text-green-darkest pointer-events-none"

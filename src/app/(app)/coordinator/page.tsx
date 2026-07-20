@@ -241,15 +241,11 @@ import {
 import { useState } from "react";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import {
-  bulkPromoteClass,
-  previewPromotion,
-  type PromotionParams,
-  type PromotionPreviewResponse,
+  bulkPromoteClass, previewPromotion,
+  type PromotionParams, type PromotionPreviewResponse,
 } from "@/api/promoteApi";
 import PromotionControlCard   from "@/components/coordinator/PromotionControlCard";
 import PromotionPreviewModal  from "@/components/coordinator/PromotionPreviewModal";
-import Image   from "next/image";
-import { branding } from "@/config/branding";
 import PageHeader from "@/components/ui/PageHeader";
 
 // ── TanStack hooks ────────────────────────────────────────────────────────────
@@ -287,46 +283,18 @@ export default function CoordinatorPage() {
 
   // Last upload percentage — derived from upload count as a display metric
   // "Marks Uploaded" shows actual batch count instead of hardcoded 98.2%
-  const uploadsDisplay  = loadingStats
-    ? "..."
-    : totalUploads > 0
-      ? totalUploads.toLocaleString()
-      : "0";
+  const uploadsDisplay  = loadingStats ? "..." : totalUploads > 0 ? totalUploads.toLocaleString() : "0";
 
   const disciplinaryDisplay = loadingStats ? "..." : openCases.toLocaleString();
 
   // ── Ribbon stat definitions — only values replaced, layout untouched ──────
   const dashboardStats = [
-    {
-      title: "Active Students",
-      value: loadingStats ? "..." : activeStudents.toLocaleString(),
-      icon:  <UserCheck className="w-6 h-6" />,
-    },
-    {
-      title: "Inactive/Other",
-      value: loadingStats ? "..." : inactiveStudents.toLocaleString(),
-      icon:  <UserX className="w-6 h-6" />,
-    },
-    {
-      title: "Total Students",
-      value: loadingStats ? "..." : totalStudents.toLocaleString(),
-      icon:  <Users className="w-6 h-6" />,
-    },
-    {
-      title: "Units Offered",
-      value: loadingStats ? "..." : totalUnits.toLocaleString(),
-      icon:  <FilePenLine className="w-6 h-6" />,
-    },
-    {
-      title: "Mark Uploads",
-      value: uploadsDisplay,
-      icon:  <Upload className="w-6 h-6" />,
-    },
-    {
-      title: "Open Cases",
-      value: disciplinaryDisplay,
-      icon:  <ShieldAlert className="w-6 h-6" />,
-    },
+    { title: "Active Students", value: loadingStats ? "..." : activeStudents.toLocaleString(), icon:  <UserCheck className="w-6 h-6" /> },
+    { title: "Inactive/Other", value: loadingStats ? "..." : inactiveStudents.toLocaleString(), icon:  <UserX className="w-6 h-6" /> },
+    { title: "Total Students", value: loadingStats ? "..." : totalStudents.toLocaleString(), icon:  <Users className="w-6 h-6" /> },
+    { title: "Units Offered", value: loadingStats ? "..." : totalUnits.toLocaleString(), icon:  <FilePenLine className="w-6 h-6" /> },
+    { title: "Mark Uploads", value: uploadsDisplay, icon:  <Upload className="w-6 h-6" /> },
+    { title: "Open Cases", value: disciplinaryDisplay, icon:  <ShieldAlert className="w-6 h-6" /> },
   ];
 
   // ── Promotion handlers (unchanged) ────────────────────────────────────────
@@ -362,7 +330,7 @@ export default function CoordinatorPage() {
   // ─────────────────────────────────────────────────────────────────────────
   return (
     <ProtectedRoute allowed={["coordinator"]}>
-      <div className="max-w-8xl lg:ml-48 my-14">
+      <div className="max-w-8xl lg:ml-48 mt-14">
         <div className="bg-[#F8F9FA] min-h-screen rounded-xl shadow-2xl p-10">
 
           {/* 1. PAGE HEADER — unchanged */}
@@ -382,11 +350,7 @@ export default function CoordinatorPage() {
             </div>
 
             <div className="bg-white border-y border-green-darkest/5 py-10 relative overflow-hidden">
-              {/* Background watermark — unchanged */}
-              <div className="absolute right-0 top-0 h-full flex items-center pr-10 opacity-[0.03] pointer-events-none select-none">
-                <Image src={branding.institutionLogo} alt="" width={200} height={200} />
-              </div>
-
+            
               <div className="max-w-[1600px] mx-auto flex flex-wrap lg:flex-nowrap items-center">
                 {dashboardStats.map((stat, index) => (
                   <div

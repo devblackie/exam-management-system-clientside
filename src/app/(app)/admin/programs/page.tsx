@@ -152,12 +152,12 @@ export default function ProgramsPage() {
   }
 
   return (
-    <div className="max-w-8xl lg:ml-48 my-10">
+    <div className="max-w-8xl lg:ml-48 mt-10">
       <motion.div
         variants={pageVariants}
         initial="hidden"
         animate="visible"
-        className="bg-[#F8F9FA] min-h-screen rounded-2xl shadow-2xl p-10 border border-white/60"
+        className="bg-[#F8F9FA] min-h-screen rounded shadow-2xl p-10 border border-white/60"
       >
         <PageHeader
           title="Academic Programs"

@@ -1,4 +1,4 @@
-// // clientside/src/app/coordinator/student-search/page.tsx
+// clientside/src/app/coordinator/student-search/page.tsx
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
@@ -183,8 +183,8 @@ export default function StudentSearchPage() {
   };
 
   return (
-    <div className="max-w-8xl ml-48 my-14">
-      <div className="bg-[#F8F9FA] rounded-lg shadow-2xl p-10 min-h-screen">
+    <div className="max-w-8xl ml-48 mt-14">
+      <div className="bg-[#F8F9FA] rounded shadow-2xl p-10 min-h-screen">
         <PageHeader
           title="Student Academic"
           highlightedTitle="Records"

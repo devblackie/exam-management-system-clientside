@@ -99,8 +99,8 @@ const handleUpdateSession = async (id: string, data: Partial<AcademicYear>) => {
   if (loading) return <LoadingState message="Fetching academic years..." />;
 
   return (
-    <div className="max-w-8xl  lg:ml-48  my-14 ">
-      <div className="bg-[#F8F9FA] max-w-full min-h-screen rounded-3xl shadow-2xl p-10">
+    <div className="max-w-8xl  lg:ml-48 mt-14">
+      <div className="bg-[#F8F9FA] max-w-full min-h-screen rounded shadow-2xl p-10">
        
                 {/* Header */}
                  <PageHeader 

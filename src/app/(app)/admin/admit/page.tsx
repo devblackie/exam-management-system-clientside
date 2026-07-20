@@ -148,8 +148,8 @@ export default function InviteFormPage() {
 
   return (
     <ProtectedRoute allowed={["admin"]}>
-      <div className="max-w-8xl min-h-screen lg:ml-48 my-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
-        <div className="bg-[#F8F9FA] min-h-[100vh] rounded-xl shadow-2xl p-10 relative overflow-hidden">
+      <div className="max-w-8xl min-h-screen lg:ml-48 mt-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <div className="bg-[#F8F9FA] min-h-[100vh] rounded shadow-2xl p-10 relative overflow-hidden">
 
           {/* Watermark */}
           <div className="absolute -right-20 -bottom-20 opacity-[0.03] pointer-events-none">

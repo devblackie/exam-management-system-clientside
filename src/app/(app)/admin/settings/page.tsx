@@ -129,8 +129,8 @@ export default function AdminSettingsPage() {
 
   return (
     <ProtectedRoute allowed={["admin"]}>
-      <div className="max-w-8xl lg:ml-48 my-10">
-        <div className="bg-[#F8F9FA] rounded-lg shadow-2xl p-10 min-h-screen">
+      <div className="max-w-8xl lg:ml-48 mt-10">
+        <div className="bg-[#F8F9FA] rounded shadow-2xl p-10 min-h-screen">
           <PageHeader
             title="Institution" highlightedTitle="Settings"
             subtitle="Configure your university's identity and academic structure"

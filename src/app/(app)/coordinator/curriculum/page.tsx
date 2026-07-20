@@ -389,11 +389,11 @@ export default function CurriculumManagementPage() {
   if (programsLoading || unitsLoading) return <LoadingState message="Loading curriculum data..." />;
 
   return (
-    <div className="max-w-8xl lg:ml-48 my-14">
+    <div className="max-w-8xl lg:ml-48 mt-14">
       <motion.div
         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1.0] }}
-        className="bg-[#F8F9FA] rounded-xl shadow-2xl p-10 min-h-screen relative overflow-hidden"
+        className="bg-[#F8F9FA] rounded shadow-2xl p-10 min-h-screen relative overflow-hidden"
       >
         {/* Watermark */}
         <Layers size={400} className="absolute -right-20 -bottom-20 opacity-[0.02] text-green-darkest pointer-events-none" />

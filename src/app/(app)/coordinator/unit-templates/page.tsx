@@ -97,7 +97,7 @@ export default function UnitTemplateManagementPage() {
   if (isLoading) return <LoadingState message="Loading Unit Registry..." />;
   if (isError) {
     return (
-      <div className="max-w-8xl lg:ml-48 my-14 flex items-center justify-center min-h-[60vh]">
+      <div className="max-w-8xl lg:ml-48 mt-14 flex items-center justify-center min-h-[60vh]">
         <div className="text-center">
           <AlertTriangle size={48} className="mx-auto text-red-400 mb-4" />
           <p className="text-slate-500 font-medium">Failed to load units. Please try again.</p>
@@ -107,12 +107,12 @@ export default function UnitTemplateManagementPage() {
   }
 
   return (
-    <div className="max-w-8xl lg:ml-48 my-14">
+    <div className="max-w-8xl lg:ml-48 mt-14">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1.0] }}
-        className="bg-[#F8F9FA] min-h-screen rounded-2xl shadow-2xl p-10 border border-white/60 backdrop-blur-sm"
+        className="bg-[#F8F9FA] min-h-screen rounded shadow-2xl p-10 border border-white/60 backdrop-blur-sm"
       >
         <PageHeader title="Unit" highlightedTitle="Templates" />
 

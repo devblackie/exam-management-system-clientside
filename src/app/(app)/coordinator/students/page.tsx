@@ -490,8 +490,8 @@ export default function StudentRegistrationPage() {
 
   return (
     <ProtectedRoute allowed={["coordinator", "admin"]}>
-      <div className="max-w-8xl lg:ml-48 my-10">
-        <div className="bg-[#F8F9FA] min-h-screen rounded-xl shadow-2xl p-8 md:p-10">
+      <div className="max-w-8xl lg:ml-48 mt-10">
+        <div className="bg-[#F8F9FA] min-h-screen rounded shadow-2xl p-8 md:p-10">
 
           {/* ── Header ──────────────────────────────────────────────────── */}
           <PageHeader

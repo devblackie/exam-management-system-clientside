@@ -20,8 +20,8 @@ export default function MaintenancePage() {
   }, []);
 
   return (
-    <div className="ml-48 my-10 min-h-screen bg-[#F8F9FA] overflow-hidden">
-          <div className="bg-[#F8F9FA] min-h-screen rounded-lg shadow-2xl p-9 border border-white">
+    <div className="lg:ml-48 mt-14 min-h-screen bg-[#F8F9FA] overflow-hidden">
+          <div className="bg-[#F8F9FA] min-h-screen rounded shadow-2xl p-9 border border-white">
         <PageHeader
           title="Database"
           highlightedTitle="Maintenance"

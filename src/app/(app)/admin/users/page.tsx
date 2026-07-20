@@ -8,13 +8,7 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import { useToast } from "@/context/ToastContext";
 import { useAuth } from "@/context/AuthContext";
 import { useInstitutionSettings } from "@/hooks/queries/useInstitutionSettings";
-import {
-  useUsers,
-  useUpdateUserRole,
-  useUpdateUserStatus,
-  useUpdateUserDetails,
-  useDeleteUser,
-} from "@/hooks/queries/useAdmin";
+import { useUsers, useUpdateUserRole, useUpdateUserStatus, useUpdateUserDetails, useDeleteUser } from "@/hooks/queries/useAdmin";
 import PageHeader from "@/components/ui/PageHeader";
 import {
   Search, Trash2, ChevronLeft, ChevronRight, UserCheck, Users, ShieldCheck,
@@ -22,13 +16,7 @@ import {
 } from "lucide-react";
 import type { School, Department } from "@/api/types";
 
-type EditingUser = {
-  id: string;
-  name: string;
-  schoolCode: string;
-  departmentCode: string;
-  institutionWide: boolean;
-} | null;
+type EditingUser = { id: string; name: string; schoolCode: string; departmentCode: string; institutionWide: boolean } | null;
 
 export default function ManageUsersPage() {
   const { addToast } = useToast();
@@ -140,8 +128,8 @@ export default function ManageUsersPage() {
 
   return (
     <ProtectedRoute allowed={["admin"]}>
-      <div className="max-w-9xl lg:ml-48 my-10 animate-in fade-in duration-700">
-        <div className="bg-[#F8F9FA] min-h-screen rounded-xl shadow-2xl p-10">
+      <div className="max-w-9xl lg:ml-48 mt-10 animate-in fade-in duration-700">
+        <div className="bg-[#F8F9FA] min-h-screen rounded shadow-2xl p-10">
           <PageHeader
             title="Identity & Access"
             highlightedTitle="Management"
