@@ -832,7 +832,7 @@ export default function StudentRegistrationPage() {
                   onPaste={handleManualPaste}
                   tabIndex={0}
                   className="bg-white rounded-lg border border-green-darkest/5 shadow-sm overflow-hidden mb-8 focus-within:ring-2 focus-within:ring-yellow-gold/20 transition-all outline-none"
-                  className="bg-white rounded-lg shadow-sm overflow-hidden mb-10 focus-within:ring-2 focus-within:ring-blue-200 transition-all"
+                  // className="bg-white rounded-lg shadow-sm overflow-hidden mb-10 focus-within:ring-2 focus-within:ring-blue-200 transition-all"
 //           style={{ outline: "none" }}
                 >
                   <table className="w-full">

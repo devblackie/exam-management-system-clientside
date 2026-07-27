@@ -260,9 +260,18 @@ export default function InvoiceTable({ currency }: Props) {
 
   const totalPages = data ? Math.ceil(data.total / 10) : 1;
   const closeAndRefetch = () => { setPayModal(null); setVoidModal(null); setBulkModal(null); setSelected(new Set()); refetch(); };
-  const toggleSelect = (id: string) => {
-    setSelected(prev => { const next = new Set(prev); next.has(id) ? next.delete(id) : next.add(id); return next; });
-  };
+  
+const toggleSelect = (id: string) => {
+  setSelected(prev => {
+    const next = new Set(prev);
+    if (next.has(id)) {
+      next.delete(id);
+    } else {
+      next.add(id);
+    }
+    return next;
+  });
+};
   const selectedInvoices = useMemo(() => data?.invoices.filter(i => selected.has(i.id)) ?? [], [data, selected]);
 
   return (
